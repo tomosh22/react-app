@@ -3,6 +3,7 @@ import {CreateAccount} from "./CreateAccount";
 import {MoveMoney} from "./MoveMoney";
 import {Dashboard} from "./Dashboard";
 import {BrowserRouter as Router, Link, Route} from "react-router-dom";
+import logo from './IMG-STUBANK-LOGO.jpg'
 
 export class Home extends React.Component{
     render(){
@@ -16,6 +17,7 @@ export class Home extends React.Component{
                     <Route path={"/create_account"}> <CreateAccount /> </Route>
                     <Route path={"/move_money"}> <MoveMoney /> </Route>
                 </Router>
+                <img src={logo} alt={"StuBank logo"} height={200} width={200}/>
             </div>
         );
     }
