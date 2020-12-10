@@ -19,7 +19,7 @@ export class CreateAccount extends React.Component{
                         <option value="€">€</option>
                     </select><br></br><br></br>
 
-                    <label htmlFor="accountName">Name:</label><br></br>
+                    <label htmlFor="accountName">Account Name:</label><br></br>
                     <input type="text" id="accountName" name="accountName"></input><br></br><br></br>
 
 

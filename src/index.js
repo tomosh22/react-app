@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link} from "react-router-dom";
 import {SignUp} from "./component/SignUp";
 import {Login} from "./component/Login";
-import {MoveMoney} from "./component/MoveMoney";
+
+import {Home} from "./component/Home"
 
 
 class App extends React.Component{
@@ -25,4 +26,4 @@ class App extends React.Component{
     }
 }
 
-ReactDOM.render(<MoveMoney />, document.getElementById('root'));
+ReactDOM.render(<Home />, document.getElementById('root'));
