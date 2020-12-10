@@ -1,10 +1,11 @@
 import React from "react";
 
-function SignUp(){
-    return(
-        <div>
-            <h1>Sign Up</h1>
-            <form action="SignUp" id="signUpForm" method="post">
+export class SignUp extends React.Component{
+    render(){
+        return (
+            <div>
+                 <h1>Sign Up</h1>
+                 <form action="SignUp" id="signUpForm" method="post">
                     <label htmlFor="username">Username: </label><br></br>
                     <input type="text" id="username" name="username"></input><br></br><br></br>
 
@@ -30,10 +31,9 @@ function SignUp(){
                     <input type="text" id="postcode" name="postcode"></input><br></br><br></br>
 
                     <button type="button" onClick="SignUpUser()" formAction="">Submit</button>
-            </form>
-        </div>
+                 </form>
+            </div>
 
-    );
+        );
+    }
 }
-
-export default SignUp;
