@@ -5,7 +5,7 @@ export class TransferToUser extends React.Component {
         return (
             <div>
                 <br></br>
-                <form action="MoveMoneyToUser" id="moveMoneyToUserForm" method="post">
+                <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post">
 
                     <label htmlFor="accName">Name on Account</label><br></br>
                     <input id="accName" name="accName"></input><br></br><br></br>
