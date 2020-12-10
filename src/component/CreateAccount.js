@@ -22,9 +22,6 @@ export class CreateAccount extends React.Component{
                     <label htmlFor="accountName">Name:</label><br></br>
                     <input type="text" id="accountName" name="accountName"></input><br></br><br></br>
 
-                    <label htmlFor="balance">Balance:</label><br></br>
-                    <input type="number" step="0.01" id="balance" name="balance"></input><br></br><br></br>
-
 
                     <button type="button" onClick="Create()" formAction="">Submit</button>
                 </form>
