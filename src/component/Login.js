@@ -10,6 +10,7 @@ export class Login extends React.Component{
     };
 
     handleChange = event => {
+        // stores what user types in form in React
         this.setState ({[event.target.name] : event.target.value})
     }
 
@@ -19,6 +20,7 @@ export class Login extends React.Component{
     }
 
     validate = event =>{
+        // validates the user's input
        let usernameError = "";
        let passwordError = "";
 
