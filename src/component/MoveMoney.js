@@ -17,7 +17,6 @@ export class MoveMoney extends React.Component{
                 </Router>
             </div>
 
-
         );
     }
 }
