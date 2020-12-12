@@ -1,7 +1,115 @@
+/*
+    To modify all the pages, you need to go into index.html in the public repo and change it manually
+*/
 .btn{
-    color: aqua;
+    color: darkblue;
 }
 
 .label{
     color: cadetblue;
+}
+/*
+    :root defines the main div, inside which all the object are going to be placed,
+    you can double check that by going into the browser, right click and view code
+*/
+:root{
+
+}
+
+:root>*{
+    display: inline;
+}
+
+:root>div{
+    display: inline;
+}
+a,
+a:visited,
+a:active,
+a:link,
+a:hover{
+    font-size: 300%;
+    font-weight: 1000;
+    color: #1a4008;
+    text-decoration: none;
+    margin-left: 0.6%;
+}
+
+.stickyTop{
+    position: sticky;
+    top: 0;
+    background-image: linear-gradient(to bottom right, rgba(0,100,0,0.7), rgba(30,144,255,0.7));
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 10px;
+    border-bottom: darkblue;
+}
+
+.stickyTop div{
+    width: 80%;
+    height: 100%;
+    text-align: right;
+}
+.favicon{
+    margin-left: 1.5%;
+    object-fit: contain;
+    height: 40px;
+}
+
+.navigation{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    background-color: green;
+}
+
+.navigationLinks{
+    float: right;
+    display: inline;
+}
+
+.navLink{
+    margin-inline: 50px;
+    font-size: 60%;
+    font-weight: 600;
+    text-align: start;
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+}
+
+footer{
+    position: absolute;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+    background-color: cadetblue;
+    width: 100%;
+    height: 6%;
+    bottom: 0;
+}
+
+footer p{
+    align-self: start;
+}
+
+footer p + p{
+    margin-left: 40px;
+}
+
+footer p + img{
+    margin-left: 40px;
+}
+
+footer img{
+    align-self: center;
+    object-fit: contain;
+    height: 70%;
+}
+
+form{
+    margin-left: 5px;
 }
