@@ -3,9 +3,12 @@ import {CreateAccount} from "./CreateAccount";
 import {MoveMoney} from "./MoveMoney";
 import {Dashboard} from "./Dashboard";
 import {BrowserRouter as Router, Link, Route} from "react-router-dom";
-import logo from '../assets/IMG-STUBANK-LOGO.jpg';
-import favicon from '../assets/favicon.ico';
-import style from "../Style/newStyles.module.css";
+import favicon from '../assets/images/favicon.ico';
+import style from "../assets/css/homePageStyle.module.css";
+import {Login} from "./Login";
+import {SignUp} from "./SignUp";
+import {TransferToAccount} from "./TransferToAccount";
+import {Welcome} from "./Welcome";
 
 export class Home extends React.Component{
     render(){
@@ -20,15 +23,19 @@ export class Home extends React.Component{
                             </div>
                             <nav>
                                 <Link to={"/dashboard"}><button className={style.nav_link}>Dashboard</button></Link>
-                                <Link to={"/create_account"}><button className={style.nav_link}>Create account</button></Link>
                                 <Link to={"/move_money"}><button className={style.nav_link}>Move Money</button></Link>
+                                <Link to={"/login"}><button className={style.nav_link}>Log in</button></Link>
                             </nav>
                         </div>
                     </div>
                 </header>
                 <div>
                     <Route path={"/dashboard"}> <Dashboard /> </Route>
+                    <Route path={"/"} exact> <Welcome /> </Route>
+                    <Route path={"/login"}> <Login /> </Route>
                     <Route path={"/create_account"}> <CreateAccount /> </Route>
+                    <Route path={"/register"}> <SignUp /> </Route>
+                    <Route path={"/transfer"}> <TransferToAccount /> </Route>
                     <Route path={"/move_money"}> <MoveMoney /> </Route>
                 </div>
             </Router>
