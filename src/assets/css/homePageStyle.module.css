@@ -1,0 +1,114 @@
+
+body{
+    margin: 0;
+    font-size: 15px;
+    color: #333
+}
+
+/*
+    root is the main div, so we style it as container
+*/
+:root,
+ .container{
+     width: 100%;
+     max-width: 1200px;
+     margin: 0 auto;
+ }
+
+
+/* Style link in a way they do not change depending on the state */
+a,
+a:visited,
+a:active,
+a:link,
+a:hover{
+    font-size: 300%;
+    font-weight: 1000;
+    color: #1a4008;
+    text-decoration: none;
+    margin-left: 0.6%;
+}
+
+/* Navigation bar */
+nav{
+    font-size: 14px;
+    text-transform: uppercase;
+    display: inline-flex;
+}
+
+.nav_link{
+    display: inline-block;
+    vertical-align: center;
+    position: relative;
+
+    margin: 0 10px;
+    font-size: 40%;
+    font-weight: 600;
+
+    background-color: Transparent;
+    transition: color .1s linear;
+    background-repeat:no-repeat;
+
+    outline:none;
+    border: none;
+    white-space: nowrap;
+}
+
+.nav_link:hover{
+    color: darkslategray;
+    border-width: 0;
+}
+
+.nav_link:after{
+    content: "";
+    width: 100%;
+    height: 3px;
+    display: block;
+
+    background-color: darkslategray;
+
+    top: 100%;
+    left: 0;
+    z-index: 1;
+    position: absolute;
+
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+
+.nav_link:hover:after{
+    opacity: 1;
+}
+
+/* Header*/
+header{
+    position: relative;
+
+    color: #78bc55;
+    width: 100%;
+    height: 7vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+
+    border-bottom: 2px solid currentColor;
+}
+
+.header_inner{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 7px;
+}
+
+.logo{
+    display: inline-flex;
+}
+
+.favicon{
+    margin-left: 1.5%;
+    object-fit: contain;
+    height: 40px;
+}
