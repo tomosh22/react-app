@@ -59,32 +59,32 @@ export class TransferToUser extends React.Component {
     render() {
         return (
             <div>
-                <br></br>
+                <br/>
                 <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
 
-                    <label htmlFor="accName">Name on Account</label><br></br>
-                    <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.accNameError}</div><br></br>
+                    <label htmlFor="accName">Name on Account</label><br/>
+                    <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
 
-                    <label htmlFor="accNumber">Account Number</label><br></br>
+                    <label htmlFor="accNumber">Account Number</label><br/>
                     <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.accNumberError}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
 
-                    <label htmlFor="sortCode">Sort Code</label><br></br>
+                    <label htmlFor="sortCode">Sort Code</label><br/>
                     <input id="sortCode" name="sortCode" value={this.state.sortCode}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.sortCodeError}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/>
 
-                    <label htmlFor="amount">Amount</label><br></br>
+                    <label htmlFor="amount">Amount</label><br/>
                     <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
                         <option value="£">£</option>
                         <option value="$">$</option>
                         <option value="€">€</option>
                     </select>
                     <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.amountError}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.amountError}</div><br/>
 
                     <button type="submit">Send Money</button>
 

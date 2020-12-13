@@ -35,24 +35,24 @@ export class CreateAccount extends React.Component{
             <div>
                 <h1>Create Account</h1>
                 <form action="CreateAccount" id="createAccountForm" method="post" onSubmit={this.handleSubmit}>
-                    <label htmlFor="type">Type:</label><br></br>
+                    <label htmlFor="type">Type:</label><br/>
                     <select id="type" name="type" value={this.state.type} onChange={this.handleChange}>
                         <option value="current">Current</option>
                         <option value="savings">Savings</option>
-                    </select><br></br><br></br>
+                    </select><br/><br/>
 
 
-                    <label htmlFor="currency">Currency:</label><br></br>
+                    <label htmlFor="currency">Currency:</label><br/>
                     <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
                         <option value="£">£</option>
                         <option value="$">$</option>
                         <option value="€">€</option>
-                    </select><br></br><br></br>
+                    </select><br/><br/>
 
-                    <label htmlFor="accountName">Account Name:</label><br></br>
+                    <label htmlFor="accountName">Account Name:</label><br/>
                     <input type="text" id="accountName" name="accountName" value={this.state.username}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.accountNameError}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.accountNameError}</div><br/>
 
                     <button type="submit" >Submit</button>
                 </form>
