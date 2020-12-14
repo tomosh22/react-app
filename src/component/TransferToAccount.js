@@ -1,6 +1,5 @@
 import React from "react";
 import {BrowserRouter as Router, Link, Route} from "react-router-dom";
-import {TransferToUser} from "./TransferToUser";
 
 export class TransferToAccount extends React.Component {
 
@@ -14,8 +13,11 @@ export class TransferToAccount extends React.Component {
         accountToError: "",
         amountError: "",
 
-        userAccounts: ["My Saving Account", "My Current Account"]
+        userAccounts: ["My Saving Account", "My Current Account"],
         //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
+
+        valid: false
+        //States whether the user's input is valid or not
     };
 
 
@@ -34,6 +36,7 @@ export class TransferToAccount extends React.Component {
         let accountFromError ="";
         let accountToError="";
         let amountError = "";
+        let valid = false;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
         if (!this.state.accountTo){
@@ -48,7 +51,11 @@ export class TransferToAccount extends React.Component {
             amountError = "Amount must be valid"
         }
 
-        this.setState({accountFromError, accountToError, amountError})
+        if (!accountToError && !accountFromError && !amountError){
+            valid = true;
+        }
+
+        this.setState({accountFromError, accountToError, amountError, valid})
     }
 
     render() {

@@ -18,8 +18,11 @@ export class TransferToUser extends React.Component {
         amountError: "",
         referenceError: "",
 
-        userAccounts: ["My Saving Account", "My Current Account"]
+        userAccounts: ["My Saving Account", "My Current Account"],
         //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
+
+        valid: false
+        //States whether the user's input is valid or not
     };
 
     handleChange = event => {
@@ -40,6 +43,7 @@ export class TransferToUser extends React.Component {
         let sortCodeError ="";
         let amountError = "";
         let referenceError = "";
+        let valid = false;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
         const sortCodeRegex = new RegExp("^[0-9]{2}-[0-9]{2}-[0-9]{2}")
 
@@ -68,7 +72,12 @@ export class TransferToUser extends React.Component {
             referenceError = "Reference is required"
         }
 
-        this.setState({accFromError,accNameError, accNumberError,sortCodeError, amountError, referenceError})
+        if (!accFromError && !accNameError && !accNumberError && !sortCodeError && !amountError && !referenceError){
+            valid = true;
+        }
+
+        this.setState({accFromError,accNameError, accNumberError,sortCodeError, amountError, referenceError,
+            valid})
     }
 
 
