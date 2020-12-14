@@ -1,4 +1,5 @@
 import React from "react";
+import {BrowserRouter as Router, Link, Route} from "react-router-dom";
 
 export class TransferToUser extends React.Component {
     state ={
@@ -16,6 +17,9 @@ export class TransferToUser extends React.Component {
         sortCodeError: "",
         amountError: "",
         referenceError: "",
+
+        userAccounts: ["My Saving Account", "My Current Account"]
+        //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
     };
 
     handleChange = event => {
@@ -39,7 +43,7 @@ export class TransferToUser extends React.Component {
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
         const sortCodeRegex = new RegExp("^[0-9]{2}-[0-9]{2}-[0-9]{2}")
 
-        if (!this.state.accountFrom){
+        if (!this.state.accFrom){
             accFromError = "Account name is required"
         }
         if (!this.state.accName){
@@ -74,10 +78,16 @@ export class TransferToUser extends React.Component {
                 <br/>
                 <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
 
-                    <label htmlFor="accountFrom">From:</label><br></br>
-                    <input id="accFrom" name="accFrom" placeholder={"Choose an account"}
-                           value={this.state.accFrom} onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.accFromError}</div><br></br>
+                    <label htmlFor="accountFrom">From:</label><br/>
+                    <select id="accFrom" name="accFrom"  value={this.state.accFrom} onChange={this.handleChange}>
+                        <option value="" disabled selected>Choose an account</option>
+                        {this.state.userAccounts.map(list =>(
+                            <option key={list} value={list}>
+                                {list}
+                            </option>
+                        )) }
+                    </select>
+                    <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
 
                     <div>To:</div>
                     <label htmlFor="accName">Name on Account</label><br/>
@@ -91,7 +101,7 @@ export class TransferToUser extends React.Component {
 
                     <label htmlFor="sortCode">Sort Code</label><br/>
                     <input id="sortCode" name="sortCode" value={this.state.sortCode}
-                            onChange={this.handleChange}/>
+                           onChange={this.handleChange}/>
                     <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/><br/>
 
                     <label htmlFor="amount">Amount</label><br/>
@@ -108,7 +118,6 @@ export class TransferToUser extends React.Component {
                     <input id="reference" name="reference" value={this.state.reference}
                            onChange={this.handleChange}/>
                     <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
-
 
                     <button type="submit">Send Money</button>
 

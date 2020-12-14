@@ -1,4 +1,6 @@
 import React from "react";
+import {BrowserRouter as Router, Link, Route} from "react-router-dom";
+import {TransferToUser} from "./TransferToUser";
 
 export class TransferToAccount extends React.Component {
 
@@ -11,6 +13,9 @@ export class TransferToAccount extends React.Component {
         accountFromError: "",
         accountToError: "",
         amountError: "",
+
+        userAccounts: ["My Saving Account", "My Current Account"]
+        //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
     };
 
 
@@ -54,14 +59,27 @@ export class TransferToAccount extends React.Component {
                 <form action="TransferMoneyToAccount" id="TransferMoneyToAccountForm" method="post" onSubmit={this.handleSubmit}>
 
                     <label htmlFor="accountFrom">From:</label><br></br>
-                    <input id="accountFrom" name="accountFrom" placeholder={"Choose an account"}
-                           value={this.state.accountFrom} onChange={this.handleChange}></input>
-
+                    <select id="accountFrom" name="accountFrom"  value={this.state.accountFrom}
+                            onChange={this.handleChange}>
+                        <option value="" disabled selected>Choose an account</option>
+                        {this.state.userAccounts.map(list =>(
+                            <option key={list} value={list}>
+                                {list}
+                            </option>
+                        )) }
+                    </select>
                     <div style={{color:"red"}}>{this.state.accountFromError}</div><br></br>
 
                     <label htmlFor="accountTo">To:</label><br></br>
-                    <input id="accountTo" name="accountTo" placeholder={"Choose an account"}
-                           value={this.state.accountTo} onChange={this.handleChange}></input>
+                    <select id="accountTo" name="accountTo"  value={this.state.accountTo}
+                            onChange={this.handleChange}>
+                        <option value="" disabled selected>Choose an account</option>
+                        {this.state.userAccounts.map(list =>(
+                            <option key={list} value={list}>
+                                {list}
+                            </option>
+                        )) }
+                    </select>
                     <div style={{color:"red"}}>{this.state.accountToError}</div><br></br>
 
                     <label htmlFor="amount">Amount</label><br></br>
