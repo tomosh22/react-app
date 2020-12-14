@@ -2,7 +2,8 @@
 body{
     margin: 0;
     font-size: 15px;
-    color: #333
+    color: #333;
+    font-family: "Tahoma";
 }
 
 /*
@@ -111,4 +112,12 @@ header{
     margin-left: 1.5%;
     object-fit: contain;
     height: 40px;
+}
+.main{
+    position: absolute;
+    left: 33.33%;
+    width:33.33%;
+    text-align:center;
+    background: #78bc55;
+    border-radius: 0 0 50px 50px;
 }
