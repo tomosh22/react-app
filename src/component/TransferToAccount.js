@@ -3,13 +3,16 @@ import React from "react";
 export class TransferToAccount extends React.Component {
 
     state ={
-        accountName: "",
+        accountFrom: "",
+        accountTo: "",
         currency: "£",
         //Set default value as will not update if user does not select a different option to the default option
         amount: "",
-        accountNameError: "",
+        accountFromError: "",
+        accountToError: "",
         amountError: "",
     };
+
 
     handleChange = event => {
         // stores what user types in form in React
@@ -23,12 +26,16 @@ export class TransferToAccount extends React.Component {
 
     validate = event =>{
         // validates the user's input
-        let accountNameError ="";
+        let accountFromError ="";
+        let accountToError="";
         let amountError = "";
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
-        if (!this.state.accountName){
-            accountNameError = "Account name is required"
+        if (!this.state.accountTo){
+            accountToError = "Account name is required"
+        }
+        if (!this.state.accountFrom){
+            accountFromError = "Account name is required"
         }
         if (!this.state.amount){
             amountError = "Amount is required"
@@ -36,7 +43,7 @@ export class TransferToAccount extends React.Component {
             amountError = "Amount must be valid"
         }
 
-        this.setState({accountNameError, amountError})
+        this.setState({accountFromError, accountToError, amountError})
     }
 
     render() {
@@ -46,10 +53,16 @@ export class TransferToAccount extends React.Component {
 
                 <form action="TransferMoneyToAccount" id="TransferMoneyToAccountForm" method="post" onSubmit={this.handleSubmit}>
 
-                    <label htmlFor="accountName">Account Name</label><br></br>
-                    <input id="accountName" name="accountName" value={this.state.accountName}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.accountNameError}</div><br></br>
+                    <label htmlFor="accountFrom">From:</label><br></br>
+                    <input id="accountFrom" name="accountFrom" placeholder={"Choose an account"}
+                           value={this.state.accountFrom} onChange={this.handleChange}></input>
+
+                    <div style={{color:"red"}}>{this.state.accountFromError}</div><br></br>
+
+                    <label htmlFor="accountTo">To:</label><br></br>
+                    <input id="accountTo" name="accountTo" placeholder={"Choose an account"}
+                           value={this.state.accountTo} onChange={this.handleChange}></input>
+                    <div style={{color:"red"}}>{this.state.accountToError}</div><br></br>
 
                     <label htmlFor="amount">Amount</label><br></br>
                     <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
