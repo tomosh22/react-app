@@ -1,5 +1,6 @@
 import React from "react";
 import {BrowserRouter as Router, Link, Route} from "react-router-dom";
+import {TransferToUserConfirm} from "./TransferToUserConfirm";
 
 export class TransferToUser extends React.Component {
     state ={
@@ -131,6 +132,7 @@ export class TransferToUser extends React.Component {
                     <button type="submit">Send Money</button>
 
                 </form>
+
             </div>
         )
     };
