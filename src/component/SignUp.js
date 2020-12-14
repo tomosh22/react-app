@@ -89,45 +89,45 @@ export class SignUp extends React.Component{
             <div>
                  <h1>Sign Up</h1>
                  <form action="SignUp" id="signUpForm" method="post" onSubmit={this.handleSubmit}>
-                    <label htmlFor="username">Username: </label><br></br>
+                    <label htmlFor="username">Username: </label><br/>
                     <input type="text" id="username" name="username" value={this.state.username}
-                           onChange={this.handleChange}></input>
-                     <div style={{color:"red"}}>{this.state.usernameError}</div><br></br>
+    onChange={this.handleChange}/>
+                     <div style={{color:"red"}}>{this.state.usernameError}</div><br/>
 
-                    <label htmlFor="password">Password: </label><br></br>
+                    <label htmlFor="password">Password: </label><br/>
                     <input type="password" id="password" name="password" value={this.state.password}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.passwordError}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
 
-                    <label htmlFor="email">Email: </label><br></br>
+                    <label htmlFor="email">Email: </label><br/>
                     <input type="text" id="email" name="email" value={this.state.email}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.emailError}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.emailError}</div><br/>
 
-                    <label htmlFor="firstName">First Name: </label><br></br>
+                    <label htmlFor="firstName">First Name: </label><br/>
                     <input type="text" id="firstName" name="firstName" value={this.state.firstName}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.firstNameError}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.firstNameError}</div><br/>
 
-                    <label htmlFor="lastName">Last Name: </label><br></br>
+                    <label htmlFor="lastName">Last Name: </label><br/>
                     <input type="text" id="lastName" name="lastName" value={this.state.lastName}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.lastNameError}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.lastNameError}</div><br/>
 
-                    <label htmlFor="address1">Address Line 1: </label><br></br>
+                    <label htmlFor="address1">Address Line 1: </label><br/>
                     <input type="text" id="address1" name="address1" value={this.state.address1}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.address1Error}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.address1Error}</div><br/>
 
-                    <label htmlFor="address2">Address Line 2: </label><br></br>
+                    <label htmlFor="address2">Address Line 2: </label><br/>
                     <input type="text" id="address2" name="address2" value={this.state.address2}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.address2Error}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.address2Error}</div><br/>
 
-                    <label htmlFor="postcode">Postcode: </label><br></br>
+                    <label htmlFor="postcode">Postcode: </label><br/>
                     <input type="text" id="postcode" name="postcode" value={this.state.postcode}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.postcodeError}</div><br></br>
+    onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.postcodeError}</div><br/>
 
                     <button type="submit">Submit</button>
                  </form>

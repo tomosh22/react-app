@@ -1,6 +1,11 @@
-# Getting Started with Create React App
+# Installation
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+* Install **yarn**. Follow instructions on the (would recommend using *Chocolatey*) https://classic.yarnpkg.com/en/docs/install/#windows-stable
+* Clone project.
+* Run `yarn install` to install all needed dependencies.
+* To exit application enter the terminal ant hit `ctrl + c` following with `y`
+* (**Running locally**) Access built web application on the [http://localhost:3000](http://localhost:3000/)
+* (**Running remotely**) Not accessible yet.
 
 ## Available Scripts
 

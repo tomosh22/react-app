@@ -40,15 +40,14 @@ export class Login extends React.Component{
                 <h1>Login</h1>
                 <form action="Login" id="LoginForm" method="post" onSubmit={this.handleSubmit}>
 
-                    <label htmlFor="username">Username: </label><br></br>
-                    <input type="text" id="username" name="username" value={this.state.username}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.usernameError}</div><br></br>
+                    <label htmlFor="username">Username: </label><br/>
+                    <input type="text" id="username" name="username" value={this.state.username} onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.usernameError}</div><br/>
 
-                    <label htmlFor="password">Password: </label><br></br>
+                    <label htmlFor="password">Password: </label><br/>
                     <input type="password" id="password" name="password" value={this.state.password}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.passwordError}</div><br></br>
+                           onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
 
                     <button type="submit">Submit</button>
                 </form>
