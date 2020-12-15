@@ -58,6 +58,11 @@ export class TransferToAccount extends React.Component {
         this.setState({accountFromError, accountToError, amountError, valid})
     }
 
+    ChangeDetails = event =>{
+        let valid = false;
+        this.setState({valid})
+    }
+
     render() {
         if (!this.state.valid) {return (
             <div>
@@ -110,7 +115,7 @@ export class TransferToAccount extends React.Component {
                 <p>To: <b>{this.state.accountTo}</b></p>
                 <p>Amount: <b>{this.props.currency}{this.state.amount}</b></p>
                 <button type="submit">Authorise payment</button><br />
-                <button type="submit">Change details</button>
+                <button type="button" onClick={this.ChangeDetails}>Change details</button>
             </div>
         )}
     }
