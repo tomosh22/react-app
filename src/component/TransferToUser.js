@@ -145,7 +145,7 @@ export class TransferToUser extends React.Component {
                 <p>From: <b>{this.state.accFrom}</b></p>
                 <p>Payee: <b>{this.state.accName}</b></p>
                 <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
-                <p>Amount: <b>{this.props.currency}{this.state.amount}</b></p>
+                <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                 <p>Reference: <b>{this.state.reference}</b></p>
                 <button type="submit">Authorise payment</button><br />
                 <button type="button" onClick={this.ChangeDetails}>Change details</button>

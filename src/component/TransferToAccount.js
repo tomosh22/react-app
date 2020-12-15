@@ -113,7 +113,7 @@ export class TransferToAccount extends React.Component {
                 <h1>Review Details</h1>
                 <p>From: <b>{this.state.accountFrom}</b></p>
                 <p>To: <b>{this.state.accountTo}</b></p>
-                <p>Amount: <b>{this.props.currency}{this.state.amount}</b></p>
+                <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                 <button type="submit">Authorise payment</button><br />
                 <button type="button" onClick={this.ChangeDetails}>Change details</button>
             </div>
