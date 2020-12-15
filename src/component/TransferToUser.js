@@ -1,6 +1,5 @@
 import React from "react";
 import {BrowserRouter as Router, Link, Route} from "react-router-dom";
-import {TransferToUserConfirm} from "./TransferToUserConfirm";
 
 export class TransferToUser extends React.Component {
     state ={
@@ -83,7 +82,7 @@ export class TransferToUser extends React.Component {
 
 
     render() {
-        return (
+        if (!this.state.valid) {return (
             <div>
                 <br/>
                 <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
@@ -134,6 +133,18 @@ export class TransferToUser extends React.Component {
                 </form>
 
             </div>
-        )
+        )}
+        else {return(
+            <div>
+                <h1>Review Details</h1>
+                <p>From: <b>{this.state.accFrom}</b></p>
+                <p>Payee: <b>{this.state.accName}</b></p>
+                <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
+                <p>Amount: <b>{this.props.currency}{this.state.amount}</b></p>
+                <p>Reference: <b>{this.state.reference}</b></p>
+                <button type="submit">Authorise payment</button><br />
+                <button type="submit">Change details</button>
+            </div>
+        )}
     };
 }

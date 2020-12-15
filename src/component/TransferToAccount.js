@@ -59,7 +59,7 @@ export class TransferToAccount extends React.Component {
     }
 
     render() {
-        return (
+        if (!this.state.valid) {return (
             <div>
                 <br></br>
 
@@ -102,6 +102,16 @@ export class TransferToAccount extends React.Component {
                     <button type="submit" >Send Money</button>
                 </form>
             </div>
-        )
+        )}
+        else{return(
+            <div>
+                <h1>Review Details</h1>
+                <p>From: <b>{this.state.accountFrom}</b></p>
+                <p>To: <b>{this.state.accountTo}</b></p>
+                <p>Amount: <b>{this.props.currency}{this.state.amount}</b></p>
+                <button type="submit">Authorise payment</button><br />
+                <button type="submit">Change details</button>
+            </div>
+        )}
     }
 }
