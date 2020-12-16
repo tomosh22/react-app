@@ -1,17 +1,28 @@
 import React from "react";
+import {BrowserRouter as Router, Link, Route} from "react-router-dom";
 
 export class TransferToUser extends React.Component {
     state ={
+        accFrom: "",
         accName: "",
         accNumber: "",
         sortCode: "",
         currency: "£",
         //Set default value as will not update if user does not select a different option to the default option
         amount: "",
+        reference: "",
+        accFromError: "",
         accNameError: "",
         accNumberError: "",
         sortCodeError: "",
         amountError: "",
+        referenceError: "",
+
+        userAccounts: ["My Saving Account", "My Current Account"],
+        //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
+
+        valid: false
+        //States whether the user's input is valid or not
     };
 
     handleChange = event => {
@@ -26,13 +37,19 @@ export class TransferToUser extends React.Component {
 
     validate = event =>{
         // validates the user's input
+        let accFromError="";
         let accNameError ="";
         let accNumberError ="";
         let sortCodeError ="";
         let amountError = "";
+        let referenceError = "";
+        let valid = false;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
         const sortCodeRegex = new RegExp("^[0-9]{2}-[0-9]{2}-[0-9]{2}")
 
+        if (!this.state.accFrom){
+            accFromError = "Account name is required"
+        }
         if (!this.state.accName){
             accNameError = "Account name is required"
         }
@@ -51,30 +68,55 @@ export class TransferToUser extends React.Component {
         }else if(!(amountRegex.test(this.state.amount))) {
             amountError = "Amount must be valid"
         }
+        if (!this.state.reference){
+            referenceError = "Reference is required"
+        }
 
-        this.setState({accNameError, accNumberError,sortCodeError, amountError})
+        if (!accFromError && !accNameError && !accNumberError && !sortCodeError && !amountError && !referenceError){
+            valid = true;
+        }
+
+        this.setState({accFromError,accNameError, accNumberError,sortCodeError, amountError, referenceError,
+            valid})
+    }
+
+    ChangeDetails = event =>{
+        let valid = false;
+        this.setState({valid})
     }
 
 
     render() {
-        return (
+        if (!this.state.valid) {return (
             <div>
                 <br/>
                 <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
 
+                    <label htmlFor="accountFrom">From:</label><br/>
+                    <select id="accFrom" name="accFrom"  value={this.state.accFrom} onChange={this.handleChange}>
+                        <option value="" disabled selected>Choose an account</option>
+                        {this.state.userAccounts.map(list =>(
+                            <option key={list} value={list}>
+                                {list}
+                            </option>
+                        )) }
+                    </select>
+                    <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
+
+                    <div>To:</div>
                     <label htmlFor="accName">Name on Account</label><br/>
                     <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
                     <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
 
                     <label htmlFor="accNumber">Account Number</label><br/>
                     <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
-    onChange={this.handleChange}/>
+                           onChange={this.handleChange}/>
                     <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
 
                     <label htmlFor="sortCode">Sort Code</label><br/>
                     <input id="sortCode" name="sortCode" value={this.state.sortCode}
-    onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/>
+                           onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/><br/>
 
                     <label htmlFor="amount">Amount</label><br/>
                     <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
@@ -83,13 +125,31 @@ export class TransferToUser extends React.Component {
                         <option value="€">€</option>
                     </select>
                     <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
-    onChange={this.handleChange}/>
+                           onChange={this.handleChange}/>
                     <div style={{color:"red"}}>{this.state.amountError}</div><br/>
+
+                    <label htmlFor="reference">Reference</label><br/>
+                    <input id="reference" name="reference" value={this.state.reference}
+                           onChange={this.handleChange}/>
+                    <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
                     <button type="submit">Send Money</button>
 
                 </form>
+
             </div>
-        )
+        )}
+        else {return(
+            <div>
+                <h1>Review Details</h1>
+                <p>From: <b>{this.state.accFrom}</b></p>
+                <p>Payee: <b>{this.state.accName}</b></p>
+                <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
+                <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
+                <p>Reference: <b>{this.state.reference}</b></p>
+                <button type="submit">Authorise payment</button><br />
+                <button type="button" onClick={this.ChangeDetails}>Change details</button>
+            </div>
+        )}
     };
 }

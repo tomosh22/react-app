@@ -1,15 +1,25 @@
 import React from "react";
+import {BrowserRouter as Router, Link, Route} from "react-router-dom";
 
 export class TransferToAccount extends React.Component {
 
     state ={
-        accountName: "",
+        accountFrom: "",
+        accountTo: "",
         currency: "£",
         //Set default value as will not update if user does not select a different option to the default option
         amount: "",
-        accountNameError: "",
+        accountFromError: "",
+        accountToError: "",
         amountError: "",
+
+        userAccounts: ["My Saving Account", "My Current Account"],
+        //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
+
+        valid: false
+        //States whether the user's input is valid or not
     };
+
 
     handleChange = event => {
         // stores what user types in form in React
@@ -23,12 +33,17 @@ export class TransferToAccount extends React.Component {
 
     validate = event =>{
         // validates the user's input
-        let accountNameError ="";
+        let accountFromError ="";
+        let accountToError="";
         let amountError = "";
+        let valid = false;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
-        if (!this.state.accountName){
-            accountNameError = "Account name is required"
+        if (!this.state.accountTo){
+            accountToError = "Account name is required"
+        }
+        if (!this.state.accountFrom){
+            accountFromError = "Account name is required"
         }
         if (!this.state.amount){
             amountError = "Amount is required"
@@ -36,20 +51,48 @@ export class TransferToAccount extends React.Component {
             amountError = "Amount must be valid"
         }
 
-        this.setState({accountNameError, amountError})
+        if (!accountToError && !accountFromError && !amountError){
+            valid = true;
+        }
+
+        this.setState({accountFromError, accountToError, amountError, valid})
+    }
+
+    ChangeDetails = event =>{
+        let valid = false;
+        this.setState({valid})
     }
 
     render() {
-        return (
+        if (!this.state.valid) {return (
             <div>
                 <br></br>
 
                 <form action="TransferMoneyToAccount" id="TransferMoneyToAccountForm" method="post" onSubmit={this.handleSubmit}>
 
-                    <label htmlFor="accountName">Account Name</label><br></br>
-                    <input id="accountName" name="accountName" value={this.state.accountName}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.accountNameError}</div><br></br>
+                    <label htmlFor="accountFrom">From:</label><br></br>
+                    <select id="accountFrom" name="accountFrom"  value={this.state.accountFrom}
+                            onChange={this.handleChange}>
+                        <option value="" disabled selected>Choose an account</option>
+                        {this.state.userAccounts.map(list =>(
+                            <option key={list} value={list}>
+                                {list}
+                            </option>
+                        )) }
+                    </select>
+                    <div style={{color:"red"}}>{this.state.accountFromError}</div><br></br>
+
+                    <label htmlFor="accountTo">To:</label><br></br>
+                    <select id="accountTo" name="accountTo"  value={this.state.accountTo}
+                            onChange={this.handleChange}>
+                        <option value="" disabled selected>Choose an account</option>
+                        {this.state.userAccounts.map(list =>(
+                            <option key={list} value={list}>
+                                {list}
+                            </option>
+                        )) }
+                    </select>
+                    <div style={{color:"red"}}>{this.state.accountToError}</div><br></br>
 
                     <label htmlFor="amount">Amount</label><br></br>
                     <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
@@ -64,6 +107,16 @@ export class TransferToAccount extends React.Component {
                     <button type="submit" >Send Money</button>
                 </form>
             </div>
-        )
+        )}
+        else{return(
+            <div>
+                <h1>Review Details</h1>
+                <p>From: <b>{this.state.accountFrom}</b></p>
+                <p>To: <b>{this.state.accountTo}</b></p>
+                <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
+                <button type="submit">Authorise payment</button><br />
+                <button type="button" onClick={this.ChangeDetails}>Change details</button>
+            </div>
+        )}
     }
 }
