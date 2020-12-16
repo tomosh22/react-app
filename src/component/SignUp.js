@@ -1,4 +1,5 @@
 import React from "react";
+const crypto = require("crypto");
 
 export class SignUp extends React.Component{
 
@@ -26,10 +27,46 @@ export class SignUp extends React.Component{
         this.setState ({[event.target.name] : event.target.value})
     }
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
         // validates the user's input
         event.preventDefault();
-        this.validate();
+        //this.validate();
+        if (
+            this.state.usernameError === "" &&
+            this.state.passwordError === "" &&
+            this.state.emailError === "" &&
+            this.state.firstNameError === "" &&
+            this.state.lastNameError === "" &&
+            this.state.address1Error === "" &&
+            this.state.address2Error === "" &&
+            this.state.postcodeError === ""
+        ) {
+            //generate salt and hashed password
+            var salt = crypto.randomBytes(16);
+            var hash = crypto.createHmac("sha512", salt)
+            hash.update(this.state.password + salt)
+            hash = hash.digest("hex")
+            console.log(salt, hash)
+            var AddressId = -1;
+            await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.postcode, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {if(data[0]){ AddressId = data[0].AddressId}})
+            if (AddressId === -1){
+                await fetch("http://localhost:3000/insertAddress/"+this.state.address1+"/"+this.state.address2+"/"+this.state.postcode,
+                    {
+                        method:"POST"
+                    })
+                await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.postcode, {
+                    method: "GET"
+                }).then(response => response.json()).then(data => AddressId = data[0].AddressId)
+            }
+            await fetch("http://localhost:3000/insertUser/"+this.state.username+"/"+hash+"/"+salt+"/"+this.state.firstName+"/"+this.state.lastName+"/"+this.state.email+"/"+AddressId,
+                {
+                    method:"POST"
+                })
+
+
+        }
     }
 
     validate = event =>{
