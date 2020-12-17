@@ -76,15 +76,14 @@ export class TransferToAccount extends React.Component {
     ProcessPayment = async event =>{
         //CODE TO CHECK USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0;
-        await fetch("http://localhost:3000/getUserBalance/",
-            + this.props.state.username + "/" + this.state.accountFrom,
+        await fetch("http://localhost:3000/getUserBalance/", + this.state.accountFrom,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => balance = data[0].balance)
         if (balance>this.state.amount){
             //CODE TO PROCESS TRANSACTION
             await fetch("http://localhost:3000/insertTransaction/",
-                + this.props.state.username + "/" + this.state.accountFrom + "/" + this.state.accountTo + "/" +
+                + this.state.accountFrom + "/" + this.state.accountTo + "/" +
                 this.state.currency + "/" + this.state.amount,
                 {
                     method:"POST"
@@ -143,7 +142,7 @@ export class TransferToAccount extends React.Component {
                 <p>From: <b>{this.state.accountFrom}</b></p>
                 <p>To: <b>{this.state.accountTo}</b></p>
                 <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
-                <button type="submit">Authorise payment</button><br />
+                <button type="button" onClick={this.ProcessPayment}>Authorise payment</button><br />
                 <button type="button" onClick={this.ChangeDetails}>Change details</button>
             </div>
         )}

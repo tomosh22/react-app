@@ -12,6 +12,7 @@ export class TransferToUser extends React.Component {
         amount: "",
         reference: "",
         accFromError: "",
+        accToError:"",
         accNameError: "",
         accNumberError: "",
         sortCodeError: "",
@@ -20,8 +21,11 @@ export class TransferToUser extends React.Component {
 
         userAccounts: ["Saving account", "Current account"],
 
-        valid: false
+        valid: false,
         //States whether the user's input is valid or not
+        NewPayee: false
+        //States whether user is entering a new payee
+
     };
 
     handleChange = event => {
@@ -31,24 +35,51 @@ export class TransferToUser extends React.Component {
 
     handleSubmit = event => {
         event.preventDefault();
-        this.validate();
+        if (!this.state.NewPayee){this.validateTransaction()}
+        else{this.validateNewPayee()}
     }
 
-    validate = event =>{
-        // validates the user's input
+    validateTransaction = event =>{
+        // validates the user's input for transaction form
         let accFromError="";
-        let accNameError ="";
-        let accNumberError ="";
-        let sortCodeError ="";
+        let accToError="";
         let amountError = "";
         let referenceError = "";
         let valid = false;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
-        const sortCodeRegex = new RegExp("^[0-9]{2}-[0-9]{2}-[0-9]{2}")
 
         if (!this.state.accFrom){
             accFromError = "Account name is required"
         }
+        if (!this.state.accName &&!this.state.accNumber && !this.state.sortCode){
+            accToError = "Payee Details are required"
+        }
+
+        if (!this.state.amount){
+            amountError = "Amount is required"
+        }else if(!(amountRegex.test(this.state.amount))) {
+            amountError = "Amount must be valid"
+        }
+        if (!this.state.reference){
+            referenceError = "Reference is required"
+        }
+
+        if (!accFromError && !accToError && !amountError && !referenceError){
+            valid = true;
+        }
+
+        this.setState({accFromError,accToError, amountError, referenceError, valid})
+    }
+
+    validateNewPayee = event =>{
+        // validates the user's input for new payee
+        let accNameError ="";
+        let accNumberError ="";
+        let sortCodeError ="";
+        let NewPayee = true;
+
+        const sortCodeRegex = new RegExp("^[0-9]{2}-[0-9]{2}-[0-9]{2}")
+
         if (!this.state.accName){
             accNameError = "Account name is required"
         }
@@ -62,26 +93,23 @@ export class TransferToUser extends React.Component {
             sortCodeError = "Sort code must be in format xx-xx-xx"
         }
 
-        if (!this.state.amount){
-            amountError = "Amount is required"
-        }else if(!(amountRegex.test(this.state.amount))) {
-            amountError = "Amount must be valid"
-        }
-        if (!this.state.reference){
-            referenceError = "Reference is required"
+
+        if (!accNameError && !accNumberError && !sortCodeError ){
+            NewPayee = false;
         }
 
-        if (!accFromError && !accNameError && !accNumberError && !sortCodeError && !amountError && !referenceError){
-            valid = true;
-        }
-
-        this.setState({accFromError,accNameError, accNumberError,sortCodeError, amountError, referenceError,
-            valid})
+        this.setState({accNameError, accNumberError,sortCodeError, NewPayee})
     }
+
 
     ChangeDetails = event =>{
         let valid = false;
         this.setState({valid})
+    }
+
+    AddNewPayee =  event =>{
+        let NewPayee = true;
+        this.setState({NewPayee})
     }
 
 
@@ -98,11 +126,11 @@ export class TransferToUser extends React.Component {
     ProcessPayment = async event =>{
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0;
-        await fetch("http://localhost:3000/getUserBalance/",
-            + this.state.accFrom,
+        await fetch("http://localhost:3000/getUserBalance/", + this.state.accFrom,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => balance = data.balance)
+
         if (balance>this.state.amount){
             //PROCESSES TRANSACTION
             await fetch("http://localhost:3000/insertTransaction/",
@@ -116,7 +144,8 @@ export class TransferToUser extends React.Component {
     }
 
     render() {
-        if (!this.state.valid) {return (
+        if (!this.state.valid && !this.state.NewPayee) {return (
+            //MAIN TRANSFER TO USER FORM PAGE
             <div>
                 <br/>
                 <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
@@ -133,19 +162,9 @@ export class TransferToUser extends React.Component {
                     <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
 
                     <div>To:</div>
-                    <label htmlFor="accName">Name on Account</label><br/>
-                    <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
-
-                    <label htmlFor="accNumber">Account Number</label><br/>
-                    <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
-                           onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
-
-                    <label htmlFor="sortCode">Sort Code</label><br/>
-                    <input id="sortCode" name="sortCode" value={this.state.sortCode}
-                           onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/><br/>
+                    <div><b>{this.state.accName}</b> {this.state.accNumber} {this.state.sortCode}</div>
+                    <button type="button" onClick={this.AddNewPayee}>Add a new Payee</button><br/>
+                    <div style={{color:"red"}}>{this.state.accToError}</div><br/>
 
                     <label htmlFor="amount">Amount</label><br/>
                     <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
@@ -168,7 +187,8 @@ export class TransferToUser extends React.Component {
 
             </div>
         )}
-        else {return(
+        else if (this.state.valid && !this.state.NewPayee){return(
+            // REVIEW DETAILS PAGE
             <div>
                 <h1>Review Details</h1>
                 <p>From: <b>{this.state.accFrom}</b></p>
@@ -178,6 +198,28 @@ export class TransferToUser extends React.Component {
                 <p>Reference: <b>{this.state.reference}</b></p>
                 <button type="button" onClick={this.ProcessPayment}>Authorise payment</button><br />
                 <button type="button" onClick={this.ChangeDetails}>Change details</button>
+            </div>
+        )}
+        else{return(
+            // ADD A NEW PAYEE PAGE
+            <div>
+                <br/>
+                <form action="AddNewPayee" id="AddNewPayeeForm" method="post" onSubmit={this.handleSubmit}>
+                <label htmlFor="accName">Name on Account</label><br/>
+                <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
+                <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
+
+                <label htmlFor="accNumber">Account Number</label><br/>
+                <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
+                       onChange={this.handleChange}/>
+                <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
+
+                <label htmlFor="sortCode">Sort Code</label><br/>
+                <input id="sortCode" name="sortCode" value={this.state.sortCode}
+                       onChange={this.handleChange}/>
+                <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/><br/>
+                <button type="submit">Add a new Payee</button>
+                </form>
             </div>
         )}
     };
