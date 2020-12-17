@@ -35,8 +35,9 @@ export class TransferToUser extends React.Component {
 
     handleChange = event => {
         // stores what user types in form in React
-        this.setState ({[event.target.name] : event.target.value})
         this.setPayeeDetails()
+        this.setState ({[event.target.name] : event.target.value})
+
     }
 
     handleSubmit = event => {
@@ -51,7 +52,8 @@ export class TransferToUser extends React.Component {
             let accName = details[0];
             let accNumber = details[1];
             let sortCode = details[2];
-            this.setState({accName, accNumber,sortCode})
+            let chosenPayee = "";
+            this.setState({accName, accNumber,sortCode, chosenPayee})
         }
     }
 
