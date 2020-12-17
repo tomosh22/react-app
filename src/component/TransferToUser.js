@@ -96,17 +96,17 @@ export class TransferToUser extends React.Component {
     }
 
     ProcessPayment = async event =>{
-        //CODE TO CHECK USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
+        //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0;
         await fetch("http://localhost:3000/getUserBalance/",
-            + this.props.state.username + "/" + this.state.accFrom,
+            + this.state.accFrom,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => balance = data.balance)
         if (balance>this.state.amount){
-            //CODE TO PROCESS TRANSACTION
+            //PROCESSES TRANSACTION
             await fetch("http://localhost:3000/insertTransaction/",
-                + this.props.state.username + "/" + this.state.accFrom + "/" + this.state.accName + "/" +
+                + this.state.accFrom + "/" + this.state.accName + "/" +
                 this.state.accNumber + "/" + this.state.sortCode + "/" +this.state.currency + "/" + this.state.amount
                 + "/" + this.state.reference,
                 {
@@ -176,7 +176,7 @@ export class TransferToUser extends React.Component {
                 <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
                 <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                 <p>Reference: <b>{this.state.reference}</b></p>
-                <button type="submit">Authorise payment</button><br />
+                <button type="button" onClick={this.ProcessPayment}>Authorise payment</button><br />
                 <button type="button" onClick={this.ChangeDetails}>Change details</button>
             </div>
         )}
