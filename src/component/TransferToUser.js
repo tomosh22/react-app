@@ -21,6 +21,8 @@ export class TransferToUser extends React.Component {
 
         userAccounts: ["Saving account", "Current account"],
 
+        recentPayees: ["Katie", "Sam", "James", "Sophie", "Lucy"],
+
         valid: false,
         //States whether the user's input is valid or not
         NewPayee: false
@@ -51,7 +53,7 @@ export class TransferToUser extends React.Component {
         if (!this.state.accFrom){
             accFromError = "Account name is required"
         }
-        if (!this.state.accName &&!this.state.accNumber && !this.state.sortCode){
+        if (!this.state.accName || !this.state.accNumber || !this.state.sortCode){
             accToError = "Payee Details are required"
         }
 
@@ -123,6 +125,29 @@ export class TransferToUser extends React.Component {
 
     }
 
+    GetRecentPayees = async event =>{
+        //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
+
+        await fetch("http://localhost:3000/getUserRecentPayees/", + this.props.state.username,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => {if(data){ this.state.recentPayees = data.recentPayees}})
+
+    }
+
+    GetRecentPayeeDetails = async event =>{
+        //CODE TO GET DETAILS OF RECENT PAYEE SELECTED
+
+        await fetch("http://localhost:3000/getUserRecentPayeeDetails/",
+            + this.props.state.username + "/" + this.state.accName,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => {if(data){ this.state.accNumber = data.accNumber;
+            this.state.sortCode=data.sortCode}})
+    }
+
+
+
     ProcessPayment = async event =>{
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0;
@@ -164,6 +189,14 @@ export class TransferToUser extends React.Component {
                     <div>To:</div>
                     <div><b>{this.state.accName}</b> {this.state.accNumber} {this.state.sortCode}</div>
                     <button type="button" onClick={this.AddNewPayee}>Add a new Payee</button><br/>
+                    <select id="accName" name="accName"  value={this.state.accName} onChange={this.handleChange}>
+                        <option value="" disabled selected>Choose a recent payee</option>
+                        {this.state.recentPayees.map(list =>(
+                            <option key={list} value={list}>
+                                {list}
+                            </option>
+                        )) }
+                    </select>
                     <div style={{color:"red"}}>{this.state.accToError}</div><br/>
 
                     <label htmlFor="amount">Amount</label><br/>
