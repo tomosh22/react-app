@@ -63,13 +63,13 @@ export class TransferToAccount extends React.Component {
         this.setState({valid})
     }
 
-    GetUserAccounts = async event =>{
+    GetUserAccounts = event =>{
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
 
-        await fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
+         fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data[0]){ this.state.userAccounts = data[0].userAccounts}})
+            }).then(response => response.json()).then(data => {if(data){ this.state.userAccounts = data.userAccounts}})
 
     }
 
@@ -79,7 +79,7 @@ export class TransferToAccount extends React.Component {
         await fetch("http://localhost:3000/getUserBalance/", + this.state.accountFrom,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => balance = data[0].balance)
+            }).then(response => response.json()).then(data => balance = data.balance)
         if (balance>this.state.amount){
             //CODE TO PROCESS TRANSACTION
             await fetch("http://localhost:3000/insertTransaction/",
@@ -92,6 +92,8 @@ export class TransferToAccount extends React.Component {
     }
 
     render() {
+        //this.GetUserAccounts();
+        //uncomment these when connected to database
         if (!this.state.valid) {return (
             <div>
                 <br></br>
