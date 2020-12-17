@@ -1,11 +1,11 @@
 import React, {Component} from "react";
 
-export class Welcome extends Component{
+export class Admin extends Component {
     render(){
         return(
             <div>
-                <h1>Welcome to StuBank</h1>
-           </div>
+                <h1>Welcome to Admin page</h1>
+            </div>
         )
     }
 }
