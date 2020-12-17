@@ -11,6 +11,7 @@ export class TransferToUser extends React.Component {
         //Set default value as will not update if user does not select a different option to the default option
         amount: "",
         reference: "",
+        chosenPayee:"",
         accFromError: "",
         accToError:"",
         accNameError: "",
@@ -21,7 +22,9 @@ export class TransferToUser extends React.Component {
 
         userAccounts: ["Saving account", "Current account"],
 
-        recentPayees: ["Katie", "Sam", "James", "Sophie", "Lucy"],
+        recentPayees: [["Katie","1234567","11-11-11"], ["Sam","2345678","22-22-22"], ["James","3456789","33-33-33"],
+            ["Sophie","4567890", "44-44-44"], ["Lucy","5678901","55-55-55"]],
+        //example of what recent Payees should look like
 
         valid: false,
         //States whether the user's input is valid or not
@@ -33,12 +36,23 @@ export class TransferToUser extends React.Component {
     handleChange = event => {
         // stores what user types in form in React
         this.setState ({[event.target.name] : event.target.value})
+        this.setPayeeDetails()
     }
 
     handleSubmit = event => {
         event.preventDefault();
         if (!this.state.NewPayee){this.validateTransaction()}
         else{this.validateNewPayee()}
+    }
+
+    setPayeeDetails = event => {
+        if (this.state.chosenPayee){
+            let details = (this.state.chosenPayee).split(",");
+            let accName = details[0];
+            let accNumber = details[1];
+            let sortCode = details[2];
+            this.setState({accName, accNumber,sortCode})
+        }
     }
 
     validateTransaction = event =>{
@@ -132,20 +146,8 @@ export class TransferToUser extends React.Component {
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {if(data){ this.state.recentPayees = data.recentPayees}})
-
+            //recentPayees should be a 3d array [accName,accNumber,sortCode] of 5 most recent payees.
     }
-
-    GetRecentPayeeDetails = async event =>{
-        //CODE TO GET DETAILS OF RECENT PAYEE SELECTED
-
-        await fetch("http://localhost:3000/getUserRecentPayeeDetails/",
-            + this.props.state.username + "/" + this.state.accName,
-            {
-                method:"GET"
-            }).then(response => response.json()).then(data => {if(data){ this.state.accNumber = data.accNumber;
-            this.state.sortCode=data.sortCode}})
-    }
-
 
 
     ProcessPayment = async event =>{
@@ -191,11 +193,11 @@ export class TransferToUser extends React.Component {
 
                     <div>To:</div>
                     <div><b>{this.state.accName}</b> {this.state.accNumber} {this.state.sortCode}</div>
-                    <select id="accName" name="accName"  value={this.state.accName} onChange={this.handleChange}>
+                    <select id="chosenPayee" name="chosenPayee"  value={this.state.chosenPayee} onChange={this.handleChange}>
                         <option value="" disabled selected>Choose a recent payee</option>
                         {this.state.recentPayees.map(list =>(
                             <option key={list} value={list}>
-                                {list}
+                                {list[0]}
                             </option>
                         )) }
                     </select><br/>
