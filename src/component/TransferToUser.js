@@ -115,20 +115,20 @@ export class TransferToUser extends React.Component {
     }
 
 
-    GetUserAccounts = async event =>{
+    GetUserAccounts = event =>{
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
 
-        await fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
+        fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {if(data){ this.state.userAccounts = data.userAccounts}})
 
     }
 
-    GetRecentPayees = async event =>{
+    GetRecentPayees = event =>{
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
 
-        await fetch("http://localhost:3000/getUserRecentPayees/", + this.props.state.username,
+        fetch("http://localhost:3000/getUserRecentPayees/", + this.props.state.username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {if(data){ this.state.recentPayees = data.recentPayees}})
@@ -169,6 +169,9 @@ export class TransferToUser extends React.Component {
     }
 
     render() {
+        //this.GetRecentPayees();
+        //this.GetUserAccounts();
+        //uncomment these when connected to database
         if (!this.state.valid && !this.state.NewPayee) {return (
             //MAIN TRANSFER TO USER FORM PAGE
             <div>
@@ -188,7 +191,6 @@ export class TransferToUser extends React.Component {
 
                     <div>To:</div>
                     <div><b>{this.state.accName}</b> {this.state.accNumber} {this.state.sortCode}</div>
-                    <button type="button" onClick={this.AddNewPayee}>Add a new Payee</button><br/>
                     <select id="accName" name="accName"  value={this.state.accName} onChange={this.handleChange}>
                         <option value="" disabled selected>Choose a recent payee</option>
                         {this.state.recentPayees.map(list =>(
@@ -196,7 +198,8 @@ export class TransferToUser extends React.Component {
                                 {list}
                             </option>
                         )) }
-                    </select>
+                    </select><br/>
+                    <button type="button" onClick={this.AddNewPayee}>Add a new Payee</button>
                     <div style={{color:"red"}}>{this.state.accToError}</div><br/>
 
                     <label htmlFor="amount">Amount</label><br/>
