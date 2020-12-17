@@ -18,8 +18,7 @@ export class TransferToUser extends React.Component {
         amountError: "",
         referenceError: "",
 
-        userAccounts: ["My Saving Account", "My Current Account"],
-        //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
+        userAccounts: ["Saving account", "Current account"],
 
         valid: false
         //States whether the user's input is valid or not
@@ -85,6 +84,36 @@ export class TransferToUser extends React.Component {
         this.setState({valid})
     }
 
+
+    GetUserAccounts = async event =>{
+        //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
+
+        await fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => {if(data){ this.state.userAccounts = data.userAccounts}})
+
+    }
+
+    ProcessPayment = async event =>{
+        //CODE TO CHECK USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
+        let balance=0;
+        await fetch("http://localhost:3000/getUserBalance/",
+            + this.props.state.username + "/" + this.state.accFrom,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => balance = data.balance)
+        if (balance>this.state.amount){
+            //CODE TO PROCESS TRANSACTION
+            await fetch("http://localhost:3000/insertTransaction/",
+                + this.props.state.username + "/" + this.state.accFrom + "/" + this.state.accName + "/" +
+                this.state.accNumber + "/" + this.state.sortCode + "/" +this.state.currency + "/" + this.state.amount
+                + "/" + this.state.reference,
+                {
+                    method:"POST"
+                })
+        }
+    }
 
     render() {
         if (!this.state.valid) {return (
