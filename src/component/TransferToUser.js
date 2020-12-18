@@ -26,23 +26,22 @@ export class TransferToUser extends React.Component {
             ["Sophie","4567890", "44-44-44"], ["Lucy","5678901","55-55-55"]],
         //example of what recent Payees should look like
 
-        valid: false,
-        //States whether the user's input is valid or not
-        NewPayee: false
-        //States whether user is entering a new payee
+        display: 0,
+        // determines the display of the webpage
+        // 0: main transaction page; 1: review details page; 2: new payee page; 3: recent payee page;
 
     };
 
     handleChange = event => {
         // stores what user types in form in React
-        this.setPayeeDetails()
         this.setState ({[event.target.name] : event.target.value})
 
     }
 
     handleSubmit = event => {
         event.preventDefault();
-        if (!this.state.NewPayee){this.validateTransaction()}
+        if (this.state.display==0){this.validateTransaction()}
+        else if (this.state.display==3){this.setPayeeDetails(); this.state.display = 0}
         else{this.validateNewPayee()}
     }
 
@@ -63,7 +62,7 @@ export class TransferToUser extends React.Component {
         let accToError="";
         let amountError = "";
         let referenceError = "";
-        let valid = false;
+        let display = 0;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
         if (!this.state.accFrom){
@@ -83,10 +82,10 @@ export class TransferToUser extends React.Component {
         }
 
         if (!accFromError && !accToError && !amountError && !referenceError){
-            valid = true;
+            display = 1;
         }
 
-        this.setState({accFromError,accToError, amountError, referenceError, valid})
+        this.setState({accFromError,accToError, amountError, referenceError, display})
     }
 
     validateNewPayee = event =>{
@@ -94,7 +93,7 @@ export class TransferToUser extends React.Component {
         let accNameError ="";
         let accNumberError ="";
         let sortCodeError ="";
-        let NewPayee = true;
+        let display = 2;
 
         const sortCodeRegex = new RegExp("^[0-9]{2}-[0-9]{2}-[0-9]{2}")
 
@@ -113,21 +112,26 @@ export class TransferToUser extends React.Component {
 
 
         if (!accNameError && !accNumberError && !sortCodeError ){
-            NewPayee = false;
+            display=0;
         }
 
-        this.setState({accNameError, accNumberError,sortCodeError, NewPayee})
+        this.setState({accNameError, accNumberError,sortCodeError, display})
     }
 
 
     ChangeDetails = event =>{
-        let valid = false;
-        this.setState({valid})
+        let display =0;
+        this.setState({display})
     }
 
-    AddNewPayee =  event =>{
-        let NewPayee = true;
-        this.setState({NewPayee})
+    SelectNewPayee =  event =>{
+        let display = 2;
+        this.setState({display})
+    }
+
+    SelectRecentPayee =  event =>{
+        let display = 3;
+        this.setState({display})
     }
 
 
@@ -144,7 +148,7 @@ export class TransferToUser extends React.Component {
     GetRecentPayees = event =>{
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
 
-        fetch("http://localhost:3000/getUserRecentPayees/", + this.props.state.username,
+        fetch("http://localhost:3000/getAccountPayees/", + this.props.state.username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {if(data){ this.state.recentPayees = data.recentPayees}})
@@ -176,91 +180,112 @@ export class TransferToUser extends React.Component {
         //this.GetRecentPayees();
         //this.GetUserAccounts();
         //uncomment these when connected to database
-        if (!this.state.valid && !this.state.NewPayee) {return (
-            //MAIN TRANSFER TO USER FORM PAGE
-            <div>
-                <br/>
-                <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
+        switch(this.state.display){
+            case 0:
+                return (
+                //MAIN TRANSFER TO USER FORM PAGE
+                <div>
+                    <br/>
+                    <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
 
-                    <label htmlFor="accountFrom">From:</label><br/>
-                    <select id="accFrom" name="accFrom"  value={this.state.accFrom} onChange={this.handleChange}>
-                        <option value="" disabled selected>Choose an account</option>
-                        {this.state.userAccounts.map(list =>(
-                            <option key={list} value={list}>
-                                {list}
-                            </option>
-                        )) }
-                    </select>
-                    <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
+                        <label htmlFor="accountFrom">From:</label><br/>
+                        <select id="accFrom" name="accFrom"  value={this.state.accFrom} onChange={this.handleChange}>
+                            <option value="" disabled selected>Choose an account</option>
+                            {this.state.userAccounts.map(list =>(
+                                <option key={list} value={list}>
+                                    {list}
+                                </option>
+                            )) }
+                        </select>
+                        <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
 
-                    <div>To:</div>
-                    <div><b>{this.state.accName}</b> {this.state.accNumber} {this.state.sortCode}</div>
-                    <select id="chosenPayee" name="chosenPayee"  value={this.state.chosenPayee} onChange={this.handleChange}>
-                        <option value="" disabled selected>Choose a recent payee</option>
-                        {this.state.recentPayees.map(list =>(
-                            <option key={list} value={list}>
-                                {list[0]}
-                            </option>
-                        )) }
-                    </select><br/>
-                    <button type="button" onClick={this.AddNewPayee}>Add a new Payee</button>
-                    <div style={{color:"red"}}>{this.state.accToError}</div><br/>
+                        <div>To:</div>
+                        <div><b>{this.state.accName}</b> {this.state.accNumber} {this.state.sortCode}</div>
+                        <button type="button" onClick={this.SelectNewPayee} disabled={!this.state.accFrom}>Add a new Payee</button>
+                        <button type="button" onClick={this.SelectRecentPayee} disabled={!this.state.accFrom}>Select Recent Payee</button>
+                        <div style={{color:"red"}}>{this.state.accToError}</div><br/>
 
-                    <label htmlFor="amount">Amount</label><br/>
-                    <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
-                        <option value="£">£</option>
-                        <option value="$">$</option>
-                        <option value="€">€</option>
-                    </select>
-                    <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
-                           onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.amountError}</div><br/>
+                        <label htmlFor="amount">Amount</label><br/>
+                        <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
+                            <option value="£">£</option>
+                            <option value="$">$</option>
+                            <option value="€">€</option>
+                        </select>
+                        <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
+                               onChange={this.handleChange}/>
+                        <div style={{color:"red"}}>{this.state.amountError}</div><br/>
 
-                    <label htmlFor="reference">Reference</label><br/>
-                    <input id="reference" name="reference" value={this.state.reference}
-                           onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
+                        <label htmlFor="reference">Reference</label><br/>
+                        <input id="reference" name="reference" value={this.state.reference}
+                               onChange={this.handleChange}/>
+                        <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
-                    <button type="submit">Send Money</button>
+                        <button type="submit">Send Money</button>
 
-                </form>
+                    </form>
 
-            </div>
-        )}
-        else if (this.state.valid && !this.state.NewPayee){return(
-            // REVIEW DETAILS PAGE
-            <div>
-                <h1>Review Details</h1>
-                <p>From: <b>{this.state.accFrom}</b></p>
-                <p>Payee: <b>{this.state.accName}</b></p>
-                <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
-                <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
-                <p>Reference: <b>{this.state.reference}</b></p>
-                <button type="button" onClick={this.ProcessPayment}>Authorise payment</button><br />
-                <button type="button" onClick={this.ChangeDetails}>Change details</button>
-            </div>
-        )}
-        else{return(
-            // ADD A NEW PAYEE PAGE
-            <div>
-                <br/>
-                <form action="AddNewPayee" id="AddNewPayeeForm" method="post" onSubmit={this.handleSubmit}>
-                <label htmlFor="accName">Name on Account</label><br/>
-                <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
-                <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
+                </div>
+                )
+                break;
 
-                <label htmlFor="accNumber">Account Number</label><br/>
-                <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
-                       onChange={this.handleChange}/>
-                <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
+            case 1:
+                return(
+                // REVIEW DETAILS PAGE
+                    <div>
+                        <h1>Review Details</h1>
+                        <p>From: <b>{this.state.accFrom}</b></p>
+                        <p>Payee: <b>{this.state.accName}</b></p>
+                        <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
+                        <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
+                        <p>Reference: <b>{this.state.reference}</b></p>
+                        <button type="button" onClick={this.ProcessPayment}>Authorise payment</button><br />
+                        <button type="button" onClick={this.ChangeDetails}>Change details</button>
+                    </div>
+                )
+                break;
 
-                <label htmlFor="sortCode">Sort Code</label><br/>
-                <input id="sortCode" name="sortCode" value={this.state.sortCode}
-                       onChange={this.handleChange}/>
-                <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/><br/>
-                <button type="submit">Add a new Payee</button>
-                </form>
-            </div>
-        )}
+            case 2:
+                return(
+                // ADD A NEW PAYEE PAGE
+                    <div>
+                        <br/>
+                        <form action="AddNewPayee" id="AddNewPayeeForm" method="post" onSubmit={this.handleSubmit}>
+                        <label htmlFor="accName">Name on Account</label><br/>
+                        <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
+                        <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
+
+                        <label htmlFor="accNumber">Account Number</label><br/>
+                        <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
+                               onChange={this.handleChange}/>
+                        <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
+
+                        <label htmlFor="sortCode">Sort Code</label><br/>
+                        <input id="sortCode" name="sortCode" value={this.state.sortCode}
+                               onChange={this.handleChange}/>
+                        <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/><br/>
+                        <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                )
+                break;
+
+            case 3:
+                return(
+                    <div>
+                        <br/>
+                        <form action="SelectRecentPayee" id="SelectRecentPayee" method="post" onSubmit={this.handleSubmit}>
+                        <select id="chosenPayee" name="chosenPayee"  value={this.state.chosenPayee} onChange={this.handleChange}
+                                disabled={!this.state.accFrom}>
+                            <option value="" disabled selected>Choose a recent payee</option>
+                            {this.state.recentPayees.map(list =>(
+                                <option key={list} value={list}>
+                                    {list[0]}
+                                </option>
+                            )) }
+                        </select><br/><br/>
+                        <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                )
     };
-}
+}}
