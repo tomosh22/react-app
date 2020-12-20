@@ -21,10 +21,14 @@ export class TransferToUser extends React.Component {
         referenceError: "",
 
         userAccounts: ["Saving account", "Current account"],
+        //example of what user accounts should look like
 
         recentPayees: [["Katie","1234567","11-11-11"], ["Sam","2345678","22-22-22"], ["James","3456789","33-33-33"],
             ["Sophie","4567890", "44-44-44"], ["Lucy","5678901","55-55-55"]],
         //example of what recent Payees should look like
+
+        balance: 1000.00,
+        //example of what balance should look like
 
         display: 0,
         // determines the display of the webpage
@@ -41,7 +45,7 @@ export class TransferToUser extends React.Component {
     handleSubmit = event => {
         event.preventDefault();
         if (this.state.display==0){this.validateTransaction()}
-        else if (this.state.display==3){this.setPayeeDetails(); this.state.display = 0}
+        else if (this.state.display==3){this.setPayeeDetails(); this.state.display = 0;} //this.GetBalance() uncomment this when connected to database
         else{this.validateNewPayee()}
     }
 
@@ -132,39 +136,35 @@ export class TransferToUser extends React.Component {
     SelectRecentPayee =  event =>{
         let display = 3;
         this.setState({display})
+        //this.GetRecentPayees();
+        //uncomment these when connected to database
     }
 
 
     GetUserAccounts = event =>{
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
-
+        let userAccounts = [];
         fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data){ this.state.userAccounts = data.userAccounts}})
-
+            }).then(response => response.json()).then(data => {if(data){ userAccounts = data.userAccounts}})
+        this.setState({userAccounts})
     }
 
     GetRecentPayees = event =>{
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
-
+        let recentPayees;
         fetch("http://localhost:3000/getAccountPayees/", + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data){ this.state.recentPayees = data.recentPayees}})
+            }).then(response => response.json()).then(data => {if(data){ recentPayees = data.recentPayees}})
             //recentPayees should be a 3d array [accName,accNumber,sortCode] of 5 most recent payees.
+        this.setState({recentPayees})
     }
 
 
     ProcessPayment = async event =>{
-        //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
-        let balance=0;
-        await fetch("http://localhost:3000/getUserBalance/", + this.state.accFrom,
-            {
-                method:"GET"
-            }).then(response => response.json()).then(data => balance = data.balance)
-
-        if (balance>this.state.amount){
+        if (this.state.balance>this.state.amount){
             //PROCESSES TRANSACTION
             await fetch("http://localhost:3000/insertTransaction/",
                 + this.state.accFrom + "/" + this.state.accName + "/" +
@@ -176,8 +176,17 @@ export class TransferToUser extends React.Component {
         }
     }
 
+    GetBalance = event =>{
+        //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
+        let balance=0;
+        fetch("http://localhost:3000/getUserBalance/", + this.state.accFrom,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => balance = data.balance)
+        this.setState({balance})
+    }
+
     render() {
-        //this.GetRecentPayees();
         //this.GetUserAccounts();
         //uncomment these when connected to database
         switch(this.state.display){
@@ -206,18 +215,19 @@ export class TransferToUser extends React.Component {
                         <div style={{color:"red"}}>{this.state.accToError}</div><br/>
 
                         <label htmlFor="amount">Amount</label><br/>
-                        <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
+                        <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}
+                                disabled={!this.state.accName}>
                             <option value="£">£</option>
                             <option value="$">$</option>
                             <option value="€">€</option>
                         </select>
                         <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
-                               onChange={this.handleChange}/>
+                               onChange={this.handleChange} disabled={!this.state.accName} min={"0.00"} max={this.state.balance}/>
                         <div style={{color:"red"}}>{this.state.amountError}</div><br/>
 
                         <label htmlFor="reference">Reference</label><br/>
                         <input id="reference" name="reference" value={this.state.reference}
-                               onChange={this.handleChange}/>
+                               onChange={this.handleChange} disabled={!this.state.accName}/>
                         <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
                         <button type="submit">Send Money</button>
@@ -270,6 +280,7 @@ export class TransferToUser extends React.Component {
                 break;
 
             case 3:
+                //SELECT A RECENT PAYEE PAGE
                 return(
                     <div>
                         <br/>
