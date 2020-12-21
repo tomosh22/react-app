@@ -3,7 +3,7 @@ import {BrowserRouter as Router, Link, Route} from "react-router-dom";
 
 export class TransferToAccount extends React.Component {
 
-    state ={
+    state = {
         accountFrom: "",
         accountTo: "",
         currency: "£",
@@ -14,139 +14,209 @@ export class TransferToAccount extends React.Component {
         amountError: "",
 
         userAccounts: ["My Saving Account", "My Current Account"],
+        updatedUserAccounts: ["My Saving Account", "My Current Account"],
         //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
+        //updatedUserAccounts is used to select account to
 
-        valid: false
-        //States whether the user's input is valid or not
+        display: 0,
+        // determines the display of the webpage
+
+        balance: 1000.00,
+        //example of what balance should look like
     };
 
 
     handleChange = event => {
         // stores what user types in form in React
-        this.setState ({[event.target.name] : event.target.value})
+        this.setState({[event.target.name]: event.target.value})
     }
 
     handleSubmit = event => {
         event.preventDefault();
-        this.validate();
+        if (this.state.display==0){this.validate()}
+        else{this.validateAccountTo()}
     }
 
-    validate = event =>{
+    validate = event => {
         // validates the user's input
-        let accountFromError ="";
-        let accountToError="";
+        let accountFromError = "";
+        let accountToError = "";
         let amountError = "";
-        let valid = false;
+        let display = 0;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
-        if (!this.state.accountTo){
+        if (!this.state.accountTo) {
             accountToError = "Account name is required"
         }
-        if (!this.state.accountFrom){
+        if (!this.state.accountFrom) {
             accountFromError = "Account name is required"
         }
-        if (!this.state.amount){
+        if (!this.state.amount) {
             amountError = "Amount is required"
-        }else if(!(amountRegex.test(this.state.amount))) {
+        } else if (!(amountRegex.test(this.state.amount))) {
             amountError = "Amount must be valid"
         }
 
-        if (!accountToError && !accountFromError && !amountError){
-            valid = true;
+        if (!accountToError && !accountFromError && !amountError) {
+            display = 1;
         }
 
-        this.setState({accountFromError, accountToError, amountError, valid})
+        this.setState({accountFromError, accountToError, amountError, display})
     }
 
-    ChangeDetails = event =>{
-        let valid = false;
-        this.setState({valid})
+    validateAccountTo = event =>{
+        let accountToError = "";
+        let display = 2;
+        if (!this.state.accountTo) {
+            accountToError = "Account name is required"
+        }
+        if (!accountToError){
+            display=0;
+        }
+        this.setState({accountToError, display})
+    }
+
+
+    ChangeDetails = event => {
+        let display = 0;
+        this.setState({display})
+    }
+
+    SelectAccountTo = event =>{
+        let display =2;
+        let updatedUserAccounts=[]
+        let i;
+        //this.GetBalance()
+        //uncomment these when connected to database
+        for (i = 0; i < (this.state.userAccounts).length; i++){
+            // prevents the user sending a transaction to the same account
+            if (this.state.userAccounts[i]!=this.state.accountFrom){
+                updatedUserAccounts.push(this.state.userAccounts[i])
+            }
+        }
+
+        this.setState({display, updatedUserAccounts})
     }
 
     GetUserAccounts = event =>{
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
-
-         fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
+        let userAccounts = [];
+        fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data){ this.state.userAccounts = data.userAccounts}})
-
+            }).then(response => response.json()).then(data => {if(data){ userAccounts = data.userAccounts}})
+        this.setState({userAccounts})
     }
 
     ProcessPayment = async event =>{
-        //CODE TO CHECK USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
-        let balance=0;
-        await fetch("http://localhost:3000/getUserBalance/", + this.state.accountFrom,
-            {
-                method:"GET"
-            }).then(response => response.json()).then(data => balance = data.balance)
-        if (balance>this.state.amount){
-            //CODE TO PROCESS TRANSACTION
+        if (this.state.balance>this.state.amount){
+            //PROCESSES TRANSACTION
             await fetch("http://localhost:3000/insertTransaction/",
-                + this.state.accountFrom + "/" + this.state.accountTo + "/" +
-                this.state.currency + "/" + this.state.amount,
+                + this.state.accountFrom + "/" + this.state.accountTo + "/" +this.state.currency + "/" +
+                this.state.amount,
                 {
                     method:"POST"
                 })
         }
     }
 
+    GetBalance = event =>{
+        //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
+        let balance=0;
+        fetch("http://localhost:3000/getUserBalance/", + this.state.accountFrom,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => balance = data.balance)
+        this.setState({balance})
+    }
+
+
+
     render() {
         //this.GetUserAccounts();
         //uncomment these when connected to database
-        if (!this.state.valid) {return (
-            <div>
-                <br></br>
+        switch (this.state.display) {
+            case 0:
+                return (
+                    <div>
+                        <br></br>
 
-                <form action="TransferMoneyToAccount" id="TransferMoneyToAccountForm" method="post" onSubmit={this.handleSubmit}>
+                        <form action="TransferMoneyToAccount" id="TransferMoneyToAccountForm" method="post"
+                              onSubmit={this.handleSubmit}>
 
-                    <label htmlFor="accountFrom">From:</label><br></br>
-                    <select id="accountFrom" name="accountFrom"  value={this.state.accountFrom}
-                            onChange={this.handleChange}>
-                        <option value="" disabled selected>Choose an account</option>
-                        {this.state.userAccounts.map(list =>(
-                            <option key={list} value={list}>
-                                {list}
-                            </option>
-                        )) }
-                    </select>
-                    <div style={{color:"red"}}>{this.state.accountFromError}</div><br></br>
+                            <label htmlFor="accountFrom">From:</label><br></br>
+                            <select id="accountFrom" name="accountFrom" value={this.state.accountFrom}
+                                    onChange={this.handleChange}>
+                                <option value="" disabled selected>Choose an account</option>
+                                {this.state.userAccounts.map(list => (
+                                    <option key={list} value={list}>
+                                        {list}
+                                    </option>
+                                ))}
+                            </select>
+                            <div style={{color: "red"}}>{this.state.accountFromError}</div>
+                            <br></br>
 
-                    <label htmlFor="accountTo">To:</label><br></br>
-                    <select id="accountTo" name="accountTo"  value={this.state.accountTo}
-                            onChange={this.handleChange}>
-                        <option value="" disabled selected>Choose an account</option>
-                        {this.state.userAccounts.map(list =>(
-                            <option key={list} value={list}>
-                                {list}
-                            </option>
-                        )) }
-                    </select>
-                    <div style={{color:"red"}}>{this.state.accountToError}</div><br></br>
+                            <label htmlFor="accountTo">To:</label><br></br>
+                            <div><b>{this.state.accountTo}</b></div>
+                            <button type="button" onClick={this.SelectAccountTo} disabled={!this.state.accountFrom}>Choose an account</button>
+                            <div style={{color: "red"}}>{this.state.accountToError}</div>
+                            <br></br>
 
-                    <label htmlFor="amount">Amount</label><br></br>
-                    <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
-                        <option value="£">£</option>
-                        <option value="$">$</option>
-                        <option value="€">€</option>
-                    </select>
-                    <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
-                           onChange={this.handleChange}></input>
-                    <div style={{color:"red"}}>{this.state.amountError}</div><br></br>
+                            <label htmlFor="amount">Amount</label><br></br>
+                            <select id="currency" name="currency" value={this.state.currency}
+                                    onChange={this.handleChange}
+                                    disabled={!this.state.accountTo}>
+                                <option value="£">£</option>
+                                <option value="$">$</option>
+                                <option value="€">€</option>
+                            </select>
+                            <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
+                                   onChange={this.handleChange} disabled={!this.state.accountTo} min={"0.00"}
+                                   max={this.state.balance}></input>
+                            <div style={{color: "red"}}>{this.state.amountError}</div>
+                            <br></br>
 
-                    <button type="submit" >Send Money</button>
-                </form>
-            </div>
-        )}
-        else{return(
-            <div>
-                <h1>Review Details</h1>
-                <p>From: <b>{this.state.accountFrom}</b></p>
-                <p>To: <b>{this.state.accountTo}</b></p>
-                <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
-                <button type="button" onClick={this.ProcessPayment}>Authorise payment</button><br />
-                <button type="button" onClick={this.ChangeDetails}>Change details</button>
-            </div>
-        )}
+                            <button type="submit">Send Money</button>
+                        </form>
+                    </div>
+                )
+                break;
+
+            case 1:
+                return (
+                    <div>
+                        <h1>Review Details</h1>
+                        <p>From: <b>{this.state.accountFrom}</b></p>
+                        <p>To: <b>{this.state.accountTo}</b></p>
+                        <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
+                        <button type="button" onClick={this.ProcessPayment}>Authorise payment</button>
+                        <br/>
+                        <button type="button" onClick={this.ChangeDetails}>Change details</button>
+                    </div>
+                )
+                break;
+
+            case 2:
+                return(
+                    <div>
+                        <br></br>
+                        <form action="SelectAccount" id="SelectAccount" method="post" onSubmit={this.handleSubmit}>
+                            <select id="accountTo" name="accountTo" value={this.state.accountTo}
+                                    onChange={this.handleChange}>
+                                <option value="" disabled selected>Choose an account</option>
+                                {this.state.updatedUserAccounts.map(list => (
+                                    <option key={list} value={list}>
+                                        {list}
+                                    </option>
+                                ))}
+                            </select>
+                            <div style={{color: "red"}}>{this.state.accountToError}</div>
+                            <br></br>
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                )
+        }
     }
 }
