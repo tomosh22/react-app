@@ -12,6 +12,7 @@ export class TransferToUser extends React.Component {
         amount: "",
         reference: "",
         chosenPayee:"",
+        password:"",
         accFromError: "",
         accToError:"",
         accNameError: "",
@@ -19,6 +20,7 @@ export class TransferToUser extends React.Component {
         sortCodeError: "",
         amountError: "",
         referenceError: "",
+        passwordError:"",
 
         userAccounts: ["Saving account", "Current account"],
         //example of what user accounts should look like
@@ -34,6 +36,12 @@ export class TransferToUser extends React.Component {
         // determines the display of the webpage
         // 0: main transaction page; 1: review details page; 2: new payee page; 3: recent payee page;
 
+        passwordAttempts: 3,
+        //number of attempts for the user to enter password
+        userPassword: "",
+        salt: "",
+        //user's hashed password and salt from database
+
     };
 
     handleChange = event => {
@@ -46,6 +54,7 @@ export class TransferToUser extends React.Component {
         event.preventDefault();
         if (this.state.display==0){this.validateTransaction()}
         else if (this.state.display==3){this.setPayeeDetails(); this.state.display = 0;} //this.GetBalance() uncomment this when connected to database
+        else if (this.state.display==4){this.validatePassword()}
         else{this.validateNewPayee()}
     }
 
@@ -122,6 +131,40 @@ export class TransferToUser extends React.Component {
         this.setState({accNameError, accNumberError,sortCodeError, display})
     }
 
+    validatePassword = event =>{
+        // validates user's password to authorise payment
+        let passwordError = "";
+        let userPassword = "password";
+        //change userPassword here!!
+        let password = this.state.password;
+        let passwordAttempts = this.state.passwordAttempts;
+
+        //this.GetPassword();
+        //var hash = crypto.createHmac("sha512", this.state.salt);
+        //hash.update(password + this.state.salt);
+        //hash = hash.digest("hex");
+        //password = hash;
+        //userPassword = this.state.userPassword;
+
+
+        if (!this.state.password){
+            passwordError = "Password is required"
+        } else{
+            if (passwordAttempts>0){
+                if (password != userPassword){
+                    -- passwordAttempts
+                    passwordError = passwordAttempts + " login attempts remaining"
+                }
+                else{
+                    //this.ProcessPayment()
+                    //uncomment when connected to database
+                }
+            }
+            else{passwordError= "0 login attempts remaining"}
+        }
+        this.setState({passwordError, passwordAttempts})
+    }
+
 
     ChangeDetails = event =>{
         let display =0;
@@ -138,6 +181,11 @@ export class TransferToUser extends React.Component {
         this.setState({display})
         //this.GetRecentPayees();
         //uncomment these when connected to database
+    }
+
+    authorisePayment = event =>{
+        let display = 4;
+        this.setState({display})
     }
 
 
@@ -185,6 +233,18 @@ export class TransferToUser extends React.Component {
             }).then(response => response.json()).then(data => balance = data.balance)
         this.setState({balance})
     }
+
+    GetPassword = event =>{
+        // GETS THE USER'S HASHED PASSWORD AND SALT
+        let userPassword;
+        let salt;
+        fetch("http://localhost:3000/getUserBalance/", + this.props.state.username,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => (userPassword = data.hash, salt = data.salt))
+        this.setState({userPassword, salt})
+    }
+
 
     render() {
         //this.GetUserAccounts();
@@ -248,7 +308,7 @@ export class TransferToUser extends React.Component {
                         <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                         <p>Reference: <b>{this.state.reference}</b></p>
-                        <button type="button" onClick={this.ProcessPayment}>Authorise payment</button><br />
+                        <button type="button" onClick={this.authorisePayment}>Confirm details</button><br />
                         <button type="button" onClick={this.ChangeDetails}>Change details</button>
                     </div>
                 )
@@ -273,6 +333,7 @@ export class TransferToUser extends React.Component {
                         <input id="sortCode" name="sortCode" value={this.state.sortCode}
                                onChange={this.handleChange}/>
                         <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/><br/>
+                        <button type="button" onClick={this.ChangeDetails}>Back</button>
                         <button type="submit">Submit</button>
                         </form>
                     </div>
@@ -294,9 +355,27 @@ export class TransferToUser extends React.Component {
                                 </option>
                             )) }
                         </select><br/><br/>
+                        <button type="button" onClick={this.ChangeDetails}>Back</button>
                         <button type="submit">Submit</button>
                         </form>
                     </div>
                 )
+                break;
+
+            case 4:
+                //AUTHORISE PAYMENT BY ENTERING PASSWORD
+                return(
+                    <div>
+                        <br/>
+                        <form action="AuthorisePayment" id="AuthorisePayment" method="post" onSubmit={this.handleSubmit}>
+                            <label htmlFor="password">Enter Password</label><br/>
+                            <input type="password" id="password" name="password" value={this.state.password}
+                                   onChange={this.handleChange} disabled={this.state.passwordAttempts==0}/>
+                            <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
+                            <button type="submit">Authorise Payment</button>
+                        </form>
+                    </div>
+                )
+                break;
     };
 }}
