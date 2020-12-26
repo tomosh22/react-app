@@ -1,10 +1,9 @@
 import React, {useContext} from "react";
 import {context} from "./Home"
-import {Redirect, useHistory} from "react-router-dom";
+import {Account} from "./Home"
 const crypto = require("crypto");
 
 export class SignUp extends React.Component{
-    //static contextType = context
     state = {
         username: "",
         password: "",
@@ -31,7 +30,7 @@ export class SignUp extends React.Component{
 
 
 
-    async handleSubmit(event,setFirstName,setLoggedIn){
+    async handleSubmit(event,setFirstName,setLoggedIn,addAccount){
         this.state.lastName = this.state.lastName.replace("\'","");
         // validates the user's input
         event.preventDefault();
@@ -85,7 +84,9 @@ export class SignUp extends React.Component{
                 {
                     method:"POST"
                 })
-
+            await fetch("http://localhost:3000/getUserAccounts/" + this.state.username, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {for(x of data){addAccount(new Account(data.Name,data.Type,data.Balance,data.Currency,data.AccNumber))}})
             setFirstName(this.state.firstName)
             setLoggedIn(true)
             this.props.history.push("/dashboard");
@@ -143,14 +144,12 @@ export class SignUp extends React.Component{
         this.setState({usernameError, passwordError, emailError, firstNameError, lastNameError, address1Error,
             address2Error, postcodeError})
     };
-
-
     render(){
         return (
-            <context.Consumer>{({setFirstName,setLoggedIn}) => (
+            <context.Consumer>{({setFirstName,setLoggedIn,addAccount}) => (
                 <div>
                     <h1>Sign Up</h1>
-                    <form action="SignUp" id="signUpForm" method="post" onSubmit={e => this.handleSubmit(e,setFirstName,setLoggedIn)}>
+                    <form action="SignUp" id="signUpForm" method="post" onSubmit={e => this.handleSubmit(e,setFirstName,setLoggedIn,addAccount)}>
                         <label htmlFor="username">Username: </label><br/>
                         <input type="text" id="username" name="username" value={this.state.username}
                                onChange={this.handleChange}/>
