@@ -1,5 +1,4 @@
 import React from "react";
-import {BrowserRouter as Router, Link, Route} from "react-router-dom";
 
 const initialState = {
     accountFrom: "",
@@ -42,8 +41,8 @@ export class TransferToAccount extends React.Component {
 
     handleSubmit = event => {
         event.preventDefault();
-        if (this.state.display==0){this.validate()}
-        else if (this.state.display==3){this.validatePassword()}
+        if (this.state.display===0){this.validate()}
+        else if (this.state.display===3){this.validatePassword()}
         else{this.validateAccountTo()}
     }
 
@@ -75,6 +74,7 @@ export class TransferToAccount extends React.Component {
     }
 
     validateAccountTo = event =>{
+        //validates the account to send to
         let accountToError = "";
         let display = 2;
         if (!this.state.accountTo) {
@@ -107,7 +107,7 @@ export class TransferToAccount extends React.Component {
             passwordError = "Password is required"
         } else{
             if (passwordAttempts>0){
-                if (password != userPassword){
+                if (password !== userPassword){
                     -- passwordAttempts
                     passwordError = passwordAttempts + " login attempts remaining"
                 }
@@ -147,7 +147,7 @@ export class TransferToAccount extends React.Component {
 
         for (i = 0; i < (this.state.userAccounts).length; i++){
             // prevents the user sending a transaction to the same account
-            if (this.state.userAccounts[i]!=this.state.accountFrom){
+            if (this.state.userAccounts[i]!==this.state.accountFrom){
                 updatedUserAccounts.push(this.state.userAccounts[i])
             }
         }
@@ -295,7 +295,7 @@ export class TransferToAccount extends React.Component {
                         <form action="AuthorisePayment" id="AuthorisePayment" method="post" onSubmit={this.handleSubmit}>
                             <label htmlFor="password">Enter Password</label><br/>
                             <input type="password" id="password" name="password" value={this.state.password}
-                                   onChange={this.handleChange} disabled={this.state.passwordAttempts==0}/>
+                                   onChange={this.handleChange} disabled={this.state.passwordAttempts===0}/>
                             <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
                             <button type="submit">Authorise Payment</button>
                         </form>
