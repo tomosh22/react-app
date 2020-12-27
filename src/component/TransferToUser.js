@@ -1,48 +1,52 @@
 import React from "react";
 import {BrowserRouter as Router, Link, Route} from "react-router-dom";
 
+const initialState ={
+    accFrom: "",
+    accName: "",
+    accNumber: "",
+    sortCode: "",
+    currency: "£",
+    //Set default value as will not update if user does not select a different option to the default option
+    amount: "",
+    reference: "",
+    chosenPayee:"",
+    password:"",
+    accFromError: "",
+    accToError:"",
+    accNameError: "",
+    accNumberError: "",
+    sortCodeError: "",
+    amountError: "",
+    referenceError: "",
+    passwordError:"",
+
+    userAccounts: ["Saving account", "Current account"],
+    //example of what user accounts should look like
+
+    recentPayees: [["Katie","1234567","11-11-11"], ["Sam","2345678","22-22-22"], ["James","3456789","33-33-33"],
+        ["Sophie","4567890", "44-44-44"], ["Lucy","5678901","55-55-55"]],
+    //example of what recent Payees should look like
+
+    balance: 1000.00,
+    //example of what balance should look like
+
+    display: 0,
+    // determines the display of the webpage
+    // 0: main transaction page; 1: review details page; 2: new payee page; 3: recent payee page;
+
+    passwordAttempts: 3,
+    //number of attempts for the user to enter password
+    userPassword: "",
+    salt: "",
+    //user's hashed password and salt from database
+
+};
+
+
 export class TransferToUser extends React.Component {
-    state ={
-        accFrom: "",
-        accName: "",
-        accNumber: "",
-        sortCode: "",
-        currency: "£",
-        //Set default value as will not update if user does not select a different option to the default option
-        amount: "",
-        reference: "",
-        chosenPayee:"",
-        password:"",
-        accFromError: "",
-        accToError:"",
-        accNameError: "",
-        accNumberError: "",
-        sortCodeError: "",
-        amountError: "",
-        referenceError: "",
-        passwordError:"",
 
-        userAccounts: ["Saving account", "Current account"],
-        //example of what user accounts should look like
-
-        recentPayees: [["Katie","1234567","11-11-11"], ["Sam","2345678","22-22-22"], ["James","3456789","33-33-33"],
-            ["Sophie","4567890", "44-44-44"], ["Lucy","5678901","55-55-55"]],
-        //example of what recent Payees should look like
-
-        balance: 1000.00,
-        //example of what balance should look like
-
-        display: 0,
-        // determines the display of the webpage
-        // 0: main transaction page; 1: review details page; 2: new payee page; 3: recent payee page;
-
-        passwordAttempts: 3,
-        //number of attempts for the user to enter password
-        userPassword: "",
-        salt: "",
-        //user's hashed password and salt from database
-
-    };
+    state=initialState;
 
     handleChange = event => {
         // stores what user types in form in React
@@ -54,7 +58,7 @@ export class TransferToUser extends React.Component {
         event.preventDefault();
         if (this.state.display==0){this.validateTransaction()}
         else if (this.state.display==3){this.setPayeeDetails(); this.state.display = 0;} //this.GetBalance() uncomment this when connected to database
-        else if (this.state.display==4){this.validatePassword()}
+        else if (this.state.display==4){this.validatePassword();}
         else{this.validateNewPayee()}
     }
 
@@ -138,6 +142,7 @@ export class TransferToUser extends React.Component {
         //change userPassword here!!
         let password = this.state.password;
         let passwordAttempts = this.state.passwordAttempts;
+        let display = 4;
 
         //this.GetPassword();
         //var hash = crypto.createHmac("sha512", this.state.salt);
@@ -158,11 +163,12 @@ export class TransferToUser extends React.Component {
                 else{
                     //this.ProcessPayment()
                     //uncomment when connected to database
+                    display = 5;
                 }
             }
             else{passwordError= "0 login attempts remaining"}
         }
-        this.setState({passwordError, passwordAttempts})
+        this.setState({passwordError, passwordAttempts, display})
     }
 
 
@@ -186,6 +192,10 @@ export class TransferToUser extends React.Component {
     authorisePayment = event =>{
         let display = 4;
         this.setState({display})
+    }
+
+    resetState = event => {
+        this.setState(initialState);
     }
 
 
@@ -377,5 +387,17 @@ export class TransferToUser extends React.Component {
                     </div>
                 )
                 break;
+
+            case 5:
+                //CONFIRMATION PAYMENT HAS GONE THROUGH
+                return(
+                    <div>
+                        <br/>
+                        <p>Payment sent successfully</p>
+                        <button type={"button"} onClick={this.resetState}>Close</button>
+                    </div>
+                )
+            break;
+
     };
 }}
