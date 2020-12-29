@@ -49,7 +49,7 @@ export class TransferToUser extends React.Component {
 
     handleChange = event => {
         // stores what user types in form in React
-        this.setState ({[event.target.name] : event.target.value})
+        this.setState({[event.target.name]: event.target.value})
 
     }
 
@@ -356,17 +356,13 @@ export class TransferToUser extends React.Component {
                     <div>
                         <br/>
                         <form action="SelectRecentPayee" id="SelectRecentPayee" method="post" onSubmit={this.handleSubmit}>
-                        <select id="chosenPayee" name="chosenPayee"  value={this.state.chosenPayee} onChange={this.handleChange}
-                                disabled={!this.state.accFrom}>
-                            <option value="" disabled selected>Choose a recent payee</option>
                             {this.state.recentPayees.map(list =>(
-                                <option key={list} value={list}>
+                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}>
                                     {list[0]}
-                                </option>
+                                </button>
                             )) }
-                        </select><br/><br/>
-                        <button type="button" onClick={this.ChangeDetails}>Back</button>
-                        <button type="submit">Submit</button>
+                            <br/><br/>
+                            <button type="button" onClick={this.ChangeDetails}>Back</button>
                         </form>
                     </div>
                 )
