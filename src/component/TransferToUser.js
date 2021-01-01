@@ -9,6 +9,9 @@ const initialState ={
     //Set default value as will not update if user does not select a different option to the default option
     amount: "",
     reference: "",
+    dateToday:"",
+    payLater: false,
+    payToday: false,
     chosenPayee:"",
     password:"",
     accFromError: "",
@@ -19,6 +22,7 @@ const initialState ={
     amountError: "",
     referenceError: "",
     passwordError:"",
+    dateError:"",
 
     userAccounts: ["Saving account", "Current account"],
     //example of what user accounts should look like
@@ -52,6 +56,19 @@ export class TransferToUser extends React.Component {
         this.setState({[event.target.name]: event.target.value})
 
     }
+    handleCheck = event =>{
+        // stores what user types in form in React
+        this.setState({[event.target.name]: event.target.checked})
+        if (event.target.checked===true){
+            if (event.target.name==="payLater"){
+                this.setState({payToday:false})
+            }else{
+                this.setState({payLater:false});
+                let date=this.GetDate();
+                this.setState({date});
+            }
+        }
+    }
 
     handleSubmit = event => {
         event.preventDefault();
@@ -79,6 +96,7 @@ export class TransferToUser extends React.Component {
         let accToError="";
         let amountError = "";
         let referenceError = "";
+        let dateError = "";
         let display = 0;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
@@ -97,12 +115,15 @@ export class TransferToUser extends React.Component {
         if (!this.state.reference){
             referenceError = "Reference is required"
         }
+        if(!this.state.date){
+            dateError = "Date to pay is required"
+        }
 
-        if (!accFromError && !accToError && !amountError && !referenceError){
+        if (!accFromError && !accToError && !amountError && !referenceError && !dateError){
             display = 1;
         }
 
-        this.setState({accFromError,accToError, amountError, referenceError, display})
+        this.setState({accFromError,accToError, amountError, referenceError, dateError, display})
     }
 
     validateNewPayee = event =>{
@@ -171,7 +192,6 @@ export class TransferToUser extends React.Component {
         this.setState({passwordError, passwordAttempts, display})
     }
 
-
     ChangeDetails = event =>{
         let display =0;
         this.setState({display})
@@ -196,6 +216,21 @@ export class TransferToUser extends React.Component {
 
     resetState = event => {
         this.setState(initialState);
+    }
+
+    GetDate = event =>{
+        let date = new Date();
+        let dd = date.getDate();
+        let mm = date.getMonth()+1;
+        let yyyy = date.getFullYear();
+        if(dd<10) {
+            dd="0" +dd;
+        }
+        if(mm<10) {
+            mm="0" +mm;
+        }
+        date = yyyy+"-"+mm+"-"+dd;
+        return(date);
     }
 
 
@@ -300,6 +335,16 @@ export class TransferToUser extends React.Component {
                                onChange={this.handleChange} disabled={!this.state.accName}/>
                         <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
+                        <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accName}
+                               checked={this.state.payToday} onChange={this.handleCheck}/>
+                        <label htmlFor="payToday">Pay Today</label><t/>
+                        <input type="checkbox" id="payLater" name="payLater" disabled={!this.state.accName}
+                               checked={this.state.payLater} onChange={this.handleCheck}/>
+                        <label htmlFor="payLater">Pay Later</label><br/>
+                        <input type="date" id="date" name="date" disabled={this.state.payLater===false}
+                               value={this.state.date} onChange={this.handleChange} min={this.GetDate()}/>
+                        <div style={{color:"red"}}>{this.state.dateError}</div><br/><br/>
+
                         <button type="submit">Send Money</button>
 
                     </form>
@@ -318,6 +363,7 @@ export class TransferToUser extends React.Component {
                         <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                         <p>Reference: <b>{this.state.reference}</b></p>
+                        <p>Date: <b>{this.state.date}</b></p>
                         <button type="button" onClick={this.authorisePayment}>Confirm details</button><br />
                         <button type="button" onClick={this.ChangeDetails}>Change details</button>
                     </div>
