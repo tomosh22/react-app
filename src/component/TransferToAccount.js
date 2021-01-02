@@ -1,4 +1,5 @@
 import React from "react";
+import {TransferToUser} from "./TransferToUser";
 
 const initialState = {
     accountFrom: "",
@@ -7,10 +8,14 @@ const initialState = {
     //Set default value as will not update if user does not select a different option to the default option
     amount: "",
     password:"",
+    dateToday:"",
+    payLater: false,
+    payToday: false,
     accountFromError: "",
     accountToError: "",
     amountError: "",
     passwordError: "",
+    dateError:"",
 
     userAccounts: ["My Saving Account", "My Current Account"],
     updatedUserAccounts: [],
@@ -39,6 +44,20 @@ export class TransferToAccount extends React.Component {
         this.setState({[event.target.name]: event.target.value})
     }
 
+    handleCheck = event =>{
+        // stores what user types in form in React
+        this.setState({[event.target.name]: event.target.checked})
+        if (event.target.checked===true){
+            if (event.target.name==="payLater"){
+                this.setState({payToday:false})
+            }else{
+                this.setState({payLater:false});
+                let date= this.GetDate();
+                this.setState({date});
+            }
+        }
+    }
+
     handleSubmit = event => {
         event.preventDefault();
         if (this.state.display===0){this.validate()}
@@ -51,6 +70,7 @@ export class TransferToAccount extends React.Component {
         let accountFromError = "";
         let accountToError = "";
         let amountError = "";
+        let dateError = "";
         let display = 0;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
@@ -65,12 +85,15 @@ export class TransferToAccount extends React.Component {
         } else if (!(amountRegex.test(this.state.amount))) {
             amountError = "Amount must be valid"
         }
+        if(!this.state.date){
+            dateError = "Date to pay is required"
+        }
 
-        if (!accountToError && !accountFromError && !amountError) {
+        if (!accountToError && !accountFromError && !amountError && !dateError) {
             display = 1;
         }
 
-        this.setState({accountFromError, accountToError, amountError, display})
+        this.setState({accountFromError, accountToError, amountError, dateError, display})
     }
 
     validateAccountTo = event =>{
@@ -138,6 +161,21 @@ export class TransferToAccount extends React.Component {
         this.setState(initialState);
     }
 
+    GetDate = event =>{
+        let date = new Date();
+        let dd = date.getDate();
+        let mm = date.getMonth()+1;
+        let yyyy = date.getFullYear();
+        if(dd<10) {
+            dd="0" +dd;
+        }
+        if(mm<10) {
+            mm="0" +mm;
+        }
+        date = yyyy+"-"+mm+"-"+dd;
+        return(date);
+    }
+
     SelectAccountTo = event =>{
         let display =2;
         let updatedUserAccounts=[]
@@ -170,7 +208,7 @@ export class TransferToAccount extends React.Component {
             //PROCESSES TRANSACTION
             await fetch("http://localhost:3000/insertTransaction/",
                 + this.state.accountFrom + "/" + this.state.accountTo + "/" +this.state.currency + "/" +
-                this.state.amount,
+                this.state.amount + "/" + this.state.date,
                 {
                     method:"POST"
                 })
@@ -241,7 +279,17 @@ export class TransferToAccount extends React.Component {
                             <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
                                    onChange={this.handleChange} disabled={!this.state.accountTo} min={"0.00"}
                                    max={this.state.balance}></input>
-                            <div style={{color: "red"}}>{this.state.amountError}</div>
+                            <div style={{color: "red"}}>{this.state.amountError}</div><br/>
+
+                            <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accountTo}
+                                   checked={this.state.payToday} onChange={this.handleCheck}/>
+                            <label htmlFor="payToday">Pay Today</label><t/>
+                            <input type="checkbox" id="payLater" name="payLater" disabled={!this.state.accountTo}
+                                   checked={this.state.payLater} onChange={this.handleCheck}/>
+                            <label htmlFor="payLater">Pay Later</label><br/>
+                            <input type="date" id="date" name="date" disabled={!this.state.payLater}
+                                   value={this.state.date} onChange={this.handleChange} min={this.GetDate()}/>
+                            <div style={{color:"red"}}>{this.state.dateError}</div>
                             <br></br>
 
                             <button type="submit">Send Money</button>
@@ -257,6 +305,7 @@ export class TransferToAccount extends React.Component {
                         <p>From: <b>{this.state.accountFrom}</b></p>
                         <p>To: <b>{this.state.accountTo}</b></p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
+                        <p>Date: <b>{this.state.date}</b></p>
                         <button type="button" onClick={this.authorisePayment}>Confirm details</button>
                         <br/>
                         <button type="button" onClick={this.ChangeDetails}>Change details</button>

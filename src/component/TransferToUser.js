@@ -30,6 +30,8 @@ const initialState ={
     recentPayees: [["Katie","1234567","11-11-11"], ["Sam","2345678","22-22-22"], ["James","3456789","33-33-33"],
         ["Sophie","4567890", "44-44-44"], ["Lucy","5678901","55-55-55"]],
     //example of what recent Payees should look like
+    favourite: false,
+    favouritePayees:[],
 
     balance: 1000.00,
     //example of what balance should look like
@@ -62,7 +64,7 @@ export class TransferToUser extends React.Component {
         if (event.target.checked===true){
             if (event.target.name==="payLater"){
                 this.setState({payToday:false})
-            }else{
+            }else if (event.target.name==="payToday"){
                 this.setState({payLater:false});
                 let date=this.GetDate();
                 this.setState({date});
@@ -150,6 +152,21 @@ export class TransferToUser extends React.Component {
 
 
         if (!accNameError && !accNumberError && !sortCodeError ){
+            if (this.state.favourite){
+                let favouritePayees= this.state.favouritePayees;
+                let newFavourite= [this.state.accName,this.state.accNumber,this.state.sortCode];
+                let i;
+                let found=false;
+                for(i=0; i<favouritePayees.length; i++){
+                    if(JSON.stringify(favouritePayees[i])=== JSON.stringify(newFavourite)){
+                        found=true;
+                    }
+                }
+                if (!found){
+                    favouritePayees.push(newFavourite);
+                    this.setState({favouritePayees})
+                }
+            }
             display=0;
         }
 
@@ -262,7 +279,7 @@ export class TransferToUser extends React.Component {
             await fetch("http://localhost:3000/insertTransaction/",
                 + this.state.accFrom + "/" + this.state.accName + "/" +
                 this.state.accNumber + "/" + this.state.sortCode + "/" +this.state.currency + "/" + this.state.amount
-                + "/" + this.state.reference,
+                + "/" + this.state.reference + "/" + this.state.date,
                 {
                     method:"POST"
                 })
@@ -341,7 +358,7 @@ export class TransferToUser extends React.Component {
                         <input type="checkbox" id="payLater" name="payLater" disabled={!this.state.accName}
                                checked={this.state.payLater} onChange={this.handleCheck}/>
                         <label htmlFor="payLater">Pay Later</label><br/>
-                        <input type="date" id="date" name="date" disabled={this.state.payLater===false}
+                        <input type="date" id="date" name="date" disabled={!this.state.payLater}
                                value={this.state.date} onChange={this.handleChange} min={this.GetDate()}/>
                         <div style={{color:"red"}}>{this.state.dateError}</div><br/><br/>
 
@@ -388,7 +405,10 @@ export class TransferToUser extends React.Component {
                         <label htmlFor="sortCode">Sort Code</label><br/>
                         <input id="sortCode" name="sortCode" value={this.state.sortCode}
                                onChange={this.handleChange}/>
-                        <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/><br/>
+                        <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/>
+                        <input type="checkbox" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}/>
+                        <label htmlFor="favourite">Add payee to your favourite payees?</label>
+                        <br/><br/>
                         <button type="button" onClick={this.ChangeDetails}>Back</button>
                         <button type="submit">Submit</button>
                         </form>
@@ -402,7 +422,15 @@ export class TransferToUser extends React.Component {
                     <div>
                         <br/>
                         <form action="SelectRecentPayee" id="SelectRecentPayee" method="post" onSubmit={this.handleSubmit}>
+                            <label htmlFor="recentPayees" hidden={this.state.recentPayees.length===0}>Recent Payees:</label><br/>
                             {this.state.recentPayees.map(list =>(
+                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}>
+                                    {list[0]}
+                                </button>
+                            )) }
+                            <br/><br/>
+                            <label htmlFor="favouritePayees" hidden={this.state.favouritePayees.length===0}>Favourite Payees:</label><br/>
+                            {this.state.favouritePayees.map(list =>(
                                 <button name={"chosenPayee"} value={list} onClick={this.handleChange}>
                                     {list[0]}
                                 </button>
