@@ -174,6 +174,8 @@ export class TransferToUser extends React.Component {
                 if (!found){
                     favouritePayees.push(newFavourite);
                     this.setState({favouritePayees})
+                    //this.SetFavourite();
+                    //uncomment when connected to database
                 }
             }
             display=0;
@@ -232,6 +234,7 @@ export class TransferToUser extends React.Component {
         let display = 3;
         this.setState({display})
         //this.GetRecentPayees();
+        //this.GetFavourite()
         //uncomment these when connected to database
     }
 
@@ -314,6 +317,24 @@ export class TransferToUser extends React.Component {
                 method:"GET"
             }).then(response => response.json()).then(data => (userPassword = data.hash, salt = data.salt))
         this.setState({userPassword, salt})
+    }
+
+    GetFavourite = event =>{
+        //GETS THE USER'S FAVOURITE PAYEES
+        let favouritePayees=[];
+        fetch("http://localhost:3000/getFavouritePayees/", + this.props.state.username,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => (favouritePayees = data))
+        this.setState({favouritePayees})
+    }
+
+    SetFavourite = event =>{
+        // SETS THE USER'S FAVOURITE PAYEES
+        fetch("http://localhost:3000/setFavouritePayees/", + this.props.state.username + "/" + this.state.favouritePayees,
+            {
+                method:"POST"
+            })
     }
 
 
@@ -446,7 +467,7 @@ export class TransferToUser extends React.Component {
                                     {list[0]}
                                 </button>
                             )) }
-                            <p>{this.state.details}</p>
+                            <p><b>{this.state.details}</b></p>
                             <br/>
                             <button type="button" onClick={this.ChangeDetails}>Back</button>
                         </form>
