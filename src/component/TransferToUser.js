@@ -23,6 +23,7 @@ const initialState ={
     referenceError: "",
     passwordError:"",
     dateError:"",
+    details:"",
 
     userAccounts: ["Saving account", "Current account"],
     //example of what user accounts should look like
@@ -70,6 +71,14 @@ export class TransferToUser extends React.Component {
                 this.setState({date});
             }
         }
+    }
+
+    handleDetails= event =>{
+        //stores details of payees user mouse is hovering over
+        this.setState({details: event.target.value})
+    }
+    resetDetails= event =>{
+        this.setState({details: ""})
     }
 
     handleSubmit = event => {
@@ -424,18 +433,21 @@ export class TransferToUser extends React.Component {
                         <form action="SelectRecentPayee" id="SelectRecentPayee" method="post" onSubmit={this.handleSubmit}>
                             <label htmlFor="recentPayees" hidden={this.state.recentPayees.length===0}>Recent Payees:</label><br/>
                             {this.state.recentPayees.map(list =>(
-                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}>
+                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}
+                                        onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
                                 </button>
                             )) }
                             <br/><br/>
                             <label htmlFor="favouritePayees" hidden={this.state.favouritePayees.length===0}>Favourite Payees:</label><br/>
                             {this.state.favouritePayees.map(list =>(
-                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}>
+                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}
+                                        onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
                                 </button>
                             )) }
-                            <br/><br/>
+                            <p>{this.state.details}</p>
+                            <br/>
                             <button type="button" onClick={this.ChangeDetails}>Back</button>
                         </form>
                     </div>
