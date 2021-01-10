@@ -113,11 +113,3 @@ header{
     object-fit: contain;
     height: 40px;
 }
-.main{
-    position: absolute;
-    left: 33.33%;
-    width:33.33%;
-    text-align:center;
-    background: #78bc55;
-    border-radius: 0 0 50px 50px;
-}
