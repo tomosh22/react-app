@@ -34,6 +34,11 @@ const initialState ={
     favourite: false,
     favouritePayees:[],
 
+    tagCategories: ["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment","Add tag..."],
+    tag:"",
+    tagError:"",
+    addTag:"",
+
     balance: 1000.00,
     //example of what balance should look like
 
@@ -101,6 +106,26 @@ export class TransferToUser extends React.Component {
         }
     }
 
+    addTagCategory = event =>{
+        //add new tag to the tag list
+        let tagCategories= this.state.tagCategories;
+        let i;
+        let found=false;
+        for(i=0; i<tagCategories.length; i++){
+            if(tagCategories[i]===this.state.addTag){
+                found=true;
+                let tagError="Tag already exists";
+                this.setState({tagError})
+            }
+        }
+        if (!found) {
+            tagCategories.push(this.state.addTag);
+            let addTag = "";
+            let tag = this.state.addTag;
+            this.setState({tagCategories, addTag, tag});
+        }
+    }
+
     validateTransaction = event =>{
         // validates the user's input for transaction form
         let accFromError="";
@@ -108,6 +133,7 @@ export class TransferToUser extends React.Component {
         let amountError = "";
         let referenceError = "";
         let dateError = "";
+        let tagError="";
         let display = 0;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
@@ -130,11 +156,15 @@ export class TransferToUser extends React.Component {
             dateError = "Date to pay is required"
         }
 
-        if (!accFromError && !accToError && !amountError && !referenceError && !dateError){
+        if(!this.state.tag || this.state.tag==="Add tag..."){
+            tagError="Tag is required"
+        }
+
+        if (!accFromError && !accToError && !amountError && !referenceError && !dateError && !tagError){
             display = 1;
         }
 
-        this.setState({accFromError,accToError, amountError, referenceError, dateError, display})
+        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display})
     }
 
     validateNewPayee = event =>{
@@ -206,7 +236,7 @@ export class TransferToUser extends React.Component {
         } else{
             if (passwordAttempts>0){
                 if (password !== userPassword){
-                    -- passwordAttempts
+                    -- passwordAttempts;
                     passwordError = passwordAttempts + " login attempts remaining"
                 }
                 else{
@@ -382,6 +412,22 @@ export class TransferToUser extends React.Component {
                                onChange={this.handleChange} disabled={!this.state.accName}/>
                         <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
+                        <label htmlFor="tag">Payment Category</label><br/>
+                        <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
+                                disabled={!this.state.accName}>
+                            <option value="" disabled selected>Choose an tag</option>
+                            {this.state.tagCategories.map(list =>(
+                                <option key={list} value={list}>
+                                    {list}
+                                </option>
+                            )) }
+                        </select><br/>
+                        <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
+                               hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
+                        <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={this.addTagCategory}>Add</button><br/>
+                        <div style={{color:"red"}}>{this.state.tagError}</div><br/>
+
+
                         <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accName}
                                checked={this.state.payToday} onChange={this.handleCheck}/>
                         <label htmlFor="payToday">Pay Today</label><t/>
@@ -410,6 +456,7 @@ export class TransferToUser extends React.Component {
                         <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                         <p>Reference: <b>{this.state.reference}</b></p>
+                        <p>Category: <b>{this.state.tag}</b></p>
                         <p>Date: <b>{this.state.date}</b></p>
                         <button type="button" onClick={this.authorisePayment}>Confirm details</button><br />
                         <button type="button" onClick={this.ChangeDetails}>Change details</button>
