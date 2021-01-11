@@ -63,7 +63,7 @@ export class SignUp extends React.Component{
                 }
                 if(!found){break;};
             }
-            console.log(salt)
+            salt = salt.toString("utf8")
             var hash = crypto.createHmac("sha512", salt)
             hash.update(this.state.password + salt)
             hash = hash.digest("hex")

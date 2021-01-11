@@ -1,5 +1,6 @@
 import React from "react";
 import {context} from "./Home";
+const crypto = require("crypto");
 
 export class Login extends React.Component{
 
@@ -16,18 +17,36 @@ export class Login extends React.Component{
         console.log("username " + this.state.username)
     }
 
-    async handleSubmit(event,setUsername,setFirstName,setLastName,setLoggedIn,addAccoun){
+    async handleSubmit(event,setUsername,setFirstName,setLastName,setLoggedIn){
         event.preventDefault();
         //this.validate();
-        var username,salt,firstname,secondname,email
+        var username,hash,salt,firstname,secondname,email
+        await fetch("http://localhost:3000/selectHashAndSalt/" + this.state.username, {
+            method: "GET"
+        }).then(response => response.json()).then(data => {hash = data[0].Password;salt = data[0].Salt})
+        console.log(hash);
+        console.log(salt);
+        var hashCheck = crypto.createHmac("sha512",salt)
+        hashCheck.update(this.state.password + salt)
+        hashCheck = hashCheck.digest("hex")
+        if(hash == hashCheck){
+            console.log("logged in")
+        }
+        else{
+            console.log("wrong password")
+        }
+        console.log(hash)
+        console.log(hashCheck)
+
+
+
         await fetch("http://localhost:3000/selectLoginUser/" + this.state.username, {
             method: "GET"
         }).then(response => response.json()).then(data => {username=data[0].Username;salt=data[0].Salt;firstname=data[0].FirstName;secondname=data[0].SecondName;email=data[0].Email})
-        console.log("salt: ",salt);
         setUsername(username);
         setFirstName(firstname);
         setLastName(secondname);
-
+        setLoggedIn(true);
 
         this.props.history.push("/dashboard");
     }
