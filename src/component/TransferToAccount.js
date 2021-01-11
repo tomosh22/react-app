@@ -1,5 +1,4 @@
 import React from "react";
-import {TransferToUser} from "./TransferToUser";
 
 const initialState = {
     accountFrom: "",
@@ -33,6 +32,13 @@ const initialState = {
     userPassword: "",
     salt: "",
     //user's hashed password and salt from database
+
+    tagCategories: ["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment","Add tag...", "Delete tag..."],
+    tag:"",
+    tagError:"",
+    addTag:"",
+    deleteTag:"",
+
 };
 
 export class TransferToAccount extends React.Component {
@@ -65,12 +71,53 @@ export class TransferToAccount extends React.Component {
         else{this.validateAccountTo()}
     }
 
+    addTagCategory = event =>{
+        //add new tag to the tag list
+        let tagCategories= this.state.tagCategories;
+        let i;
+        let found=false;
+        for(i=0; i<tagCategories.length; i++){
+            if(tagCategories[i]===this.state.addTag){
+                found=true;
+                let tagError="Tag already exists";
+                this.setState({tagError})
+            }
+        }
+        if (!found) {
+            tagCategories.push(this.state.addTag);
+            let addTag = "";
+            let tag = this.state.addTag;
+            this.setState({tagCategories, addTag, tag});
+        }
+    }
+
+    deleteTagCategory= event =>{
+        //deletes tag from the tag list
+        let tagCategories= this.state.tagCategories;
+        let i;
+        let found=false;
+        for(i=0; i<tagCategories.length; i++){
+            if(tagCategories[i]===this.state.deleteTag){
+                tagCategories.splice(i, 1);
+                found=true;
+                let deleteTag="";
+                let tag="";
+                this.setState({tagCategories,tag, deleteTag})
+            }
+        }
+        if(!found){
+            let tagError="Tag does not exists";
+            this.setState({tagError})
+        }
+    }
+
     validate = event => {
         // validates the user's input
         let accountFromError = "";
         let accountToError = "";
         let amountError = "";
         let dateError = "";
+        let tagError="";
         let display = 0;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
@@ -89,11 +136,15 @@ export class TransferToAccount extends React.Component {
             dateError = "Date to pay is required"
         }
 
-        if (!accountToError && !accountFromError && !amountError && !dateError) {
+        if(!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag..."){
+            tagError="Tag is required"
+        }
+
+        if (!accountToError && !accountFromError && !amountError && !dateError && !tagError) {
             display = 1;
         }
 
-        this.setState({accountFromError, accountToError, amountError, dateError, display})
+        this.setState({accountFromError, accountToError, amountError, dateError, tagError, display})
     }
 
     validateAccountTo = event =>{
@@ -281,6 +332,25 @@ export class TransferToAccount extends React.Component {
                                    max={this.state.balance}></input>
                             <div style={{color: "red"}}>{this.state.amountError}</div><br/>
 
+                            <label htmlFor="tag">Payment Category </label><br/>
+                            <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
+                                    disabled={!this.state.accountTo}>
+                                <option value="" disabled selected>Choose an tag</option>
+                                {this.state.tagCategories.map(list =>(
+                                    <option key={list} value={list}>
+                                        {list}
+                                    </option>
+                                )) }
+                            </select><br/>
+                            <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
+                                   hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
+                            <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={this.addTagCategory}>Add</button>
+                            <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
+                                   hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
+                            <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={this.deleteTagCategory}>Delete</button><br/>
+                            <div style={{color:"red"}}>{this.state.tagError}</div><br/>
+
+
                             <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accountTo}
                                    checked={this.state.payToday} onChange={this.handleCheck}/>
                             <label htmlFor="payToday">Pay Today</label><t/>
@@ -305,6 +375,7 @@ export class TransferToAccount extends React.Component {
                         <p>From: <b>{this.state.accountFrom}</b></p>
                         <p>To: <b>{this.state.accountTo}</b></p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
+                        <p>Category: <b>{this.state.tag}</b></p>
                         <p>Date: <b>{this.state.date}</b></p>
                         <button type="button" onClick={this.authorisePayment}>Confirm details</button>
                         <br/>

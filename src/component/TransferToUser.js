@@ -433,7 +433,7 @@ export class TransferToUser extends React.Component {
                                onChange={this.handleChange} disabled={!this.state.accName}/>
                         <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
-                        <label htmlFor="tag">Payment Category</label><br/>
+                        <label htmlFor="tag">Payment Category </label><br/>
                         <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
                                 disabled={!this.state.accName}>
                             <option value="" disabled selected>Choose an tag</option>
