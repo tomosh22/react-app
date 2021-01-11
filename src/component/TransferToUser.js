@@ -34,10 +34,11 @@ const initialState ={
     favourite: false,
     favouritePayees:[],
 
-    tagCategories: ["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment","Add tag..."],
+    tagCategories: ["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment","Add tag...", "Delete tag..."],
     tag:"",
     tagError:"",
     addTag:"",
+    deleteTag:"",
 
     balance: 1000.00,
     //example of what balance should look like
@@ -126,6 +127,26 @@ export class TransferToUser extends React.Component {
         }
     }
 
+    deleteTagCategory= event =>{
+        //deletes tag from the tag list
+        let tagCategories= this.state.tagCategories;
+        let i;
+        let found=false;
+        for(i=0; i<tagCategories.length; i++){
+            if(tagCategories[i]===this.state.deleteTag){
+                tagCategories.splice(i, 1);
+                found=true;
+                let deleteTag="";
+                let tag="";
+                this.setState({tagCategories,tag, deleteTag})
+            }
+        }
+        if(!found){
+            let tagError="Tag does not exists";
+            this.setState({tagError})
+        }
+    }
+
     validateTransaction = event =>{
         // validates the user's input for transaction form
         let accFromError="";
@@ -156,7 +177,7 @@ export class TransferToUser extends React.Component {
             dateError = "Date to pay is required"
         }
 
-        if(!this.state.tag || this.state.tag==="Add tag..."){
+        if(!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag..."){
             tagError="Tag is required"
         }
 
@@ -424,7 +445,10 @@ export class TransferToUser extends React.Component {
                         </select><br/>
                         <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
                                hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
-                        <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={this.addTagCategory}>Add</button><br/>
+                        <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={this.addTagCategory}>Add</button>
+                        <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
+                               hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
+                        <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={this.deleteTagCategory}>Delete</button><br/>
                         <div style={{color:"red"}}>{this.state.tagError}</div><br/>
 
 
