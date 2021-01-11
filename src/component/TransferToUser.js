@@ -34,7 +34,7 @@ const initialState ={
     favourite: false,
     favouritePayees:[],
 
-    tagCategories: ["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment","Add tag...", "Delete tag..."],
+    tagCategories: ["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"],
     tag:"",
     tagError:"",
     addTag:"",
@@ -442,6 +442,8 @@ export class TransferToUser extends React.Component {
                                     {list}
                                 </option>
                             )) }
+                            <option value={"Add tag..."}>Add tag...</option>
+                            <option value={"Delete tag..."}>Delete tag...</option>
                         </select><br/>
                         <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
                                hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
