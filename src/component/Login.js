@@ -1,5 +1,5 @@
 import React from "react";
-import {context} from "./Home";
+import {Account, context} from "./Home";
 const crypto = require("crypto");
 
 export class Login extends React.Component{
@@ -10,14 +10,12 @@ export class Login extends React.Component{
         usernameError: "",
         passwordError: ""
     };
-
     handleChange = event => {
         // stores what user types in form in React
         this.setState ({[event.target.name] : event.target.value})
         console.log("username " + this.state.username)
     }
-
-    async handleSubmit(event,setUsername,setFirstName,setLastName,setLoggedIn){
+    async handleSubmit(event,setUsername,setFirstName,setLastName,setLoggedIn,addAccount){
         event.preventDefault();
         //this.validate();
         var username,hash,salt,firstname,secondname,email
@@ -29,26 +27,25 @@ export class Login extends React.Component{
         var hashCheck = crypto.createHmac("sha512",salt)
         hashCheck.update(this.state.password + salt)
         hashCheck = hashCheck.digest("hex")
+        //if password is correct
         if(hash == hashCheck){
-            console.log("logged in")
+            await fetch("http://localhost:3000/selectLoginUser/" + this.state.username, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {username=data[0].Username;salt=data[0].Salt;firstname=data[0].FirstName;secondname=data[0].SecondName;email=data[0].Email})
+            await fetch("http://localhost:3000/getUserAccounts/" + this.state.username, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {for(var x of data){addAccount(new Account(data[0].Name,data[0].Type,data[0].Balance,data[0].Currency,data[0].AccNumber))}})
+            setUsername(username);
+            setFirstName(firstname);
+            setLastName(secondname);
+            setLoggedIn(true);
+            this.props.history.push("/dashboard");
         }
+        //if password is incorrect
         else{
-            console.log("wrong password")
+            alert("Incorrect login, please try again")
         }
-        console.log(hash)
-        console.log(hashCheck)
 
-
-
-        await fetch("http://localhost:3000/selectLoginUser/" + this.state.username, {
-            method: "GET"
-        }).then(response => response.json()).then(data => {username=data[0].Username;salt=data[0].Salt;firstname=data[0].FirstName;secondname=data[0].SecondName;email=data[0].Email})
-        setUsername(username);
-        setFirstName(firstname);
-        setLastName(secondname);
-        setLoggedIn(true);
-
-        this.props.history.push("/dashboard");
     }
 
     validate = event =>{
