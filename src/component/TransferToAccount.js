@@ -1,5 +1,19 @@
 import React from "react";
 import GetDate from "./MoveMoneyFunctions";
+import styled from "styled-components";
+
+const Button = styled.button`
+    background-color: #78bc55;
+    border: none;
+    color: white;
+    padding: 4px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 6px;
+`
 
 const initialState = {
     accountFrom: "",
@@ -350,7 +364,7 @@ export class TransferToAccount extends React.Component {
                             <div style={{color:"red"}}>{this.state.dateError}</div>
                             <br></br>
 
-                            <button type="submit">Send Money</button>
+                            <Button type="submit">Send Money</Button>
                         </form>
                     </div>
                 )
@@ -365,9 +379,9 @@ export class TransferToAccount extends React.Component {
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                         <p>Category: <b>{this.state.tag}</b></p>
                         <p>Date: <b>{this.state.date}</b></p>
-                        <button type="button" onClick={this.authorisePayment}>Confirm details</button>
+                        <Button type="button" onClick={this.authorisePayment}>Confirm details</Button>
                         <br/>
-                        <button type="button" onClick={this.ChangeDetails}>Change details</button>
+                        <Button type="button" onClick={this.ChangeDetails}>Change details</Button>
                     </div>
                 )
                 break;
@@ -388,8 +402,8 @@ export class TransferToAccount extends React.Component {
                             </select>
                             <div style={{color: "red"}}>{this.state.accountToError}</div>
                             <br></br>
-                            <button type="button" onClick={this.ChangeDetails}>Back</button>
-                            <button type="submit">Submit</button>
+                            <Button type="button" onClick={this.ChangeDetails}>Back</Button>
+                            <Button type="submit">Submit</Button>
                         </form>
                     </div>
                 )
@@ -405,7 +419,7 @@ export class TransferToAccount extends React.Component {
                             <input type="password" id="password" name="password" value={this.state.password}
                                    onChange={this.handleChange} disabled={this.state.passwordAttempts===0}/>
                             <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
-                            <button type="submit">Authorise Payment</button>
+                            <Button type="submit">Authorise Payment</Button>
                         </form>
                     </div>
                 )
@@ -417,7 +431,7 @@ export class TransferToAccount extends React.Component {
                     <div>
                         <br/>
                         <p>Payment sent successfully</p>
-                        <button type={"button"} onClick={this.resetState}>Close</button>
+                        <Button type={"button"} onClick={this.resetState}>Close</Button>
                     </div>
                 )
                 break;

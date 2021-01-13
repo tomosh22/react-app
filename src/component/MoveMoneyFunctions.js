@@ -1,4 +1,5 @@
 function GetDate () {
+    //Returns current date
     let date = new Date();
     let dd = date.getDate();
     let mm = date.getMonth()+1;
@@ -12,4 +13,5 @@ function GetDate () {
     date = yyyy+"-"+mm+"-"+dd;
     return(date);
 }
+
 export default GetDate

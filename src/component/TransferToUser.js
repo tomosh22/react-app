@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import GetDate from "./MoveMoneyFunctions";
 
 const CirclePayeeButton = styled.button`
-    background-color: #78bc55;
+    background-color: #5FA9EF;
     border: none;
     padding: 15px;
     text-align: center;
@@ -12,6 +12,18 @@ const CirclePayeeButton = styled.button`
     text-decoration: none;
     border-radius: 50%;
     font-size: 16px;
+`
+const Button = styled.button`
+    background-color: #78bc55;
+    border: none;
+    color: white;
+    padding: 4px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 6px;
 `
 
 const initialState ={
@@ -463,7 +475,7 @@ export class TransferToUser extends React.Component {
                                value={this.state.date} onChange={this.handleChange} min={GetDate()}/>
                         <div style={{color:"red"}}>{this.state.dateError}</div><br/><br/>
 
-                        <button type="submit">Send Money</button>
+                        <Button type="submit">Send Money</Button>
 
                     </form>
 
@@ -483,8 +495,8 @@ export class TransferToUser extends React.Component {
                         <p>Reference: <b>{this.state.reference}</b></p>
                         <p>Category: <b>{this.state.tag}</b></p>
                         <p>Date: <b>{this.state.date}</b></p>
-                        <button type="button" onClick={this.authorisePayment}>Confirm details</button><br />
-                        <button type="button" onClick={this.ChangeDetails}>Change details</button>
+                        <Button type="button" onClick={this.authorisePayment}>Confirm details</Button><br />
+                        <Button type="button" onClick={this.ChangeDetails}>Change details</Button>
                     </div>
                 )
                 break;
@@ -511,8 +523,8 @@ export class TransferToUser extends React.Component {
                         <input type="checkbox" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}/>
                         <label htmlFor="favourite">Add payee to your favourite payees?</label>
                         <br/><br/>
-                        <button type="button" onClick={this.ChangeDetails}>Back</button>
-                        <button type="submit">Submit</button>
+                        <Button type="button" onClick={this.ChangeDetails}>Back</Button>
+                        <Button type="submit">Submit</Button>
                         </form>
                     </div>
                 )
@@ -541,7 +553,7 @@ export class TransferToUser extends React.Component {
                             )) }
                             <p><b>{this.state.details}</b></p>
                             <br/>
-                            <button type="button" onClick={this.ChangeDetails}>Back</button>
+                            <Button type="button" onClick={this.ChangeDetails}>Back</Button>
                         </form>
                     </div>
                 )
@@ -557,7 +569,7 @@ export class TransferToUser extends React.Component {
                             <input type="password" id="password" name="password" value={this.state.password}
                                    onChange={this.handleChange} disabled={this.state.passwordAttempts===0}/>
                             <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
-                            <button type="submit">Authorise Payment</button>
+                            <Button type="submit">Authorise Payment</Button>
                         </form>
                     </div>
                 )
@@ -569,7 +581,7 @@ export class TransferToUser extends React.Component {
                     <div>
                         <br/>
                         <p>Payment sent successfully</p>
-                        <button type={"button"} onClick={this.resetState}>Close</button>
+                        <Button type={"button"} onClick={this.resetState}>Close</Button>
                     </div>
                 )
             break;
