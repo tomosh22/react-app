@@ -1,4 +1,17 @@
 import React from "react";
+import styled from 'styled-components';
+
+const Button = styled.button`
+    background-color: #78bc55;
+    border: none;
+    padding: 15px;
+    text-align: center;
+    margin: 6px 4px;
+    color: white;
+    text-decoration: none;
+    border-radius: 50%;
+    font-size: 16px;
+`
 
 const initialState ={
     accFrom: "",
@@ -527,18 +540,18 @@ export class TransferToUser extends React.Component {
                         <form action="SelectRecentPayee" id="SelectRecentPayee" method="post" onSubmit={this.handleSubmit}>
                             <label htmlFor="recentPayees" hidden={this.state.recentPayees.length===0}>Recent Payees:</label><br/>
                             {this.state.recentPayees.map(list =>(
-                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}
+                                <Button name={"chosenPayee"} value={list} onClick={this.handleChange}
                                         onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
-                                </button>
+                                </Button>
                             )) }
                             <br/><br/>
                             <label htmlFor="favouritePayees" hidden={this.state.favouritePayees.length===0}>Favourite Payees:</label><br/>
                             {this.state.favouritePayees.map(list =>(
-                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}
+                                <Button name={"chosenPayee"} value={list} onClick={this.handleChange}
                                         onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
-                                </button>
+                                </Button>
                             )) }
                             <p><b>{this.state.details}</b></p>
                             <br/>
