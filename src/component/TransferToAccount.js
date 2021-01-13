@@ -1,4 +1,5 @@
 import React from "react";
+import GetDate from "./MoveMoneyFunctions";
 
 const initialState = {
     accountFrom: "",
@@ -58,7 +59,7 @@ export class TransferToAccount extends React.Component {
                 this.setState({payToday:false})
             }else{
                 this.setState({payLater:false});
-                let date= this.GetDate();
+                let date= GetDate();
                 this.setState({date});
             }
         }
@@ -212,21 +213,6 @@ export class TransferToAccount extends React.Component {
         this.setState(initialState);
     }
 
-    GetDate = event =>{
-        let date = new Date();
-        let dd = date.getDate();
-        let mm = date.getMonth()+1;
-        let yyyy = date.getFullYear();
-        if(dd<10) {
-            dd="0" +dd;
-        }
-        if(mm<10) {
-            mm="0" +mm;
-        }
-        date = yyyy+"-"+mm+"-"+dd;
-        return(date);
-    }
-
     SelectAccountTo = event =>{
         let display =2;
         let updatedUserAccounts=[]
@@ -360,7 +346,7 @@ export class TransferToAccount extends React.Component {
                                    checked={this.state.payLater} onChange={this.handleCheck}/>
                             <label htmlFor="payLater">Pay Later</label><br/>
                             <input type="date" id="date" name="date" disabled={!this.state.payLater}
-                                   value={this.state.date} onChange={this.handleChange} min={this.GetDate()}/>
+                                   value={this.state.date} onChange={this.handleChange} min={GetDate()}/>
                             <div style={{color:"red"}}>{this.state.dateError}</div>
                             <br></br>
 

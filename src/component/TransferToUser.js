@@ -1,7 +1,8 @@
 import React from "react";
 import styled from 'styled-components';
+import GetDate from "./MoveMoneyFunctions";
 
-const Button = styled.button`
+const CirclePayeeButton = styled.button`
     background-color: #78bc55;
     border: none;
     padding: 15px;
@@ -86,7 +87,7 @@ export class TransferToUser extends React.Component {
                 this.setState({payToday:false})
             }else if (event.target.name==="payToday"){
                 this.setState({payLater:false});
-                let date=this.GetDate();
+                let date=GetDate();
                 this.setState({date});
             }
         }
@@ -311,21 +312,6 @@ export class TransferToUser extends React.Component {
         this.setState(initialState);
     }
 
-    GetDate = event =>{
-        let date = new Date();
-        let dd = date.getDate();
-        let mm = date.getMonth()+1;
-        let yyyy = date.getFullYear();
-        if(dd<10) {
-            dd="0" +dd;
-        }
-        if(mm<10) {
-            mm="0" +mm;
-        }
-        date = yyyy+"-"+mm+"-"+dd;
-        return(date);
-    }
-
 
     GetUserAccounts = event =>{
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
@@ -474,7 +460,7 @@ export class TransferToUser extends React.Component {
                                checked={this.state.payLater} onChange={this.handleCheck}/>
                         <label htmlFor="payLater">Pay Later</label><br/>
                         <input type="date" id="date" name="date" disabled={!this.state.payLater}
-                               value={this.state.date} onChange={this.handleChange} min={this.GetDate()}/>
+                               value={this.state.date} onChange={this.handleChange} min={GetDate()}/>
                         <div style={{color:"red"}}>{this.state.dateError}</div><br/><br/>
 
                         <button type="submit">Send Money</button>
@@ -540,18 +526,18 @@ export class TransferToUser extends React.Component {
                         <form action="SelectRecentPayee" id="SelectRecentPayee" method="post" onSubmit={this.handleSubmit}>
                             <label htmlFor="recentPayees" hidden={this.state.recentPayees.length===0}>Recent Payees:</label><br/>
                             {this.state.recentPayees.map(list =>(
-                                <Button name={"chosenPayee"} value={list} onClick={this.handleChange}
+                                <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
                                         onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
-                                </Button>
+                                </CirclePayeeButton>
                             )) }
                             <br/><br/>
                             <label htmlFor="favouritePayees" hidden={this.state.favouritePayees.length===0}>Favourite Payees:</label><br/>
                             {this.state.favouritePayees.map(list =>(
-                                <Button name={"chosenPayee"} value={list} onClick={this.handleChange}
+                                <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
                                         onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
-                                </Button>
+                                </CirclePayeeButton>
                             )) }
                             <p><b>{this.state.details}</b></p>
                             <br/>
