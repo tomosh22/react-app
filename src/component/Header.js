@@ -13,7 +13,7 @@ export class Header extends React.Component{
                         <div className={style.header_inner}>
                             <div className={style.logo}>
                                 <img className={style.favicon} src={favicon} alt={"Transparent logo"}/>
-                                <a  href={"//localhost:3000"}>StuBank</a>
+                                <a  href={"/"}>StuBank</a>
                             </div>
                             <nav>
                                 <Link to={"/dashboard"}><button className={style.nav_link}>Dashboard</button></Link>

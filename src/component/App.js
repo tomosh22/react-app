@@ -8,10 +8,9 @@ import {CreateAccount} from "./CreateAccount";
 import {SignUp} from "./SignUp";
 import {TransferToAccount} from "./TransferToAccount";
 import {MoveMoney} from "./MoveMoney";
-import {AdminLogin} from './AdminLogin'
+import {AdminLogin} from './Admin/AdminLogin'
 import {Home} from "./Home";
-import {AdminPage} from "./AdminPage";
-import {Redirect} from "react-router";
+import {AdminPage} from "./Admin/AdminPage";
 
 export class App extends Component{
     pageLook =()=>{

@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import style from "../assets/css/admin.module.css";
+import style from "../../assets/css/admin.module.css";
 import {Redirect} from "react-router";
 
 export class AdminLogin extends Component {
@@ -8,7 +8,7 @@ export class AdminLogin extends Component {
         this.state = {
             username: '',
             password: '',
-            logged: false
+            logged: true
         };
     }
     handleInputChange = (event) =>{
