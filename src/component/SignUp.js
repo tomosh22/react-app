@@ -1,8 +1,9 @@
-import React from "react";
+import React, {useContext} from "react";
+import {context} from "./Home"
+import {Account} from "./Home"
 const crypto = require("crypto");
 
 export class SignUp extends React.Component{
-
     state = {
         username: "",
         password: "",
@@ -11,6 +12,8 @@ export class SignUp extends React.Component{
         lastName: "",
         address1: "",
         address2: "",
+        address3: "",
+        address4: "",
         postcode: "",
         usernameError: "",
         passwordError: "",
@@ -19,6 +22,8 @@ export class SignUp extends React.Component{
         lastNameError: "",
         address1Error: "",
         address2Error: "",
+        address3Error: "",
+        address4Error: "",
         postcodeError: "",
     };
 
@@ -27,7 +32,10 @@ export class SignUp extends React.Component{
         this.setState ({[event.target.name] : event.target.value})
     }
 
-    handleSubmit = async event => {
+
+
+    async handleSubmit(event,setFirstName,setLoggedIn,addAccount){
+        this.state.lastName = this.state.lastName.replace("\'","");
         // validates the user's input
         event.preventDefault();
         //this.validate();
@@ -41,31 +49,51 @@ export class SignUp extends React.Component{
             this.state.address2Error === "" &&
             this.state.postcodeError === ""
         ) {
-            //generate salt and hashed password
-            var salt = crypto.randomBytes(16);
+            var abort = false;
+            await fetch("http://localhost:3000/selectUsername/" + this.state.username, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {if(data[0]){ alert("username already exists");abort = true}})
+            if(abort) return;
+            //generate salt and hashed password without ascii code 39 (')
+            var found;
+            while(true){
+                var salt = crypto.randomBytes(16);
+                found = false;
+                for(var x of salt){
+                    console.log(x)
+                    if(x == 39){
+                        found = true;
+                    }
+                }
+                if(!found){break;};
+            }
+            salt = salt.toString("utf8")
             var hash = crypto.createHmac("sha512", salt)
             hash.update(this.state.password + salt)
             hash = hash.digest("hex")
-            console.log(salt, hash)
             var AddressId = -1;
-            await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.postcode, {
+            await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.address3 + "/" + this.state.address1 + "/" + this.state.postcode, {
                 method: "GET"
             }).then(response => response.json()).then(data => {if(data[0]){ AddressId = data[0].AddressId}})
             if (AddressId === -1){
-                await fetch("http://localhost:3000/insertAddress/"+this.state.address1+"/"+this.state.address2+"/"+this.state.postcode,
+                await fetch("http://localhost:3000/insertAddress/"+this.state.address1+"/"+this.state.address2+"/"+this.state.address3+"/"+this.state.address4+"/"+this.state.postcode,
                     {
                         method:"POST"
                     })
-                await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.postcode, {
+                await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.address3+ "/" + this.state.address4+"/"+ this.state.postcode, {
                     method: "GET"
-                }).then(response => response.json()).then(data => AddressId = data[0].AddressId)
+                }).then(response => response.json()).then(data => {AddressId = data[0].AddressId; this.data = data[0]})
             }
             await fetch("http://localhost:3000/insertUser/"+this.state.username+"/"+hash+"/"+salt+"/"+this.state.firstName+"/"+this.state.lastName+"/"+this.state.email+"/"+AddressId,
                 {
                     method:"POST"
                 })
-
-
+            await fetch("http://localhost:3000/getUserAccounts/" + this.state.username, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {for(x of data){addAccount(new Account(data.Name,data.Type,data.Balance,data.Currency,data.AccNumber))}})
+            setFirstName(this.state.firstName)
+            setLoggedIn(true)
+            this.props.history.push("/dashboard");
         }
     }
 
@@ -77,6 +105,8 @@ export class SignUp extends React.Component{
         let lastNameError= "";
         let address1Error= "";
         let address2Error= "";
+        let address3Error= "";
+        let address4Error= "";
         let postcodeError= "";
         const passwordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
         const emailRegex = new RegExp("[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$");
@@ -111,6 +141,12 @@ export class SignUp extends React.Component{
         if (!this.state.address2){
             address2Error = "Address line 2 is required"
         }
+        if (!this.state.address3){
+            address3Error = "Address line 3 is required"
+        }
+        if (!this.state.address4){
+            address4Error = "Address line 4 is required"
+        }
         if (!this.state.postcode){
             postcodeError = "Postcode is required"
         } else if (!(postcodeRegex.test(this.state.postcode))) {
@@ -118,58 +154,79 @@ export class SignUp extends React.Component{
         }
 
         this.setState({usernameError, passwordError, emailError, firstNameError, lastNameError, address1Error,
-            address2Error, postcodeError})
-    }
-
+            address2Error,address3Error,address4Error, postcodeError})
+    };
     render(){
         return (
-            <div>
-                 <h1>Sign Up</h1>
-                 <form action="SignUp" id="signUpForm" method="post" onSubmit={this.handleSubmit}>
-                    <label htmlFor="username">Username: </label><br/>
-                    <input type="text" id="username" name="username" value={this.state.username}
-    onChange={this.handleChange}/>
-                     <div style={{color:"red"}}>{this.state.usernameError}</div><br/>
+            <context.Consumer>{({setFirstName,setLoggedIn,addAccount}) => (
+                <div>
+                    <h1>Sign Up</h1>
+                    <form action="SignUp" id="signUpForm" method="post" onSubmit={e => this.handleSubmit(e,setFirstName,setLoggedIn,addAccount)}>
+                        <label htmlFor="username">Username: </label><br/>
+                        <input type="text" id="username" name="username" value={this.state.username}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.usernameError}</div>
+                        <br/>
 
-                    <label htmlFor="password">Password: </label><br/>
-                    <input type="password" id="password" name="password" value={this.state.password}
-    onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
+                        <label htmlFor="password">Password: </label><br/>
+                        <input type="password" id="password" name="password" value={this.state.password}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.passwordError}</div>
+                        <br/>
 
-                    <label htmlFor="email">Email: </label><br/>
-                    <input type="text" id="email" name="email" value={this.state.email}
-    onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.emailError}</div><br/>
+                        <label htmlFor="email">Email: </label><br/>
+                        <input type="text" id="email" name="email" value={this.state.email}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.emailError}</div>
+                        <br/>
 
-                    <label htmlFor="firstName">First Name: </label><br/>
-                    <input type="text" id="firstName" name="firstName" value={this.state.firstName}
-    onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.firstNameError}</div><br/>
+                        <label htmlFor="firstName">First Name: </label><br/>
+                        <input type="text" id="firstName" name="firstName" value={this.state.firstName}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.firstNameError}</div>
+                        <br/>
 
-                    <label htmlFor="lastName">Last Name: </label><br/>
-                    <input type="text" id="lastName" name="lastName" value={this.state.lastName}
-    onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.lastNameError}</div><br/>
+                        <label htmlFor="lastName">Last Name: </label><br/>
+                        <input type="text" id="lastName" name="lastName" value={this.state.lastName}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.lastNameError}</div>
+                        <br/>
 
-                    <label htmlFor="address1">Address Line 1: </label><br/>
-                    <input type="text" id="address1" name="address1" value={this.state.address1}
-    onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.address1Error}</div><br/>
+                        <label htmlFor="address1">House or Building Number: </label><br/>
+                        <input type="text" id="address1" name="address1" value={this.state.address1}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.address1Error}</div>
+                        <br/>
 
-                    <label htmlFor="address2">Address Line 2: </label><br/>
-                    <input type="text" id="address2" name="address2" value={this.state.address2}
-    onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.address2Error}</div><br/>
+                        <label htmlFor="address2">Street: </label><br/>
+                        <input type="text" id="address2" name="address2" value={this.state.address2}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.address2Error}</div>
+                        <br/>
 
-                    <label htmlFor="postcode">Postcode: </label><br/>
-                    <input type="text" id="postcode" name="postcode" value={this.state.postcode}
-    onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.postcodeError}</div><br/>
+                        <label htmlFor="address3">Town/City: </label><br/>
+                        <input type="text" id="address3" name="address3" value={this.state.address3}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.address3Error}</div>
+                        <br/>
 
-                    <button type="submit">Submit</button>
-                 </form>
-            </div>
+                        <label htmlFor="address4">County: </label><br/>
+                        <input type="text" id="address4" name="address4" value={this.state.address4}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.address4Error}</div>
+                        <br/>
 
+                        <label htmlFor="postcode">Postcode: </label><br/>
+                        <input type="text" id="postcode" name="postcode" value={this.state.postcode}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.postcodeError}</div>
+                        <br/>
+
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+                )}
+            </context.Consumer>
         );
     }
 }
