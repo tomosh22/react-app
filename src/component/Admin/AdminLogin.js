@@ -8,7 +8,7 @@ export class AdminLogin extends Component {
         this.state = {
             username: '',
             password: '',
-            logged: true
+            logged: false
         };
     }
     handleInputChange = (event) =>{

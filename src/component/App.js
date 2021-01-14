@@ -12,6 +12,8 @@ import {AdminLogin} from './Admin/AdminLogin'
 import {Home} from "./Home";
 import {AdminPage} from "./Admin/AdminPage";
 import {Logout} from "./Logout";
+import {ErrorPage} from "./Error"
+import {Switch} from "react-router";
 
 export const context = React.createContext()
 
@@ -34,8 +36,8 @@ export class App extends Component{
                 <div>
                     <Router>
                         <div>
-                            <Route path={"/admin"}><AdminLogin /></Route>
-                            <Route path={"/service"}><AdminPage /></Route>
+                            <Route exact path={"/admin"}><AdminLogin /></Route>
+                            <Route exact path={"/service"}><AdminPage /></Route>
                         </div>
                     </Router>
                 </div>
@@ -47,15 +49,18 @@ export class App extends Component{
                     <Router>
                         <Header />
                         <div>
-                            <Route path={"/"} exact> <Home /> </Route>
-                            <Route path={"/dashboard"}> <Dashboard /> </Route>
-                            <Route path={"/login"} exact> <Login /> </Route>
-                            <Route path={"/create_account"}> <CreateAccount /> </Route>
-                            <Route path={"/register"}> <SignUp /> </Route>
-                            <Route path={"/transfer"}> <TransferToAccount /> </Route>
-                            <Route path={"/move_money"}> <MoveMoney /> </Route>
-                            <Route path={"/signup"}> <SignUp /> </Route>
-                            <Route path={"/logout"}><Logout /></Route>
+                            <Switch>
+                                <Route exact path={"/"}> <Home /> </Route>
+                                <Route exact path={"/dashboard"}> <Dashboard /> </Route>
+                                <Route exact path={"/login"}> <Login /> </Route>
+                                <Route exact path={"/create_account"}> <CreateAccount /> </Route>
+                                <Route exact path={"/register"}> <SignUp /> </Route>
+                                <Route exact path={"/transfer"}> <TransferToAccount /> </Route>
+                                <Route exact path={"/move_money"}> <MoveMoney /> </Route>
+                                <Route exact path={"/signup"}> <SignUp /> </Route>
+                                <Route exact path={"/logout"}><Logout /></Route>
+                                <Route exact path={"*"}><ErrorPage /></Route>
+                            </Switch>
                         </div>
                     </Router>
                 </context.Provider>

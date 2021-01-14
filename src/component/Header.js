@@ -2,7 +2,7 @@ import style from "../assets/css/homePageStyle.module.css";
 import favicon from "../assets/images/favicon.ico";
 import {Link} from "react-router-dom";
 import React, {useContext} from "react";
-import {context} from "./Home";
+import {context} from "./App";
 
 export class Header extends React.Component{
     render() {
