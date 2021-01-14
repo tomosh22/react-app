@@ -11,11 +11,9 @@ import {Logout} from "./Logout";
 import {CreateAccount} from "./CreateAccount";
 import {MoveMoney} from "./MoveMoney";
 import {Dashboard} from "./Dashboard";
-import {Admin} from "./Admin"
+//import {Admin} from "./Admin"
 import {Header} from "./Header";
-
 export const context = React.createContext()
-
 
 export class Account{
 
@@ -53,15 +51,10 @@ export class Home extends React.Component{
         }
     }
     addAccount(acc){
-        if(typeof(acc) != "Account"){
-            console.log("not an account")
-        }
-        else{
-            var accountsCopy = JSON.parse(JSON.stringify(this.state.accounts))
-            accountsCopy.push(acc)
-            this.setState({accounts:accountsCopy})
-        }
-
+        console.log("adding account",acc)
+        var accountsCopy = JSON.parse(JSON.stringify(this.state.accounts))
+        accountsCopy.push(acc)
+        this.setState({accounts:accountsCopy})
     }
     resetState(){
         console.log("resetting")
@@ -88,7 +81,7 @@ export class Home extends React.Component{
                 </Router>
                 <Router>
                     <div>
-                        <Route exact path={"/login/admin"}><Admin/></Route>
+                        {/*<Route exact path={"/login/admin"}><Admin/></Route>*/}
                     </div>
                 </Router>
             </context.Provider>

@@ -12,6 +12,8 @@ export class SignUp extends React.Component{
         lastName: "",
         address1: "",
         address2: "",
+        address3: "",
+        address4: "",
         postcode: "",
         usernameError: "",
         passwordError: "",
@@ -20,6 +22,8 @@ export class SignUp extends React.Component{
         lastNameError: "",
         address1Error: "",
         address2Error: "",
+        address3Error: "",
+        address4Error: "",
         postcodeError: "",
     };
 
@@ -68,15 +72,15 @@ export class SignUp extends React.Component{
             hash.update(this.state.password + salt)
             hash = hash.digest("hex")
             var AddressId = -1;
-            await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.postcode, {
+            await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.address3 + "/" + this.state.address1 + "/" + this.state.postcode, {
                 method: "GET"
             }).then(response => response.json()).then(data => {if(data[0]){ AddressId = data[0].AddressId}})
             if (AddressId === -1){
-                await fetch("http://localhost:3000/insertAddress/"+this.state.address1+"/"+this.state.address2+"/"+this.state.postcode,
+                await fetch("http://localhost:3000/insertAddress/"+this.state.address1+"/"+this.state.address2+"/"+this.state.address3+"/"+this.state.address4+"/"+this.state.postcode,
                     {
                         method:"POST"
                     })
-                await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.postcode, {
+                await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.address3+ "/" + this.state.address4+"/"+ this.state.postcode, {
                     method: "GET"
                 }).then(response => response.json()).then(data => {AddressId = data[0].AddressId; this.data = data[0]})
             }
@@ -101,6 +105,8 @@ export class SignUp extends React.Component{
         let lastNameError= "";
         let address1Error= "";
         let address2Error= "";
+        let address3Error= "";
+        let address4Error= "";
         let postcodeError= "";
         const passwordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
         const emailRegex = new RegExp("[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$");
@@ -135,6 +141,12 @@ export class SignUp extends React.Component{
         if (!this.state.address2){
             address2Error = "Address line 2 is required"
         }
+        if (!this.state.address3){
+            address3Error = "Address line 3 is required"
+        }
+        if (!this.state.address4){
+            address4Error = "Address line 4 is required"
+        }
         if (!this.state.postcode){
             postcodeError = "Postcode is required"
         } else if (!(postcodeRegex.test(this.state.postcode))) {
@@ -142,7 +154,7 @@ export class SignUp extends React.Component{
         }
 
         this.setState({usernameError, passwordError, emailError, firstNameError, lastNameError, address1Error,
-            address2Error, postcodeError})
+            address2Error,address3Error,address4Error, postcodeError})
     };
     render(){
         return (
@@ -180,16 +192,28 @@ export class SignUp extends React.Component{
                         <div style={{color: "red"}}>{this.state.lastNameError}</div>
                         <br/>
 
-                        <label htmlFor="address1">Address Line 1: </label><br/>
+                        <label htmlFor="address1">House or Building Number: </label><br/>
                         <input type="text" id="address1" name="address1" value={this.state.address1}
                                onChange={this.handleChange}/>
                         <div style={{color: "red"}}>{this.state.address1Error}</div>
                         <br/>
 
-                        <label htmlFor="address2">Address Line 2: </label><br/>
+                        <label htmlFor="address2">Street: </label><br/>
                         <input type="text" id="address2" name="address2" value={this.state.address2}
                                onChange={this.handleChange}/>
                         <div style={{color: "red"}}>{this.state.address2Error}</div>
+                        <br/>
+
+                        <label htmlFor="address3">Town/City: </label><br/>
+                        <input type="text" id="address3" name="address3" value={this.state.address3}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.address3Error}</div>
+                        <br/>
+
+                        <label htmlFor="address4">County: </label><br/>
+                        <input type="text" id="address4" name="address4" value={this.state.address4}
+                               onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.address4Error}</div>
                         <br/>
 
                         <label htmlFor="postcode">Postcode: </label><br/>
