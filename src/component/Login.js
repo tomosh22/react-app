@@ -34,7 +34,7 @@ export class Login extends React.Component{
             }).then(response => response.json()).then(data => {username=data[0].Username;salt=data[0].Salt;firstname=data[0].FirstName;secondname=data[0].SecondName;email=data[0].Email})
             await fetch("http://localhost:3000/getUserAccounts/" + this.state.username, {
                 method: "GET"
-            }).then(response => response.json()).then(data => {for(var x of data){addAccount(new Account(data[0].Name,data[0].Type,data[0].Balance,data[0].Currency,data[0].AccNumber))}})
+            }).then(response => response.json()).then(data => {for(var x of data){addAccount(new Account(x.Name,x.Type,x.Balance,x.Currency,x.AccNumber))}})
             setUsername(username);
             setFirstName(firstname);
             setLastName(secondname);
