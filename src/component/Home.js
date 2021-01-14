@@ -67,7 +67,7 @@ export class Home extends React.Component{
             <context.Provider value={this.state}>
                 <Router>
                     <Header />
-                    <div>
+                    <div className={style.main}>
                         <Route path={"/dashboard"}> <Dashboard /> </Route>
                         <Route path={"/"} exact> <Welcome /> </Route>
                         <Route exact path={"/login"} component={Login}/>
