@@ -86,7 +86,7 @@ export class TransferToAccount extends React.Component {
         else{this.validateAccountTo()}
     }
 
-    addTagCategory = event =>{
+    addTagCategory = () =>{
         //add new tag to the tag list
         let tagCategories= this.state.tagCategories;
         let i;
@@ -106,7 +106,7 @@ export class TransferToAccount extends React.Component {
         }
     }
 
-    deleteTagCategory= event =>{
+    deleteTagCategory = () =>{
         //deletes tag from the tag list
         let tagCategories= this.state.tagCategories;
         let i;
@@ -126,7 +126,7 @@ export class TransferToAccount extends React.Component {
         }
     }
 
-    validate = event => {
+    validate = () => {
         // validates the user's input
         let accountFromError = "";
         let accountToError = "";
@@ -162,7 +162,7 @@ export class TransferToAccount extends React.Component {
         this.setState({accountFromError, accountToError, amountError, dateError, tagError, display})
     }
 
-    validateAccountTo = event =>{
+    validateAccountTo = () =>{
         //validates the account to send to
         let accountToError = "";
         let display = 2;
@@ -175,7 +175,7 @@ export class TransferToAccount extends React.Component {
         this.setState({accountToError, display})
     }
 
-    validatePassword = event =>{
+    validatePassword = () =>{
         // validates user's password to authorise payment
         let passwordError = "";
         let userPassword = "password";
@@ -213,21 +213,25 @@ export class TransferToAccount extends React.Component {
     }
 
 
-    ChangeDetails = event => {
+    ChangeDetails = () =>{
+        //displays main transaction form
         let display = 0;
         this.setState({display})
     }
 
-    authorisePayment = event =>{
+    authorisePayment = () =>{
+        //displays authorise payment form
         let display = 3;
         this.setState({display})
     }
 
-    resetState = event => {
+    resetState = () =>{
+        //resets all details to their initial state
         this.setState(initialState);
     }
 
-    SelectAccountTo = event =>{
+    SelectAccountTo = () =>{
+        //remove accountFrom from the list of accounts that can be sent to
         let display =2;
         let updatedUserAccounts=[]
         let i;

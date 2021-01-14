@@ -109,7 +109,8 @@ export class TransferToUser extends React.Component {
         //stores details of payees user mouse is hovering over
         this.setState({details: event.target.value})
     }
-    resetDetails= event =>{
+
+    resetDetails = () =>{
         this.setState({details: ""})
     }
 
@@ -121,7 +122,7 @@ export class TransferToUser extends React.Component {
         else{this.validateNewPayee()}
     }
 
-    setPayeeDetails = event => {
+    setPayeeDetails = () => {
         //put the payees details in the correct format
         if (this.state.chosenPayee){
             let details = (this.state.chosenPayee).split(",");
@@ -133,7 +134,7 @@ export class TransferToUser extends React.Component {
         }
     }
 
-    addTagCategory = event =>{
+    addTagCategory = () =>{
         //add new tag to the tag list
         let tagCategories= this.state.tagCategories;
         let i;
@@ -153,7 +154,7 @@ export class TransferToUser extends React.Component {
         }
     }
 
-    deleteTagCategory= event =>{
+    deleteTagCategory = () =>{
         //deletes tag from the tag list
         let tagCategories= this.state.tagCategories;
         let i;
@@ -173,7 +174,7 @@ export class TransferToUser extends React.Component {
         }
     }
 
-    validateTransaction = event =>{
+    validateTransaction = () =>{
         // validates the user's input for transaction form
         let accFromError="";
         let accToError="";
@@ -214,7 +215,7 @@ export class TransferToUser extends React.Component {
         this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display})
     }
 
-    validateNewPayee = event =>{
+    validateNewPayee = () =>{
         // validates the user's input for new payee
         let accNameError ="";
         let accNumberError ="";
@@ -261,7 +262,7 @@ export class TransferToUser extends React.Component {
         this.setState({accNameError, accNumberError,sortCodeError, display})
     }
 
-    validatePassword = event =>{
+    validatePassword = () =>{
         // validates user's password to authorise payment
         let passwordError = "";
         let userPassword = "password";
@@ -297,17 +298,20 @@ export class TransferToUser extends React.Component {
         this.setState({passwordError, passwordAttempts, display})
     }
 
-    ChangeDetails = event =>{
+    ChangeDetails = () =>{
+        //displays main transaction form
         let display =0;
         this.setState({display})
     }
 
-    SelectNewPayee =  event =>{
+    SelectNewPayee = () =>{
+        //displays add new payee form
         let display = 2;
         this.setState({display})
     }
 
-    SelectRecentPayee =  event =>{
+    SelectRecentPayee = () =>{
+        //displays select recent/favourite payee form
         let display = 3;
         this.setState({display})
         //this.GetRecentPayees();
@@ -315,12 +319,14 @@ export class TransferToUser extends React.Component {
         //uncomment these when connected to database
     }
 
-    authorisePayment = event =>{
+    authorisePayment = () =>{
+        //displays authorise payment form
         let display = 4;
         this.setState({display})
     }
 
-    resetState = event => {
+    resetState = () => {
+        //resets all details to their initial state
         this.setState(initialState);
     }
 
