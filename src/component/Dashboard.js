@@ -19,7 +19,7 @@ export class Dashboard extends React.Component{
                 <Accounts/>
                 <div>
                     <Link to={"/create_account"}><button className={style.nav_link}>Create Account</button></Link>
-                    <Link to={"/make_payment"}><button className={style.nav_link}>Make Payment</button></Link>
+                    <Link to={"/move_money"}><button className={style.nav_link}>Make Payment</button></Link>
                 </div>
             </div>
         )
