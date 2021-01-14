@@ -325,32 +325,35 @@ export class TransferToUser extends React.Component {
     }
 
 
-    GetUserAccounts = event =>{
+    //DATABASE FUNCTIONS
+
+
+    async GetUserAccounts () {
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
         let userAccounts = [];
-        fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
+        await fetch("http://localhost:3000/getUserAccounts/" + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data){ userAccounts = data.userAccounts}})
+            }).then(response => response.json()).then(data => {if(data[0]){ userAccounts = data[0].userAccounts}})
         this.setState({userAccounts})
     }
 
-    GetRecentPayees = event =>{
+    async GetRecentPayees () {
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
-        let recentPayees;
-        fetch("http://localhost:3000/getAccountPayees/", + this.props.state.username,
+        let recentPayees = [];
+        await fetch("http://localhost:3000/getAccountPayees/" + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data){ recentPayees = data.recentPayees}})
+            }).then(response => response.json()).then(data => {if(data[0]){ recentPayees = data[0].recentPayees}})
             //recentPayees should be a 3d array [accName,accNumber,sortCode] of 5 most recent payees.
         this.setState({recentPayees})
     }
 
 
-    ProcessPayment = async event =>{
+    async ProcessPayment (){
         if (this.state.balance>this.state.amount){
             //PROCESSES TRANSACTION
-            await fetch("http://localhost:3000/insertTransaction/",
+            await fetch("http://localhost:3000/insertTransaction/"
                 + this.state.accFrom + "/" + this.state.accName + "/" +
                 this.state.accNumber + "/" + this.state.sortCode + "/" +this.state.currency + "/" + this.state.amount
                 + "/" + this.state.reference + "/" + this.state.date,
@@ -360,40 +363,40 @@ export class TransferToUser extends React.Component {
         }
     }
 
-    GetBalance = event =>{
+    async GetBalance (){
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
-        let balance=0;
-        fetch("http://localhost:3000/getUserBalance/", + this.state.accFrom,
+        let balance=0.00;
+        await fetch("http://localhost:3000/getUserBalance/" + this.state.accFrom,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => balance = data.balance)
+            }).then(response => response.json()).then(data => {balance = data[0].balance})
         this.setState({balance})
     }
 
-    GetPassword = event =>{
+    async GetPassword (){
         // GETS THE USER'S HASHED PASSWORD AND SALT
         let userPassword;
         let salt;
-        fetch("http://localhost:3000/getUserBalance/", + this.props.state.username,
+        await fetch("http://localhost:3000/getUserBalance/" + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => (userPassword = data.hash, salt = data.salt))
+            }).then(response => response.json()).then(data => (userPassword = data[0].hash, salt = data[0].salt))
         this.setState({userPassword, salt})
     }
 
-    GetFavourite = event =>{
+    async GetFavourite (){
         //GETS THE USER'S FAVOURITE PAYEES
         let favouritePayees=[];
-        fetch("http://localhost:3000/getFavouritePayees/", + this.props.state.username,
+        await fetch("http://localhost:3000/getFavouritePayees/" + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => (favouritePayees = data))
+            }).then(response => response.json()).then(data => {if(data[0]){ favouritePayees = data[0].favouritePayees}})
         this.setState({favouritePayees})
     }
 
-    SetFavourite = event =>{
+    async SetFavourite (){
         // SETS THE USER'S FAVOURITE PAYEES
-        fetch("http://localhost:3000/setFavouritePayees/", + this.props.state.username + "/" + this.state.favouritePayees,
+        await fetch("http://localhost:3000/setFavouritePayees/" + this.props.state.username + "/" + this.state.favouritePayees,
             {
                 method:"POST"
             })

@@ -244,20 +244,24 @@ export class TransferToAccount extends React.Component {
         this.setState({display, updatedUserAccounts})
     }
 
-    GetUserAccounts = event =>{
+
+    //DATABASE FUNCTIONS
+
+
+    async GetUserAccounts (){
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
         let userAccounts = [];
-        fetch("http://localhost:3000/getUserAccounts/", + this.props.state.username,
+        await fetch("http://localhost:3000/getUserAccounts/" + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data){ userAccounts = data.userAccounts}})
+            }).then(response => response.json()).then(data => {if(data[0]){ userAccounts = data[0].userAccounts}})
         this.setState({userAccounts})
     }
 
-    ProcessPayment = async event =>{
+    async ProcessPayment (){
         if (this.state.balance>this.state.amount){
             //PROCESSES TRANSACTION
-            await fetch("http://localhost:3000/insertTransaction/",
+            await fetch("http://localhost:3000/insertTransaction/"
                 + this.state.accountFrom + "/" + this.state.accountTo + "/" +this.state.currency + "/" +
                 this.state.amount + "/" + this.state.date,
                 {
@@ -266,24 +270,24 @@ export class TransferToAccount extends React.Component {
         }
     }
 
-    GetBalance = event =>{
+    async GetBalance (){
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0;
-        fetch("http://localhost:3000/getUserBalance/", + this.state.accountFrom,
+        await fetch("http://localhost:3000/getUserBalance/" + this.state.accountFrom,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => balance = data.balance)
+            }).then(response => response.json()).then(data => balance = data[0].balance)
         this.setState({balance})
     }
 
-    GetPassword = event =>{
+    async GetPassword (){
         // GETS THE USER'S HASHED PASSWORD AND SALT
         let userPassword;
         let salt;
-        fetch("http://localhost:3000/getUserBalance/", + this.props.state.username,
+        await fetch("http://localhost:3000/getUserBalance/" + this.props.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => (userPassword = data.hash, salt = data.salt))
+            }).then(response => response.json()).then(data => (userPassword = data[0].hash, salt = data[0].salt))
         this.setState({userPassword, salt})
     }
 
