@@ -1,11 +1,9 @@
-import React, {Component} from "react";
-
-export class Welcome extends Component{
+export class Welcome extends React.Component{
     render(){
         return(
             <div>
-                <h1>Welcome to StuBank</h1>
-           </div>
+                <p>Welcome</p>
+            </div>
         )
     }
 }
