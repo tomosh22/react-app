@@ -28,6 +28,16 @@ export class Account{
     }
 }
 
+export class Transaction{
+    constructor(id,amount,dateTime,accNumberTo,accNumberFrom){
+        this.id = id;
+        this.amount = amount;
+        this.dateTime = dateTime;
+        this.accNumberTo = accNumberTo;
+        this.accNumberFrom = accNumberFrom;
+    }
+}
+
 export class App extends Component{
     pageLook =()=>{
         const pathname = window.location.pathname
@@ -81,7 +91,19 @@ export class App extends Component{
         setLoggedIn:(bool) => this.setState({loggedIn:bool}),
         accounts:[],
         addAccount:(acc) => this.addAccount(acc),
-        removeAccount:(accNumber) => this.removeAccount(accNumber)
+        removeAccount:(accNumber) => this.removeAccount(accNumber),
+        transactions:[],
+        addTransaction:(trans) => this.addTransaction(trans),
+        removeTransaction:(id) => this.removeTransaction(id),
+        vendors: {
+            11111111:"Netflix",
+            22222222:"Spotify",
+            33333333:"PureGym",
+            44444444:"McDonalds",
+            55555555:"Uber Eats",
+            66666666:"Asda",
+            77777777:"Aldi"
+        }
     }
     removeAccount(accNumber){
         for(var x = 0; x<this.state.accounts.length;x++){
@@ -98,11 +120,29 @@ export class App extends Component{
         accountsCopy.push(acc)
         this.setState({accounts:accountsCopy})
     }
+    removeTransaction(id){
+        for(var x = 0; x<this.state.transactions.length;x++){
+            if(this.state.transactions[x].id == id){
+                var transactionsCopy = JSON.parse(JSON.stringify(this.state.transactions))
+                transactionsCopy.splice(x,1)
+                this.setState({transactions:transactionsCopy})
+            }
+        }
+    }
+    addTransaction(trans){
+        //console.log("adding transaction",trans)
+        var transactionsCopy = JSON.parse(JSON.stringify(this.state.transactions))
+        transactionsCopy.push(trans)
+        this.setState({transactions:transactionsCopy})
+        console.log("transactions",this.state.transactions)
+    }
     resetState(){
         console.log("resetting")
         this.setState({firstName:null})
         this.setState({lastName:null})
         this.setState({loggedIn:false})
+        this.setState({accounts:[]})
+        this.setState({transactions:[]})
     }
 
     render(){
