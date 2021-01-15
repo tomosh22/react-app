@@ -1,6 +1,8 @@
 import React from "react";
 import GetDate from "./MoveMoneyFunctions";
 import styled from "styled-components";
+import Icon from '@mdi/react';
+import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeft,} from '@mdi/js';
 
 const Button = styled.button`
     background-color: #78bc55;
@@ -307,7 +309,8 @@ export class TransferToAccount extends React.Component {
                         <form action="TransferMoneyToAccount" id="TransferMoneyToAccountForm" method="post"
                               onSubmit={this.handleSubmit}>
 
-                            <label htmlFor="accountFrom">From:</label><br></br>
+                            <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
+                            <label htmlFor="accountFrom">From</label><br></br>
                             <div><b>{this.state.accountFrom}</b></div>
                             <select id="accountFrom" name="accountFrom" value={this.state.accountFrom}
                                     onChange={this.handleChange}>
@@ -321,7 +324,8 @@ export class TransferToAccount extends React.Component {
                             <div style={{color: "red"}}>{this.state.accountFromError}</div>
                             <br></br>
 
-                            <label htmlFor="accountTo">To:</label><br></br>
+                            <Icon path={mdiAccountArrowLeft} title={"accountTo"} size={0.75} />
+                            <label htmlFor="accountTo">To</label><br></br>
                             <div><b>{this.state.accountTo}</b></div>
                             <button type="button" onClick={this.SelectAccountTo} disabled={!this.state.accountFrom}>Choose an account</button>
                             <div style={{color: "red"}}>{this.state.accountToError}</div>
@@ -340,6 +344,7 @@ export class TransferToAccount extends React.Component {
                                    max={this.state.balance}></input>
                             <div style={{color: "red"}}>{this.state.amountError}</div><br/>
 
+                            <Icon path={mdiTag} title={"Tag"} size={0.6} />
                             <label htmlFor="tag">Payment Category </label><br/>
                             <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
                                     disabled={!this.state.accountTo}>
@@ -360,7 +365,7 @@ export class TransferToAccount extends React.Component {
                             <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={this.deleteTagCategory}>Delete</button><br/>
                             <div style={{color:"red"}}>{this.state.tagError}</div><br/>
 
-
+                            <Icon path={mdiCalendar} title={"calendar"} size={0.6} />
                             <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accountTo}
                                    checked={this.state.payToday} onChange={this.handleCheck}/>
                             <label htmlFor="payToday">Pay Today</label><t/>

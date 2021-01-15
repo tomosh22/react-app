@@ -1,6 +1,10 @@
 import React from "react";
 import styled from 'styled-components';
 import GetDate from "./MoveMoneyFunctions";
+import { Checkbox } from 'pretty-checkbox-react';
+import Icon from '@mdi/react';
+import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeftOutline,} from '@mdi/js';
+import '@djthoms/pretty-checkbox';
 
 const CirclePayeeButton = styled.button`
     background-color: #5FA9EF;
@@ -420,7 +424,8 @@ export class TransferToUser extends React.Component {
                     <br/>
                     <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
 
-                        <label htmlFor="accountFrom">From:</label><br/>
+                        <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
+                        <label htmlFor="accountFrom">From</label><br/>
                         <select id="accFrom" name="accFrom"  value={this.state.accFrom} onChange={this.handleChange}>
                             <option value="" disabled selected>Choose an account</option>
                             {this.state.userAccounts.map(list =>(
@@ -431,7 +436,8 @@ export class TransferToUser extends React.Component {
                         </select>
                         <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
 
-                        <div>To:</div>
+                        <Icon path={mdiAccountArrowLeftOutline} title={"accountTo"} size={0.75} />
+                        <label>To</label>
                         <div><b>{this.state.accName}</b> {this.state.accNumber} {this.state.sortCode}</div>
                         <button type="button" onClick={this.SelectNewPayee} disabled={!this.state.accFrom}>Add a new Payee</button>
                         <button type="button" onClick={this.SelectRecentPayee} disabled={!this.state.accFrom}>Select Recent Payee</button>
@@ -445,7 +451,7 @@ export class TransferToUser extends React.Component {
                             <option value="€">€</option>
                         </select>
                         <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
-                               onChange={this.handleChange} disabled={!this.state.accName} min={"0.00"} max={this.state.balance}/>
+                               onChange={this.handleChange} disabled={!this.state.accName} min={"0.00"} max={this.state.balance} />
                         <div style={{color:"red"}}>{this.state.amountError}</div><br/>
 
                         <label htmlFor="reference">Reference</label><br/>
@@ -453,6 +459,7 @@ export class TransferToUser extends React.Component {
                                onChange={this.handleChange} disabled={!this.state.accName}/>
                         <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
+                        <Icon path={mdiTag} title={"tag"} size={0.6}/>
                         <label htmlFor="tag">Payment Category </label><br/>
                         <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
                                 disabled={!this.state.accName}>
@@ -471,9 +478,9 @@ export class TransferToUser extends React.Component {
                         <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
                                hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
                         <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={this.deleteTagCategory}>Delete</button><br/>
-                        <div style={{color:"red"}}>{this.state.tagError}</div><br/>
+                        <div style={{color:"red"}}>{this.state.tagError}</div>
 
-
+                        <Icon path={mdiCalendar} title={"calender"} size={0.6} />
                         <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accName}
                                checked={this.state.payToday} onChange={this.handleCheck}/>
                         <label htmlFor="payToday">Pay Today</label><t/>
@@ -529,7 +536,9 @@ export class TransferToUser extends React.Component {
                         <input id="sortCode" name="sortCode" value={this.state.sortCode}
                                onChange={this.handleChange}/>
                         <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/>
-                        <input type="checkbox" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}/>
+                        <>
+                            <Checkbox animation="pulse" shape="round" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}></Checkbox>
+                        </>
                         <label htmlFor="favourite">Add payee to your favourite payees?</label>
                         <br/><br/>
                         <Button type="button" onClick={this.ChangeDetails}>Back</Button>
