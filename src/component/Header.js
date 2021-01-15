@@ -25,7 +25,7 @@ export class Header extends React.Component{
                 <div className={style.container}>
                     <div className={style.header_inner}>
                         <div className={style.logo}>
-                            <img className={style.favicon} src={favicon} alt={"Transparent logo"}/>
+                            <a  href={"/"}><img className={style.favicon} src={favicon} alt={"Transparent logo"}/></a>
                             <a  href={"/"}>StuBank</a>
                         </div>
                         <nav>

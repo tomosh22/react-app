@@ -67,7 +67,7 @@ export class Login extends React.Component{
         return (
             <context.Consumer>{({setUsername,setFirstName,setLastName,setLoggedIn,addAccount}) => (
                 <div>
-                    <h1>Login</h1>
+                    <h1>Log in</h1>
                     <form action="Login" id="LoginForm" method="post" onSubmit={e => this.handleSubmit(e,setUsername,setFirstName,setLastName,setLoggedIn,addAccount)}>
 
                         <label htmlFor="username">Username: </label><br/>

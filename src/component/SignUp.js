@@ -159,7 +159,7 @@ export class SignUp extends React.Component{
         return (
             <context.Consumer>{({setFirstName,setLoggedIn,addAccount}) => (
                 <div>
-                    <h1>Sign Up</h1>
+                    <h1>Sign up</h1>
                     <form action="SignUp" id="signUpForm" method="post" onSubmit={e => this.handleSubmit(e,setFirstName,setLoggedIn,addAccount)}>
                         <label htmlFor="username">Username: </label><br/>
                         <input type="text" id="username" name="username" value={this.state.username}
