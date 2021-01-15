@@ -1,4 +1,30 @@
 import React from "react";
+import styled from 'styled-components';
+import GetDate from "./MoveMoneyFunctions";
+
+const CirclePayeeButton = styled.button`
+    background-color: #5FA9EF;
+    border: none;
+    padding: 15px;
+    text-align: center;
+    margin: 6px 4px;
+    color: white;
+    text-decoration: none;
+    border-radius: 50%;
+    font-size: 16px;
+`
+const Button = styled.button`
+    background-color: #78bc55;
+    border: none;
+    color: white;
+    padding: 4px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 6px;
+`
 
 const initialState ={
     accFrom: "",
@@ -34,6 +60,12 @@ const initialState ={
     favourite: false,
     favouritePayees:[],
 
+    tagCategories: ["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"],
+    tag:"",
+    tagError:"",
+    addTag:"",
+    deleteTag:"",
+
     balance: 1000.00,
     //example of what balance should look like
 
@@ -67,7 +99,7 @@ export class TransferToUser extends React.Component {
                 this.setState({payToday:false})
             }else if (event.target.name==="payToday"){
                 this.setState({payLater:false});
-                let date=this.GetDate();
+                let date=GetDate();
                 this.setState({date});
             }
         }
@@ -101,6 +133,46 @@ export class TransferToUser extends React.Component {
         }
     }
 
+    addTagCategory = event =>{
+        //add new tag to the tag list
+        let tagCategories= this.state.tagCategories;
+        let i;
+        let found=false;
+        for(i=0; i<tagCategories.length; i++){
+            if(tagCategories[i]===this.state.addTag){
+                found=true;
+                let tagError="Tag already exists";
+                this.setState({tagError})
+            }
+        }
+        if (!found) {
+            tagCategories.push(this.state.addTag);
+            let addTag = "";
+            let tag = this.state.addTag;
+            this.setState({tagCategories, addTag, tag});
+        }
+    }
+
+    deleteTagCategory= event =>{
+        //deletes tag from the tag list
+        let tagCategories= this.state.tagCategories;
+        let i;
+        let found=false;
+        for(i=0; i<tagCategories.length; i++){
+            if(tagCategories[i]===this.state.deleteTag){
+                tagCategories.splice(i, 1);
+                found=true;
+                let deleteTag="";
+                let tag="";
+                this.setState({tagCategories,tag, deleteTag})
+            }
+        }
+        if(!found){
+            let tagError="Tag does not exists";
+            this.setState({tagError})
+        }
+    }
+
     validateTransaction = event =>{
         // validates the user's input for transaction form
         let accFromError="";
@@ -108,6 +180,7 @@ export class TransferToUser extends React.Component {
         let amountError = "";
         let referenceError = "";
         let dateError = "";
+        let tagError="";
         let display = 0;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
@@ -130,11 +203,15 @@ export class TransferToUser extends React.Component {
             dateError = "Date to pay is required"
         }
 
-        if (!accFromError && !accToError && !amountError && !referenceError && !dateError){
+        if(!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag..."){
+            tagError="Tag is required"
+        }
+
+        if (!accFromError && !accToError && !amountError && !referenceError && !dateError && !tagError){
             display = 1;
         }
 
-        this.setState({accFromError,accToError, amountError, referenceError, dateError, display})
+        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display})
     }
 
     validateNewPayee = event =>{
@@ -206,7 +283,7 @@ export class TransferToUser extends React.Component {
         } else{
             if (passwordAttempts>0){
                 if (password !== userPassword){
-                    -- passwordAttempts
+                    -- passwordAttempts;
                     passwordError = passwordAttempts + " login attempts remaining"
                 }
                 else{
@@ -245,21 +322,6 @@ export class TransferToUser extends React.Component {
 
     resetState = event => {
         this.setState(initialState);
-    }
-
-    GetDate = event =>{
-        let date = new Date();
-        let dd = date.getDate();
-        let mm = date.getMonth()+1;
-        let yyyy = date.getFullYear();
-        if(dd<10) {
-            dd="0" +dd;
-        }
-        if(mm<10) {
-            mm="0" +mm;
-        }
-        date = yyyy+"-"+mm+"-"+dd;
-        return(date);
     }
 
 
@@ -382,6 +444,27 @@ export class TransferToUser extends React.Component {
                                onChange={this.handleChange} disabled={!this.state.accName}/>
                         <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
+                        <label htmlFor="tag">Payment Category </label><br/>
+                        <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
+                                disabled={!this.state.accName}>
+                            <option value="" disabled selected>Choose an tag</option>
+                            {this.state.tagCategories.map(list =>(
+                                <option key={list} value={list}>
+                                    {list}
+                                </option>
+                            )) }
+                            <option value={"Add tag..."}>Add tag...</option>
+                            <option value={"Delete tag..."}>Delete tag...</option>
+                        </select><br/>
+                        <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
+                               hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
+                        <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={this.addTagCategory}>Add</button>
+                        <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
+                               hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
+                        <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={this.deleteTagCategory}>Delete</button><br/>
+                        <div style={{color:"red"}}>{this.state.tagError}</div><br/>
+
+
                         <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accName}
                                checked={this.state.payToday} onChange={this.handleCheck}/>
                         <label htmlFor="payToday">Pay Today</label><t/>
@@ -389,10 +472,10 @@ export class TransferToUser extends React.Component {
                                checked={this.state.payLater} onChange={this.handleCheck}/>
                         <label htmlFor="payLater">Pay Later</label><br/>
                         <input type="date" id="date" name="date" disabled={!this.state.payLater}
-                               value={this.state.date} onChange={this.handleChange} min={this.GetDate()}/>
+                               value={this.state.date} onChange={this.handleChange} min={GetDate()}/>
                         <div style={{color:"red"}}>{this.state.dateError}</div><br/><br/>
 
-                        <button type="submit">Send Money</button>
+                        <Button type="submit">Send Money</Button>
 
                     </form>
 
@@ -410,9 +493,10 @@ export class TransferToUser extends React.Component {
                         <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                         <p>Reference: <b>{this.state.reference}</b></p>
+                        <p>Category: <b>{this.state.tag}</b></p>
                         <p>Date: <b>{this.state.date}</b></p>
-                        <button type="button" onClick={this.authorisePayment}>Confirm details</button><br />
-                        <button type="button" onClick={this.ChangeDetails}>Change details</button>
+                        <Button type="button" onClick={this.authorisePayment}>Confirm details</Button><br />
+                        <Button type="button" onClick={this.ChangeDetails}>Change details</Button>
                     </div>
                 )
                 break;
@@ -439,8 +523,8 @@ export class TransferToUser extends React.Component {
                         <input type="checkbox" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}/>
                         <label htmlFor="favourite">Add payee to your favourite payees?</label>
                         <br/><br/>
-                        <button type="button" onClick={this.ChangeDetails}>Back</button>
-                        <button type="submit">Submit</button>
+                        <Button type="button" onClick={this.ChangeDetails}>Back</Button>
+                        <Button type="submit">Submit</Button>
                         </form>
                     </div>
                 )
@@ -454,22 +538,22 @@ export class TransferToUser extends React.Component {
                         <form action="SelectRecentPayee" id="SelectRecentPayee" method="post" onSubmit={this.handleSubmit}>
                             <label htmlFor="recentPayees" hidden={this.state.recentPayees.length===0}>Recent Payees:</label><br/>
                             {this.state.recentPayees.map(list =>(
-                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}
+                                <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
                                         onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
-                                </button>
+                                </CirclePayeeButton>
                             )) }
                             <br/><br/>
                             <label htmlFor="favouritePayees" hidden={this.state.favouritePayees.length===0}>Favourite Payees:</label><br/>
                             {this.state.favouritePayees.map(list =>(
-                                <button name={"chosenPayee"} value={list} onClick={this.handleChange}
+                                <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
                                         onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
-                                </button>
+                                </CirclePayeeButton>
                             )) }
                             <p><b>{this.state.details}</b></p>
                             <br/>
-                            <button type="button" onClick={this.ChangeDetails}>Back</button>
+                            <Button type="button" onClick={this.ChangeDetails}>Back</Button>
                         </form>
                     </div>
                 )
@@ -485,7 +569,7 @@ export class TransferToUser extends React.Component {
                             <input type="password" id="password" name="password" value={this.state.password}
                                    onChange={this.handleChange} disabled={this.state.passwordAttempts===0}/>
                             <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
-                            <button type="submit">Authorise Payment</button>
+                            <Button type="submit">Authorise Payment</Button>
                         </form>
                     </div>
                 )
@@ -497,7 +581,7 @@ export class TransferToUser extends React.Component {
                     <div>
                         <br/>
                         <p>Payment sent successfully</p>
-                        <button type={"button"} onClick={this.resetState}>Close</button>
+                        <Button type={"button"} onClick={this.resetState}>Close</Button>
                     </div>
                 )
             break;

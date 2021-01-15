@@ -1,6 +1,5 @@
 import React, {useContext} from "react";
-import {context} from "./Home"
-import {Account} from "./Home"
+import {context, Account} from "./App"
 const crypto = require("crypto");
 
 export class SignUp extends React.Component{

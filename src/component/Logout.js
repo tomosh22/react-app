@@ -1,5 +1,5 @@
 import React from "react"
-import {context} from "./Home";
+import {context} from "./App";
 export class Logout extends React.Component{
     render(){
         return(

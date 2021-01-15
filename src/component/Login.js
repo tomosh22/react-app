@@ -1,5 +1,9 @@
 import React from "react";
+<<<<<<< src/component/Login.js
 import {Account,Transaction, context} from "./Home";
+=======
+import {Account, context,Transaction} from "./App";
+>>>>>>> src/component/Login.js
 const crypto = require("crypto");
 
 export class Login extends React.Component{

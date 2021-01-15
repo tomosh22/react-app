@@ -1,5 +1,5 @@
 import React,{useContext} from "react";
-import {context} from "./Home"
+import {context} from "./App"
 import {Link} from "react-router-dom";
 import style from "../assets/css/homePageStyle.module.css";
 import Chart from "react-google-charts"
