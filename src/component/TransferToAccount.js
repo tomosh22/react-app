@@ -290,7 +290,7 @@ export class TransferToAccount extends React.Component {
         // GETS THE USER'S HASHED PASSWORD AND SALT
         let userPassword;
         let salt;
-        await fetch("http://localhost:3000/getUserBalance/" + this.props.state.username,
+        await fetch("http://localhost:3000/selectHashAndSalt/" + this.props.state.username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => (userPassword = data[0].hash, salt = data[0].salt))

@@ -30,6 +30,7 @@ const Button = styled.button`
     border-radius: 6px;
 `
 
+
 const initialState ={
     accFrom: "",
     accName: "",
@@ -351,7 +352,7 @@ export class TransferToUser extends React.Component {
     async GetRecentPayees () {
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
         let recentPayees = [];
-        await fetch("http://localhost:3000/getAccountPayees/" + this.props.state.username,
+        await fetch("http://localhost:3000/getAccountPayees/" + this.state.accFrom,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {if(data[0]){ recentPayees = data[0].recentPayees}})
@@ -387,7 +388,7 @@ export class TransferToUser extends React.Component {
         // GETS THE USER'S HASHED PASSWORD AND SALT
         let userPassword;
         let salt;
-        await fetch("http://localhost:3000/getUserBalance/" + this.props.state.username,
+        await fetch("http://localhost:3000/selectHashAndSalt/" + this.props.state.username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => (userPassword = data[0].hash, salt = data[0].salt))
