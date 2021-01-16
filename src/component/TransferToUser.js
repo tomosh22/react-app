@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import GetDate from "./MoveMoneyFunctions";
 import { Checkbox } from 'pretty-checkbox-react';
 import Icon from '@mdi/react';
-import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeftOutline,} from '@mdi/js';
+import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeftOutline} from '@mdi/js';
 import '@djthoms/pretty-checkbox';
 
 const CirclePayeeButton = styled.button`
@@ -143,15 +143,26 @@ export class TransferToUser extends React.Component {
         //add new tag to the tag list
         let tagCategories= this.state.tagCategories;
         let i;
-        let found=false;
+        let suitable=true;
+        if ((this.state.addTag).length>20){
+            let tagError="Tag must be less than 20 characters";
+            this.setState({tagError});
+            suitable=false;
+        }
+        if (!(this.state.addTag)){
+            let tagError="Please enter a tag name";
+            this.setState({tagError});
+            suitable=false;
+        }
+
         for(i=0; i<tagCategories.length; i++){
             if(tagCategories[i]===this.state.addTag){
-                found=true;
+                suitable=false;
                 let tagError="Tag already exists";
                 this.setState({tagError})
             }
         }
-        if (!found) {
+        if (suitable) {
             tagCategories.push(this.state.addTag);
             let addTag = "";
             let tag = this.state.addTag;
@@ -204,7 +215,10 @@ export class TransferToUser extends React.Component {
         }
         if (!this.state.reference){
             referenceError = "Reference is required"
+        }else if ((this.state.reference).length>20){
+            referenceError = "Reference must be less than 20 characters"
         }
+
         if(!this.state.date){
             dateError = "Date to pay is required"
         }
@@ -367,7 +381,7 @@ export class TransferToUser extends React.Component {
             await fetch("http://localhost:3000/insertTransaction/"
                 + this.state.accFrom + "/" + this.state.accName + "/" +
                 this.state.accNumber + "/" + this.state.sortCode + "/" +this.state.currency + "/" + this.state.amount
-                + "/" + this.state.reference + "/" + this.state.date,
+                + "/" + this.state.reference + "/" + this.state.tag + "/" + this.state.date,
                 {
                     method:"POST"
                 })
@@ -461,7 +475,7 @@ export class TransferToUser extends React.Component {
                         <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
                         <Icon path={mdiTag} title={"tag"} size={0.6}/>
-                        <label htmlFor="tag">Payment Category </label><br/>
+                        <label htmlFor="tag">Payment Category    </label><br/>
                         <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
                                 disabled={!this.state.accName}>
                             <option value="" disabled selected>Choose an tag</option>
@@ -479,7 +493,7 @@ export class TransferToUser extends React.Component {
                         <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
                                hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
                         <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={this.deleteTagCategory}>Delete</button><br/>
-                        <div style={{color:"red"}}>{this.state.tagError}</div>
+                        <div style={{color:"red"}}>{this.state.tagError}</div><br/>
 
                         <Icon path={mdiCalendar} title={"calender"} size={0.6} />
                         <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accName}
@@ -490,7 +504,7 @@ export class TransferToUser extends React.Component {
                         <label htmlFor="payLater">Pay Later</label><br/>
                         <input type="date" id="date" name="date" disabled={!this.state.payLater}
                                value={this.state.date} onChange={this.handleChange} min={GetDate()}/>
-                        <div style={{color:"red"}}>{this.state.dateError}</div><br/><br/>
+                        <div style={{color:"red"}}>{this.state.dateError}</div>
 
                         <Button type="submit">Send Money</Button>
 

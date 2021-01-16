@@ -23,6 +23,7 @@ const initialState = {
     currency: "£",
     //Set default value as will not update if user does not select a different option to the default option
     amount: "",
+    reference: "",
     password:"",
     dateToday:"",
     payLater: false,
@@ -30,6 +31,7 @@ const initialState = {
     accountFromError: "",
     accountToError: "",
     amountError: "",
+    referenceError: "",
     passwordError: "",
     dateError:"",
 
@@ -92,15 +94,27 @@ export class TransferToAccount extends React.Component {
         //add new tag to the tag list
         let tagCategories= this.state.tagCategories;
         let i;
-        let found=false;
+        let suitable=true;
+
+        if (!(this.state.addTag)){
+            let tagError="Please enter a tag name";
+            this.setState({tagError});
+            suitable=false;
+        }
+        if ((this.state.addTag).length>20){
+            let tagError="Tag must be less than 20 characters";
+            this.setState({tagError});
+            suitable=false;
+        }
+
         for(i=0; i<tagCategories.length; i++){
             if(tagCategories[i]===this.state.addTag){
-                found=true;
+                suitable=false;
                 let tagError="Tag already exists";
                 this.setState({tagError})
             }
         }
-        if (!found) {
+        if (suitable) {
             tagCategories.push(this.state.addTag);
             let addTag = "";
             let tag = this.state.addTag;
@@ -135,7 +149,9 @@ export class TransferToAccount extends React.Component {
         let amountError = "";
         let dateError = "";
         let tagError="";
+        let referenceError="";
         let display = 0;
+
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
         if (!this.state.accountTo) {
@@ -152,16 +168,21 @@ export class TransferToAccount extends React.Component {
         if(!this.state.date){
             dateError = "Date to pay is required"
         }
+        if (!this.state.reference){
+            referenceError = "Reference is required"
+        }else if ((this.state.reference).length>20){
+            referenceError = "Reference must be less than 20 characters"
+        }
 
         if(!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag..."){
             tagError="Tag is required"
         }
 
-        if (!accountToError && !accountFromError && !amountError && !dateError && !tagError) {
+        if (!accountToError && !accountFromError && !amountError && !dateError && !tagError && !referenceError) {
             display = 1;
         }
 
-        this.setState({accountFromError, accountToError, amountError, dateError, tagError, display})
+        this.setState({accountFromError, accountToError, amountError, dateError, tagError, referenceError, display})
     }
 
     validateAccountTo = () =>{
@@ -269,7 +290,7 @@ export class TransferToAccount extends React.Component {
             //PROCESSES TRANSACTION
             await fetch("http://localhost:3000/insertTransaction/"
                 + this.state.accountFrom + "/" + this.state.accountTo + "/" +this.state.currency + "/" +
-                this.state.amount + "/" + this.state.date,
+                this.state.amount + "/" + this.state.reference+ "/" + this.state.tag + "/"  + this.state.date,
                 {
                     method:"POST"
                 })
@@ -344,6 +365,11 @@ export class TransferToAccount extends React.Component {
                                    max={this.state.balance}></input>
                             <div style={{color: "red"}}>{this.state.amountError}</div><br/>
 
+                            <label htmlFor="reference">Reference</label><br/>
+                            <input id="reference" name="reference" value={this.state.reference}
+                                   onChange={this.handleChange} disabled={!this.state.accountTo}/>
+                            <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
+
                             <Icon path={mdiTag} title={"Tag"} size={0.6} />
                             <label htmlFor="tag">Payment Category </label><br/>
                             <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
@@ -390,6 +416,7 @@ export class TransferToAccount extends React.Component {
                         <p>From: <b>{this.state.accountFrom}</b></p>
                         <p>To: <b>{this.state.accountTo}</b></p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
+                        <p>Reference: <b>{this.state.reference}</b></p>
                         <p>Category: <b>{this.state.tag}</b></p>
                         <p>Date: <b>{this.state.date}</b></p>
                         <Button type="button" onClick={this.authorisePayment}>Confirm details</Button>
