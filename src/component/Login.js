@@ -1,5 +1,5 @@
 import React from "react";
-import {Account, context} from "./App";
+import {Account, context,Transaction} from "./App";
 const crypto = require("crypto");
 
 export class Login extends React.Component{
@@ -13,9 +13,8 @@ export class Login extends React.Component{
     handleChange = event => {
         // stores what user types in form in React
         this.setState ({[event.target.name] : event.target.value})
-        console.log("username " + this.state.username)
     }
-    async handleSubmit(event,setUsername,setFirstName,setLastName,setLoggedIn,addAccount){
+    async handleSubmit(event,setUsername,setFirstName,setLastName,setLoggedIn,addAccount,addTransaction){
         event.preventDefault();
         //this.validate();
         var username,hash,salt,firstname,secondname,email
@@ -34,7 +33,11 @@ export class Login extends React.Component{
             }).then(response => response.json()).then(data => {username=data[0].Username;salt=data[0].Salt;firstname=data[0].FirstName;secondname=data[0].SecondName;email=data[0].Email})
             await fetch("http://localhost:3000/getUserAccounts/" + this.state.username, {
                 method: "GET"
-            }).then(response => response.json()).then(data => {for(var x of data){addAccount(new Account(data[0].Name,data[0].Type,data[0].Balance,data[0].Currency,data[0].AccNumber))}})
+            }).then(response => response.json()).then(data => {for(var x of data){addAccount(new Account(x.Name,x.Type,x.Balance,x.Currency,x.AccNumber))}})
+            await fetch("http://localhost:3000/getUserTransactions/" + this.state.username, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {for(var x of data){addTransaction(new Transaction(x.TransactionId,x.Amount,x.DateTime,x.AccNumberTo,x.AccNumberFrom))}})
+            //}).then(response => response.json()).then(data => console.log(data))
             setUsername(username);
             setFirstName(firstname);
             setLastName(secondname);
@@ -65,10 +68,10 @@ export class Login extends React.Component{
 
     render() {
         return (
-            <context.Consumer>{({setUsername,setFirstName,setLastName,setLoggedIn,addAccount}) => (
+            <context.Consumer>{({setUsername,setFirstName,setLastName,setLoggedIn,addAccount,addTransaction}) => (
                 <div>
                     <h1>Log in</h1>
-                    <form action="Login" id="LoginForm" method="post" onSubmit={e => this.handleSubmit(e,setUsername,setFirstName,setLastName,setLoggedIn,addAccount)}>
+                    <form action="Login" id="LoginForm" method="post" onSubmit={e => this.handleSubmit(e,setUsername,setFirstName,setLastName,setLoggedIn,addAccount,addTransaction)}>
 
                         <label htmlFor="username">Username: </label><br/>
                         <input type="text" id="username" name="username" value={this.state.username} onChange={this.handleChange}/>
