@@ -55,7 +55,7 @@ const initialState ={
     details:"",
     username: "test",
 
-    userAccounts: ["Saving account", "Current account"],
+    userAccounts: ["11111111", "22222222"],
     //example of what user accounts should look like
 
     recentPayees: [["Katie","1234567"], ["Sam","2345678"], ["James","3456789"],
@@ -70,7 +70,7 @@ const initialState ={
     addTag:"",
     deleteTag:"",
 
-    balance: 1000.00,
+    balance: 0.00,
     //example of what balance should look like
 
     display: 0,
@@ -121,7 +121,7 @@ export class TransferToUser extends React.Component {
      handleSubmit = (event) =>{
         event.preventDefault();
         if (this.state.display===0){this.validateTransaction()}
-        else if (this.state.display===3){this.setPayeeDetails(); this.state.display = 0;}// this.GetBalance() //uncomment this when connected to database
+        else if (this.state.display===3){this.setPayeeDetails(); this.state.display = 0; this.GetBalance()}//uncomment this when connected to database
         else if (this.state.display===4){this.validatePassword();}
         else{this.validateNewPayee()}
     }
@@ -382,7 +382,8 @@ export class TransferToUser extends React.Component {
         await fetch("http://localhost:3002/getUserBalance/" + this.state.accFrom,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {balance = data[0].balance})
+            }).then(response => response.json()).then(data => {balance = data[0].Balance})
+        console.log(balance);
         this.setState({balance})
     }
 
@@ -442,7 +443,7 @@ export class TransferToUser extends React.Component {
 
                         <Icon path={mdiAccountArrowLeftOutline} title={"accountTo"} size={0.75} />
                         <label>To</label>
-                        <div><b>{this.state.accName}</b> {this.state.accNumber} {this.state.sortCode}</div>
+                        <div><b>{this.state.accName}</b> {this.state.accNumber}</div>
                         <button type="button" onClick={this.SelectNewPayee} disabled={!this.state.accFrom}>Add a new Payee</button>
                         <button type="button" onClick={this.SelectRecentPayee} disabled={!this.state.accFrom}>Select Recent Payee</button>
                         <div style={{color:"red"}}>{this.state.accToError}</div><br/>
