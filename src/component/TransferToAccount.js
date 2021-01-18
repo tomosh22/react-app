@@ -35,7 +35,7 @@ const initialState = {
     passwordError: "",
     dateError:"",
 
-    userAccounts: ["My Saving Account", "My Current Account"],
+    userAccounts: ["11111111", "22222222"],
     updatedUserAccounts: [],
     //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
     //updatedUserAccounts is used to select account to
@@ -198,7 +198,7 @@ export class TransferToAccount extends React.Component {
         this.setState({accountToError, display})
     }
 
-    validatePassword = () =>{
+    async validatePassword (){
         // validates user's password to authorise payment
         let passwordError = "";
         let userPassword = "password";
@@ -224,8 +224,7 @@ export class TransferToAccount extends React.Component {
                     passwordError = passwordAttempts + " login attempts remaining"
                 }
                 else{
-                    //this.ProcessPayment()
-                    //uncomment when connected to database
+                    this.ProcessPayment();
                     display=4;
 
                 }
@@ -288,7 +287,7 @@ export class TransferToAccount extends React.Component {
     async ProcessPayment (){
         if (this.state.balance>this.state.amount){
             //PROCESSES TRANSACTION
-            await fetch("http://localhost:3000/insertTransaction/"
+            await fetch("http://localhost:3002/insertTransaction/"
                 + this.state.accountFrom + "/" + this.state.accountTo + "/" +this.state.currency + "/" +
                 this.state.amount + "/" + this.state.reference+ "/" + this.state.tag + "/"  + this.state.date,
                 {

@@ -271,7 +271,7 @@ export class TransferToUser extends React.Component {
         this.setState({accNameError, accNumberError, display})
     }
 
-    validatePassword = () =>{
+    async validatePassword (){
         // validates user's password to authorise payment
         let passwordError = "";
         let userPassword = "password";
@@ -297,8 +297,7 @@ export class TransferToUser extends React.Component {
                     passwordError = passwordAttempts + " login attempts remaining"
                 }
                 else{
-                    //this.ProcessPayment()
-                    //uncomment when connected to database
+                    this.ProcessPayment()
                     display = 5;
                 }
             }
@@ -322,9 +321,9 @@ export class TransferToUser extends React.Component {
     SelectRecentPayee = () =>{
         //displays select recent/favourite payee form
         let display = 3;
-        this.setState({display})
         //this.GetRecentPayees();
-        //this.GetFavourite()
+        //this.GetFavourite();
+        this.setState({display});
         //uncomment these when connected to database
     }
 
@@ -368,9 +367,8 @@ export class TransferToUser extends React.Component {
     async ProcessPayment (){
         if (this.state.balance>this.state.amount){
             //PROCESSES TRANSACTION
-            await fetch("http://localhost:3000/insertTransaction/"
-                + this.state.accFrom + "/" + this.state.accName + "/" +
-                this.state.accNumber + "/" + this.state.sortCode + "/" +this.state.currency + "/" + this.state.amount
+            await fetch("http://localhost:3002/insertTransaction/"
+                + this.state.accFrom + "/" + this.state.accName + "/" + this.state.currency + "/" + this.state.amount
                 + "/" + this.state.reference + "/" + this.state.tag + "/" + this.state.date,
                 {
                     method:"POST"
@@ -402,10 +400,11 @@ export class TransferToUser extends React.Component {
     async GetFavourite (){
         //GETS THE USER'S FAVOURITE PAYEES
         let favouritePayees=[];
-        await fetch("http://localhost:3000/getFavouritePayees/" + this.state.username,
+        await fetch("http://localhost:3002/getFavouritePayees/" + this.state.username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {if(data[0]){ favouritePayees = data[0].favouritePayees}})
+        console.log(favouritePayees)
         this.setState({favouritePayees})
     }
 
