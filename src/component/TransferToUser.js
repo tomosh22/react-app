@@ -210,7 +210,10 @@ export class TransferToUser extends React.Component {
             amountError = "Amount is required"
         }else if(!(amountRegex.test(this.state.amount))) {
             amountError = "Amount must be valid"
+        }else if(this.state.amount>this.state.balance){
+            amountError = "Amount must be less than your balance"
         }
+        
         if (!this.state.reference){
             referenceError = "Reference is required"
         }else if ((this.state.reference).length>20){

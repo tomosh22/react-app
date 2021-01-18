@@ -43,7 +43,7 @@ const initialState = {
     display: 0,
     // determines the display of the webpage
 
-    balance: 1000.00,
+    balance: 0.00,
     //example of what balance should look like
 
     passwordAttempts: 3,
@@ -164,7 +164,10 @@ export class TransferToAccount extends React.Component {
             amountError = "Amount is required"
         } else if (!(amountRegex.test(this.state.amount))) {
             amountError = "Amount must be valid"
+        } else if(this.state.amount>this.state.balance){
+            amountError = "Amount must be less than your balance"
         }
+
         if(!this.state.date){
             dateError = "Date to pay is required"
         }
