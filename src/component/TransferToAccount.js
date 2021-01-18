@@ -252,12 +252,12 @@ export class TransferToAccount extends React.Component {
         this.setState(initialState);
     }
 
-    SelectAccountTo = () =>{
+     SelectAccountTo = ()=>{
         //remove accountFrom from the list of accounts that can be sent to
         let display =2;
         let updatedUserAccounts=[]
         let i;
-        //this.GetBalance()
+        this.GetBalance();
         //uncomment these when connected to database
 
         for (i = 0; i < (this.state.userAccounts).length; i++){
@@ -299,10 +299,11 @@ export class TransferToAccount extends React.Component {
     async GetBalance (){
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0;
-        await fetch("http://localhost:3000/getUserBalance/" + this.state.accountFrom,
+        await fetch("http://localhost:3002/getUserBalance/" + this.state.accountFrom,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => balance = data[0].balance)
+            }).then(response => response.json()).then(data => balance = data[0].Balance)
+        console.log(balance);
         this.setState({balance})
     }
 
