@@ -53,7 +53,7 @@ const initialState ={
     passwordError:"",
     dateError:"",
     details:"",
-    username: "test",
+    username: "bobg",
 
     userAccounts: ["11111111", "22222222"],
     //example of what user accounts should look like
@@ -213,7 +213,7 @@ export class TransferToUser extends React.Component {
         }else if(this.state.amount>this.state.balance){
             amountError = "Amount must be less than your balance"
         }
-        
+
         if (!this.state.reference){
             referenceError = "Reference is required"
         }else if ((this.state.reference).length>20){
@@ -277,13 +277,13 @@ export class TransferToUser extends React.Component {
     async validatePassword (){
         // validates user's password to authorise payment
         let passwordError = "";
-        let userPassword = "password";
         //change userPassword here!!
         let password = this.state.password;
         let passwordAttempts = this.state.passwordAttempts;
         let display = 4;
 
-        //this.GetPassword();
+        this.GetPassword();
+        let userPassword= this.state.userPassword;
         //var hash = crypto.createHmac("sha512", this.state.salt);
         //hash.update(password + this.state.salt);
         //hash = hash.digest("hex");
@@ -394,10 +394,12 @@ export class TransferToUser extends React.Component {
         // GETS THE USER'S HASHED PASSWORD AND SALT
         let userPassword;
         let salt;
-        await fetch("http://localhost:3000/selectHashAndSalt/" + this.props.state.username,
+        await fetch("http://localhost:3002/selectHashAndSalt/" + this.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => (userPassword = data[0].hash, salt = data[0].salt))
+            }).then(response => response.json()).then(data => (userPassword = data[0].Password, salt = data[0].Salt))
+        console.log(userPassword);
+        console.log(salt);
         this.setState({userPassword, salt})
     }
 
