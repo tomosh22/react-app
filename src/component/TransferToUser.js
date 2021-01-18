@@ -35,7 +35,6 @@ const initialState ={
     accFrom: "",
     accName: "",
     accNumber: "",
-    sortCode: "",
     currency: "£",
     //Set default value as will not update if user does not select a different option to the default option
     amount: "",
@@ -49,18 +48,18 @@ const initialState ={
     accToError:"",
     accNameError: "",
     accNumberError: "",
-    sortCodeError: "",
     amountError: "",
     referenceError: "",
     passwordError:"",
     dateError:"",
     details:"",
+    username: "test",
 
     userAccounts: ["Saving account", "Current account"],
     //example of what user accounts should look like
 
-    recentPayees: [["Katie","1234567","11-11-11"], ["Sam","2345678","22-22-22"], ["James","3456789","33-33-33"],
-        ["Sophie","4567890", "44-44-44"], ["Lucy","5678901","55-55-55"]],
+    recentPayees: [["Katie","1234567"], ["Sam","2345678"], ["James","3456789"],
+        ["Sophie","4567890"], ["Lucy","5678901"]],
     //example of what recent Payees should look like
     favourite: false,
     favouritePayees:[],
@@ -119,10 +118,10 @@ export class TransferToUser extends React.Component {
         this.setState({details: ""})
     }
 
-    handleSubmit = event => {
+     handleSubmit = (event) =>{
         event.preventDefault();
         if (this.state.display===0){this.validateTransaction()}
-        else if (this.state.display===3){this.setPayeeDetails(); this.state.display = 0;} //this.GetBalance() uncomment this when connected to database
+        else if (this.state.display===3){this.setPayeeDetails(); this.state.display = 0;}// this.GetBalance() //uncomment this when connected to database
         else if (this.state.display===4){this.validatePassword();}
         else{this.validateNewPayee()}
     }
@@ -133,9 +132,8 @@ export class TransferToUser extends React.Component {
             let details = (this.state.chosenPayee).split(",");
             let accName = details[0];
             let accNumber = details[1];
-            let sortCode = details[2];
             let chosenPayee = "";
-            this.setState({accName, accNumber,sortCode, chosenPayee})
+            this.setState({accName, accNumber, chosenPayee})
         }
     }
 
@@ -204,7 +202,7 @@ export class TransferToUser extends React.Component {
         if (!this.state.accFrom){
             accFromError = "Account name is required"
         }
-        if (!this.state.accName || !this.state.accNumber || !this.state.sortCode){
+        if (!this.state.accName || !this.state.accNumber){
             accToError = "Payee Details are required"
         }
 
@@ -234,11 +232,10 @@ export class TransferToUser extends React.Component {
         this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display})
     }
 
-    validateNewPayee = () =>{
+    async validateNewPayee(){
         // validates the user's input for new payee
         let accNameError ="";
         let accNumberError ="";
-        let sortCodeError ="";
         let display = 2;
 
         const sortCodeRegex = new RegExp("^[0-9]{2}-[0-9]{2}-[0-9]{2}")
@@ -250,17 +247,11 @@ export class TransferToUser extends React.Component {
             accNumberError = "Account number is required"
         }
 
-        if (!this.state.sortCode){
-            sortCodeError = "Sort code is required"
-        }else if(!(sortCodeRegex.test(this.state.sortCode))) {
-            sortCodeError = "Sort code must be in format xx-xx-xx"
-        }
 
-
-        if (!accNameError && !accNumberError && !sortCodeError ){
+        if (!accNameError && !accNumberError){
             if (this.state.favourite){
                 let favouritePayees= this.state.favouritePayees;
-                let newFavourite= [this.state.accName,this.state.accNumber,this.state.sortCode];
+                let newFavourite= [this.state.accName,this.state.accNumber];
                 let i;
                 let found=false;
                 for(i=0; i<favouritePayees.length; i++){
@@ -270,15 +261,14 @@ export class TransferToUser extends React.Component {
                 }
                 if (!found){
                     favouritePayees.push(newFavourite);
+                    this.SetFavourite();
                     this.setState({favouritePayees})
-                    //this.SetFavourite();
-                    //uncomment when connected to database
                 }
             }
             display=0;
         }
 
-        this.setState({accNameError, accNumberError,sortCodeError, display})
+        this.setState({accNameError, accNumberError, display})
     }
 
     validatePassword = () =>{
@@ -391,7 +381,7 @@ export class TransferToUser extends React.Component {
     async GetBalance (){
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0.00;
-        await fetch("http://localhost:3000/getUserBalance/" + this.state.accFrom,
+        await fetch("http://localhost:3002/getUserBalance/" + this.state.accFrom,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {balance = data[0].balance})
@@ -412,7 +402,7 @@ export class TransferToUser extends React.Component {
     async GetFavourite (){
         //GETS THE USER'S FAVOURITE PAYEES
         let favouritePayees=[];
-        await fetch("http://localhost:3000/getFavouritePayees/" + this.props.state.username,
+        await fetch("http://localhost:3000/getFavouritePayees/" + this.state.username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {if(data[0]){ favouritePayees = data[0].favouritePayees}})
@@ -421,7 +411,7 @@ export class TransferToUser extends React.Component {
 
     async SetFavourite (){
         // SETS THE USER'S FAVOURITE PAYEES
-        await fetch("http://localhost:3000/setFavouritePayees/" + this.props.state.username + "/" + this.state.favouritePayees,
+        await fetch("http://localhost:3002/setFavouritePayees/" + this.state.username + "/" + this.state.accName + "/" + this.state.accNumber,
             {
                 method:"POST"
             })
@@ -521,7 +511,7 @@ export class TransferToUser extends React.Component {
                         <h1>Review Details</h1>
                         <p>From: <b>{this.state.accFrom}</b></p>
                         <p>Payee: <b>{this.state.accName}</b></p>
-                        <p>Payee Details: <b>{this.state.sortCode}   {this.state.accNumber}</b></p>
+                        <p>Payee Details: <b>{this.state.accNumber}</b></p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                         <p>Reference: <b>{this.state.reference}</b></p>
                         <p>Category: <b>{this.state.tag}</b></p>
@@ -546,11 +536,6 @@ export class TransferToUser extends React.Component {
                         <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
                                onChange={this.handleChange}/>
                         <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
-
-                        <label htmlFor="sortCode">Sort Code</label><br/>
-                        <input id="sortCode" name="sortCode" value={this.state.sortCode}
-                               onChange={this.handleChange}/>
-                        <div style={{color:"red"}}>{this.state.sortCodeError}</div><br/>
                         <>
                             <Checkbox animation="pulse" shape="round" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}></Checkbox>
                         </>
