@@ -14,6 +14,7 @@ import {AdminPage} from "./Admin/AdminPage";
 import {Logout} from "./Logout";
 import {ErrorPage} from "./Error"
 import {Switch} from "react-router";
+import style from "../assets/css/homePageStyle.module.css"
 
 export const context = React.createContext()
 
@@ -37,7 +38,19 @@ export class Transaction{
         this.accNumberFrom = accNumberFrom;
     }
 }
-
+const vendorCategories = {
+    entertainment:"Entertainment",
+    lifestyle:"Lifestyle",
+    supermarkets:"Supermarkets",
+    takeout:"Takeout",
+    shopping:"Shopping"
+}
+export class Vendor{
+    constructor(name,category){
+        this.name = name;
+        this.category = category
+    }
+}
 export class App extends Component{
     pageLook =()=>{
         const pathname = window.location.pathname
@@ -55,10 +68,11 @@ export class App extends Component{
         }
         else{
             return(
+
                 <context.Provider value={this.state}>
                     <Router>
                         <Header />
-                        <div>
+                        <div className={style.main}>
                             <Switch>
                                 <Route exact path={"/"}> <Home /> </Route>
                                 <Route exact path={"/dashboard"}> <Dashboard /> </Route>
@@ -96,13 +110,14 @@ export class App extends Component{
         addTransaction:(trans) => this.addTransaction(trans),
         removeTransaction:(id) => this.removeTransaction(id),
         vendors: {
-            11111111:"Netflix",
-            22222222:"Spotify",
-            33333333:"PureGym",
-            44444444:"McDonalds",
-            55555555:"Uber Eats",
-            66666666:"Asda",
-            77777777:"Aldi"
+            "11111111":new Vendor("Netflix",vendorCategories.entertainment),
+            "22222222":new Vendor("Spotify",vendorCategories.entertainment),
+            "33333333":new Vendor("Puregym",vendorCategories.lifestyle),
+            "44444444":new Vendor("McDonalds",vendorCategories.takeout),
+            "55555555":new Vendor("Uber Eats",vendorCategories.takeout),
+            "66666666":new Vendor("Asda",vendorCategories.supermarkets),
+            "77777777":new Vendor("Aldi",vendorCategories.supermarkets),
+            "88888888":new Vendor("Amazon",vendorCategories.shopping)
         }
     }
     removeAccount(accNumber){
