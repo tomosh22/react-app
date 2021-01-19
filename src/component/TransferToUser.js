@@ -148,6 +148,7 @@ export class TransferToUser extends React.Component {
         if (!accFromError){
             display=0;
         }
+        this.GetRecentPayees()
         this.setState({accFromError, display})
     }
 
@@ -296,7 +297,6 @@ export class TransferToUser extends React.Component {
         let passwordAttempts = this.state.passwordAttempts;
         let display = 4;
 
-        this.GetPassword();
         let userPassword= this.state.userPassword;
         //var hash = crypto.createHmac("sha512", this.state.salt);
         //hash.update(password + this.state.salt);
@@ -338,22 +338,21 @@ export class TransferToUser extends React.Component {
     SelectRecentPayee = () =>{
         //displays select recent/favourite payee form
         let display = 3;
-        //this.GetRecentPayees();
-        //this.GetFavourite();
         this.setState({display});
-        //uncomment these when connected to database
     }
 
     SelectAccountFrom=()=>{
         //get the users accounts
         let display=6;
         this.GetUserAccounts()
+        this.GetFavourite()
         this.setState({display})
     }
 
     authorisePayment = () =>{
         //displays authorise payment form
         let display = 4;
+        this.GetPassword();
         this.setState({display})
     }
 
@@ -381,11 +380,27 @@ export class TransferToUser extends React.Component {
     async GetRecentPayees () {
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
         let recentPayees = [];
-        await fetch("http://localhost:3000/getAccountPayees/" + this.state.accFrom,
+        let i;
+        let j;
+        let found= false;
+        let numOfPayees=5;
+        await fetch("http://localhost:3002/getAccountPayees/" + this.state.accFrom,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data[0]){ recentPayees = data[0].recentPayees}})
-            //recentPayees should be a 3d array [accName,accNumber,sortCode] of 5 most recent payees.
+            }).then(response => response.json()).then(data => {if (data.length<5){numOfPayees=data.length};
+            for(i=0; i<numOfPayees; i++){
+                if(!(data[i].NameTo===this.state.username)){
+                    for (j=0;j<recentPayees.length; j++){
+                        if (recentPayees[j][1]===data[i].AccNumberTo){
+                            found=true;
+                        }
+                    }
+                    if (found===false){
+                        recentPayees.push([data[i].NameTo,data[i].AccNumberTo])}
+                    }
+            }})
+            //recentPayees should be a 2d array [accName,accNumber] of 5 most recent payees.
+        console.log(recentPayees);
         this.setState({recentPayees})
     }
 
@@ -394,8 +409,8 @@ export class TransferToUser extends React.Component {
         if (this.state.balance>this.state.amount){
             //PROCESSES TRANSACTION
             await fetch("http://localhost:3002/insertTransaction/"
-                + this.state.accFrom + "/" + this.state.accName + "/" + this.state.currency + "/" + this.state.amount
-                + "/" + this.state.reference + "/" + this.state.tag + "/" + this.state.date,
+                + this.state.accFrom + "/" + this.state.accNumber + "/" + this.state.currency + "/" + this.state.amount
+                + "/" + this.state.reference + "/" + this.state.tag + "/" + this.state.date + "/" + this.state.accName,
                 {
                     method:"POST"
                 })
@@ -429,11 +444,12 @@ export class TransferToUser extends React.Component {
     async GetFavourite (){
         //GETS THE USER'S FAVOURITE PAYEES
         let favouritePayees=[];
+        let i;
         await fetch("http://localhost:3002/getFavouritePayees/" + this.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data[0]){ favouritePayees = data[0].favouritePayees}})
-        console.log(favouritePayees)
+            }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){favouritePayees.push([data[i].Name, data[i].AccNumber])}})
+        console.log(favouritePayees);
         this.setState({favouritePayees})
     }
 
@@ -447,8 +463,6 @@ export class TransferToUser extends React.Component {
 
 
     render() {
-        //this.GetUserAccounts();
-        //uncomment these when connected to database
         switch(this.state.display){
             case 0:
                 return (

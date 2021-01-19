@@ -221,7 +221,6 @@ export class TransferToAccount extends React.Component {
         let password = this.state.password;
         let passwordAttempts = this.state.passwordAttempts;
 
-        this.GetPassword();
         let userPassword= this.state.userPassword;
         //var hash = crypto.createHmac("sha512", this.state.salt);
         //hash.update(password + this.state.salt);
@@ -260,6 +259,7 @@ export class TransferToAccount extends React.Component {
     authorisePayment = () =>{
         //displays authorise payment form
         let display = 3;
+        this.GetPassword();
         this.setState({display})
     }
 
@@ -313,7 +313,7 @@ export class TransferToAccount extends React.Component {
             //PROCESSES TRANSACTION
             await fetch("http://localhost:3002/insertTransaction/"
                 + this.state.accountFrom + "/" + this.state.accountTo + "/" +this.state.currency + "/" +
-                this.state.amount + "/" + this.state.reference+ "/" + this.state.tag + "/"  + this.state.date,
+                this.state.amount + "/" + this.state.reference+ "/" + this.state.tag + "/"  + this.state.date  + "/"  + this.state.username,
                 {
                     method:"POST"
                 })
