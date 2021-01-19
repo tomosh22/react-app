@@ -55,7 +55,7 @@ const initialState ={
     details:"",
     username: "bobg",
 
-    userAccounts: ["11111111", "22222222"],
+    userAccounts: [],
     //example of what user accounts should look like
 
     recentPayees: [["Katie","1234567"], ["Sam","2345678"], ["James","3456789"],
@@ -123,6 +123,7 @@ export class TransferToUser extends React.Component {
         if (this.state.display===0){this.validateTransaction()}
         else if (this.state.display===3){this.setPayeeDetails(); this.state.display = 0; this.GetBalance()}//uncomment this when connected to database
         else if (this.state.display===4){this.validatePassword();}
+        else if (this.state.display===6){this.validateAccountFrom()}
         else{this.validateNewPayee()}
     }
 
@@ -135,6 +136,19 @@ export class TransferToUser extends React.Component {
             let chosenPayee = "";
             this.setState({accName, accNumber, chosenPayee})
         }
+    }
+
+    validateAccountFrom = () =>{
+        //validates the account to send from
+        let accFromError = "";
+        let display = 5;
+        if (!this.state.accFrom) {
+            accFromError = "Account name is required"
+        }
+        if (!accFromError){
+            display=0;
+        }
+        this.setState({accFromError, display})
     }
 
     addTagCategory = () =>{
@@ -330,6 +344,13 @@ export class TransferToUser extends React.Component {
         //uncomment these when connected to database
     }
 
+    SelectAccountFrom=()=>{
+        //get the users accounts
+        let display=6;
+        this.GetUserAccounts()
+        this.setState({display})
+    }
+
     authorisePayment = () =>{
         //displays authorise payment form
         let display = 4;
@@ -348,10 +369,12 @@ export class TransferToUser extends React.Component {
     async GetUserAccounts () {
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
         let userAccounts = [];
-        await fetch("http://localhost:3000/getUserAccounts/" + this.props.state.username,
+        let i;
+        await fetch("http://localhost:3002/getUserAccounts/" + this.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data[0]){ userAccounts = data[0].userAccounts}})
+            }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){userAccounts.push(data[i].AccNumber)}})
+        console.log(userAccounts)
         this.setState({userAccounts})
     }
 
@@ -435,19 +458,13 @@ export class TransferToUser extends React.Component {
                     <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
 
                         <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
-                        <label htmlFor="accountFrom">From</label><br/>
-                        <select id="accFrom" name="accFrom"  value={this.state.accFrom} onChange={this.handleChange}>
-                            <option value="" disabled selected>Choose an account</option>
-                            {this.state.userAccounts.map(list =>(
-                                <option key={list} value={list}>
-                                    {list}
-                                </option>
-                            )) }
-                        </select>
+                        <label htmlFor="accFrom">From</label><br/>
+                        <div><b>{this.state.accFrom}</b></div>
+                        <button type="button" onClick={this.SelectAccountFrom}>Choose an account</button>
                         <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
 
                         <Icon path={mdiAccountArrowLeftOutline} title={"accountTo"} size={0.75} />
-                        <label>To</label>
+                        <label htmlFor={"accTo"}>To</label>
                         <div><b>{this.state.accName}</b> {this.state.accNumber}</div>
                         <button type="button" onClick={this.SelectNewPayee} disabled={!this.state.accFrom}>Add a new Payee</button>
                         <button type="button" onClick={this.SelectRecentPayee} disabled={!this.state.accFrom}>Select Recent Payee</button>
@@ -608,6 +625,30 @@ export class TransferToUser extends React.Component {
                     </div>
                 )
             break;
+
+            case 6:
+                //SELECT ACCOUNT FROM PAGE
+                return(
+                    <div>
+                        <br></br>
+                        <form action="SelectAccount" id="SelectAccount" method="post" onSubmit={this.handleSubmit}>
+                            <select id="accFrom" name="accFrom" value={this.state.accFrom}
+                                    onChange={this.handleChange}>
+                                <option value="" disabled selected>Choose an account</option>
+                                {this.state.userAccounts.map(list => (
+                                    <option key={list} value={list}>
+                                        {list}
+                                    </option>
+                                ))}
+                            </select>
+                            <div style={{color: "red"}}>{this.state.accFromError}</div>
+                            <br></br>
+                            <Button type="button" onClick={this.ChangeDetails}>Back</Button>
+                            <Button type="submit">Submit</Button>
+                        </form>
+                    </div>
+                )
+                break;
 
     };
 }}

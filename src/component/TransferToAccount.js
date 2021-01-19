@@ -204,11 +204,10 @@ export class TransferToAccount extends React.Component {
 
     validateAccountFrom = () =>{
         //validates the account to send from
-        let accountToError = "";
         let display = 5;
         let accountFromError="";
         if (!this.state.accountFrom) {
-            accountToError = "Account name is required"
+            accountFromError = "Account name is required"
         }
         if (!accountFromError){
             display=0;
