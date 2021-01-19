@@ -380,24 +380,32 @@ export class TransferToUser extends React.Component {
     async GetRecentPayees () {
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
         let recentPayees = [];
-        let i;
+        let i=0;
         let j;
         let found= false;
-        let numOfPayees=5;
+        let numToDisplay=5;
         await fetch("http://localhost:3002/getAccountPayees/" + this.state.accFrom,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if (data.length<5){numOfPayees=data.length};
-            for(i=0; i<numOfPayees; i++){
+            }).then(response => response.json()).then(data => {if (data.length<5){numToDisplay=data.length};
+            let numOfPayees = data.length;
+            while(numToDisplay>0 && numOfPayees>0){
+                console.log("numPayees" + numOfPayees)
+                console.log("numToDisplay" + numToDisplay)
                 if(!(data[i].NameTo===this.state.username)){
+                    //prevents the user appearing in the recent payees
                     for (j=0;j<recentPayees.length; j++){
+                        //prevents the same payee appearing multiple times in recent payees
                         if (recentPayees[j][1]===data[i].AccNumberTo){
                             found=true;
                         }
                     }
                     if (found===false){
-                        recentPayees.push([data[i].NameTo,data[i].AccNumberTo])}
+                        recentPayees.push([data[i].NameTo,data[i].AccNumberTo])
+                        --numToDisplay}
                     }
+                    i++
+                    --numOfPayees
             }})
             //recentPayees should be a 2d array [accName,accNumber] of 5 most recent payees.
         console.log(recentPayees);
