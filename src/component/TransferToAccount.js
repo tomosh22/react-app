@@ -35,7 +35,7 @@ const initialState = {
     passwordError: "",
     dateError:"",
 
-    userAccounts: ["11111111", "22222222"],
+    userAccounts: [],
     updatedUserAccounts: [],
     //INSERT CODE FOR MAKING ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
     //updatedUserAccounts is used to select account to
@@ -87,6 +87,7 @@ export class TransferToAccount extends React.Component {
         event.preventDefault();
         if (this.state.display===0){this.validate()}
         else if (this.state.display===3){this.validatePassword()}
+        else if (this.state.display===5){this.validateAccountFrom()}
         else{this.validateAccountTo()}
     }
 
@@ -201,6 +202,20 @@ export class TransferToAccount extends React.Component {
         this.setState({accountToError, display})
     }
 
+    validateAccountFrom = () =>{
+        //validates the account to send from
+        let accountToError = "";
+        let display = 5;
+        let accountFromError="";
+        if (!this.state.accountFrom) {
+            accountToError = "Account name is required"
+        }
+        if (!accountFromError){
+            display=0;
+        }
+        this.setState({accountFromError, display})
+    }
+
     async validatePassword (){
         // validates user's password to authorise payment
         let passwordError = "";
@@ -257,10 +272,9 @@ export class TransferToAccount extends React.Component {
      SelectAccountTo = ()=>{
         //remove accountFrom from the list of accounts that can be sent to
         let display =2;
-        let updatedUserAccounts=[]
+        let updatedUserAccounts=[];
         let i;
         this.GetBalance();
-        //uncomment these when connected to database
 
         for (i = 0; i < (this.state.userAccounts).length; i++){
             // prevents the user sending a transaction to the same account
@@ -272,6 +286,13 @@ export class TransferToAccount extends React.Component {
         this.setState({display, updatedUserAccounts})
     }
 
+    SelectAccountFrom=()=>{
+        //get the users accounts
+        let display=5;
+        this.GetUserAccounts()
+        this.setState({display})
+    }
+
 
     //DATABASE FUNCTIONS
 
@@ -279,10 +300,12 @@ export class TransferToAccount extends React.Component {
     async GetUserAccounts (){
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
         let userAccounts = [];
-        await fetch("http://localhost:3000/getUserAccounts/" + this.props.state.username,
+        let i;
+        await fetch("http://localhost:3002/getUserAccounts/" + this.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {if(data[0]){ userAccounts = data[0].userAccounts}})
+            }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){userAccounts.push(data[i].AccNumber)}})
+        console.log(userAccounts);
         this.setState({userAccounts})
     }
 
@@ -323,8 +346,6 @@ export class TransferToAccount extends React.Component {
     }
 
     render() {
-        //this.GetUserAccounts();
-        //uncomment these when connected to database
         switch (this.state.display) {
             case 0:
                 return (
@@ -337,15 +358,7 @@ export class TransferToAccount extends React.Component {
                             <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
                             <label htmlFor="accountFrom">From</label><br></br>
                             <div><b>{this.state.accountFrom}</b></div>
-                            <select id="accountFrom" name="accountFrom" value={this.state.accountFrom}
-                                    onChange={this.handleChange}>
-                                <option value="" disabled selected>Choose an account</option>
-                                {this.state.userAccounts.map(list => (
-                                    <option key={list} value={list}>
-                                        {list}
-                                    </option>
-                                ))}
-                            </select>
+                            <button type="button" onClick={this.SelectAccountFrom}>Choose an account</button>
                             <div style={{color: "red"}}>{this.state.accountFromError}</div>
                             <br></br>
 
@@ -479,6 +492,29 @@ export class TransferToAccount extends React.Component {
                     </div>
                 )
                 break;
+
+            case 5:
+                return(
+                <div>
+                    <br></br>
+                    <form action="SelectAccount" id="SelectAccount" method="post" onSubmit={this.handleSubmit}>
+                        <select id="accountFrom" name="accountFrom" value={this.state.accountFrom}
+                                onChange={this.handleChange}>
+                            <option value="" disabled selected>Choose an account</option>
+                            {this.state.userAccounts.map(list => (
+                                <option key={list} value={list}>
+                                    {list}
+                                </option>
+                            ))}
+                        </select>
+                        <div style={{color: "red"}}>{this.state.accountFromError}</div>
+                        <br></br>
+                        <Button type="button" onClick={this.ChangeDetails}>Back</Button>
+                        <Button type="submit">Submit</Button>
+                    </form>
+                </div>
+                )
+            break;
         }
     }
 }
