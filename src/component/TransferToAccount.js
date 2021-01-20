@@ -19,7 +19,9 @@ const Button = styled.button`
 
 const initialState = {
     accountFrom: "",
+    accountFromName:"",
     accountTo: "",
+    accountToName:"",
     currency: "£",
     //Set default value as will not update if user does not select a different option to the default option
     amount: "",
@@ -192,6 +194,9 @@ export class TransferToAccount extends React.Component {
     validateAccountTo = () =>{
         //validates the account to send to
         let accountToError = "";
+        let details=(this.state.accountTo).split(",");
+        let accountTo=details[0]
+        let accountToName=details[1]
         let display = 2;
         if (!this.state.accountTo) {
             accountToError = "Account name is required"
@@ -199,12 +204,15 @@ export class TransferToAccount extends React.Component {
         if (!accountToError){
             display=0;
         }
-        this.setState({accountToError, display})
+        this.setState({accountTo, accountToName, accountToError, display})
     }
 
     validateAccountFrom = () =>{
         //validates the account to send from
         let display = 5;
+        let details=(this.state.accountFrom).split(",");
+        let accountFrom=details[0]
+        let accountFromName=details[1]
         let accountFromError="";
         if (!this.state.accountFrom) {
             accountFromError = "Account name is required"
@@ -212,7 +220,7 @@ export class TransferToAccount extends React.Component {
         if (!accountFromError){
             display=0;
         }
-        this.setState({accountFromError, display})
+        this.setState({accountFrom, accountFromName, accountFromError, display})
     }
 
     async validatePassword (){
@@ -277,7 +285,7 @@ export class TransferToAccount extends React.Component {
 
         for (i = 0; i < (this.state.userAccounts).length; i++){
             // prevents the user sending a transaction to the same account
-            if (this.state.userAccounts[i]!==this.state.accountFrom){
+            if (this.state.userAccounts[i][0]!==this.state.accountFrom){
                 updatedUserAccounts.push(this.state.userAccounts[i])
             }
         }
@@ -303,7 +311,7 @@ export class TransferToAccount extends React.Component {
         await fetch("http://localhost:3002/getUserAccounts/" + this.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){userAccounts.push(data[i].AccNumber)}})
+            }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){userAccounts.push([data[i].AccNumber,data[i].Name])}})
         console.log(userAccounts);
         this.setState({userAccounts})
     }
@@ -356,14 +364,14 @@ export class TransferToAccount extends React.Component {
 
                             <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
                             <label htmlFor="accountFrom">From</label><br></br>
-                            <div><b>{this.state.accountFrom}</b></div>
+                            <div><b>{this.state.accountFromName}  </b>{this.state.accountFrom}</div>
                             <button type="button" onClick={this.SelectAccountFrom}>Choose an account</button>
                             <div style={{color: "red"}}>{this.state.accountFromError}</div>
                             <br></br>
 
                             <Icon path={mdiAccountArrowLeft} title={"accountTo"} size={0.75} />
                             <label htmlFor="accountTo">To</label><br></br>
-                            <div><b>{this.state.accountTo}</b></div>
+                            <div><b>{this.state.accountToName}   </b>{this.state.accountTo}</div>
                             <button type="button" onClick={this.SelectAccountTo} disabled={!this.state.accountFrom}>Choose an account</button>
                             <div style={{color: "red"}}>{this.state.accountToError}</div>
                             <br></br>
@@ -429,8 +437,8 @@ export class TransferToAccount extends React.Component {
                 return (
                     <div>
                         <h1>Review Details</h1>
-                        <p>From: <b>{this.state.accountFrom}</b></p>
-                        <p>To: <b>{this.state.accountTo}</b></p>
+                        <p>From: <b>{this.state.accountFromName}   </b>{this.state.accountFrom}</p>
+                        <p>To: <b>{this.state.accountToName}   </b>{this.state.accountTo}</p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                         <p>Reference: <b>{this.state.reference}</b></p>
                         <p>Category: <b>{this.state.tag}</b></p>
@@ -452,7 +460,7 @@ export class TransferToAccount extends React.Component {
                                 <option value="" disabled selected>Choose an account</option>
                                 {this.state.updatedUserAccounts.map(list => (
                                     <option key={list} value={list}>
-                                        {list}
+                                        {list[1]}
                                     </option>
                                 ))}
                             </select>
@@ -502,7 +510,7 @@ export class TransferToAccount extends React.Component {
                             <option value="" disabled selected>Choose an account</option>
                             {this.state.userAccounts.map(list => (
                                 <option key={list} value={list}>
-                                    {list}
+                                    {list[1]}
                                 </option>
                             ))}
                         </select>

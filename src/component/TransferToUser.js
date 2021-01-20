@@ -33,6 +33,7 @@ const Button = styled.button`
 
 const initialState ={
     accFrom: "",
+    accFromName:"",
     accName: "",
     accNumber: "",
     currency: "£",
@@ -140,6 +141,11 @@ export class TransferToUser extends React.Component {
 
     validateAccountFrom = () =>{
         //validates the account to send from
+        let details=(this.state.accFrom).split(",");
+        let accFrom=details[0]
+        let accFromName=details[1]
+        this.setState({accFrom, accFromName});
+        console.log((accFrom))
         let accFromError = "";
         let display = 5;
         if (!this.state.accFrom) {
@@ -148,7 +154,7 @@ export class TransferToUser extends React.Component {
         if (!accFromError){
             display=0;
         }
-        this.GetRecentPayees()
+        this.GetRecentPayees(accFrom)
         this.setState({accFromError, display})
     }
 
@@ -372,19 +378,20 @@ export class TransferToUser extends React.Component {
         await fetch("http://localhost:3002/getUserAccounts/" + this.state.username,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){userAccounts.push(data[i].AccNumber)}})
+            }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){userAccounts.push([data[i].AccNumber,data[i].Name])}})
         console.log(userAccounts)
         this.setState({userAccounts})
     }
 
-    async GetRecentPayees () {
+    async GetRecentPayees (accFrom) {
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
         let recentPayees = [];
         let i=0;
         let j;
         let found= false;
         let numToDisplay=5;
-        await fetch("http://localhost:3002/getAccountPayees/" + this.state.accFrom,
+        console.log(accFrom)
+        await fetch("http://localhost:3002/getAccountPayees/" + accFrom,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {if (data.length<5){numToDisplay=data.length};
@@ -481,7 +488,7 @@ export class TransferToUser extends React.Component {
 
                         <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
                         <label htmlFor="accFrom">From</label><br/>
-                        <div><b>{this.state.accFrom}</b></div>
+                        <div><b>{this.state.accFromName}  </b>{this.state.accFrom}</div>
                         <button type="button" onClick={this.SelectAccountFrom}>Choose an account</button>
                         <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
 
@@ -553,7 +560,7 @@ export class TransferToUser extends React.Component {
                 // REVIEW DETAILS PAGE
                     <div>
                         <h1>Review Details</h1>
-                        <p>From: <b>{this.state.accFrom}</b></p>
+                        <p>From: <b>{this.state.accFromName}  </b>{this.state.accFrom}</p>
                         <p>Payee: <b>{this.state.accName}</b></p>
                         <p>Payee Details: <b>{this.state.accNumber}</b></p>
                         <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
@@ -659,7 +666,7 @@ export class TransferToUser extends React.Component {
                                 <option value="" disabled selected>Choose an account</option>
                                 {this.state.userAccounts.map(list => (
                                     <option key={list} value={list}>
-                                        {list}
+                                        {list[1]}
                                     </option>
                                 ))}
                             </select>
