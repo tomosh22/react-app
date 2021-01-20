@@ -1,4 +1,4 @@
-import React,{useContext} from "react";
+import React,{useContext,useState} from "react";
 import {context} from "./App"
 import {Link} from "react-router-dom";
 import style from "../assets/css/homePageStyle.module.css";
@@ -8,13 +8,46 @@ import Chart from "react-google-charts"
 
 
 export class Dashboard extends React.Component{
-    getChartData(accounts){
+    state = {
+        chartType:"balances"
+    }
+    getBalances(accounts){
         const data = [["Account Name","Balance"]]
         for(var x of accounts){
-            data.push([x.name,x.balance])
+            data.push([x.name.concat(": ",x.currency,x.balance),x.balance])
+        }
+        //console.log(data)
+        return data
+    }
+    getExpenditure(transactions,vendors){
+        console.log(transactions)
+        console.log(vendors)
+        let data = [["Category","Amount"]]
+
+        for(var x of transactions){
+            let found = false;
+            //console.log("category: ",vendors[x.accNumberTo].category)
+            console.log("hi")
+
+            for (var y of data){
+
+                if(y[0] === vendors[x.accNumberTo].category){
+                    y[1] += x.amount
+                    found = true
+                    break;
+                }
+            }
+            if(!found){
+                data.push([vendors[x.accNumberTo].category,x.amount])
+            }
         }
         console.log(data)
         return data
+    }
+    handleChange(event){
+        //console.log("value",event.target.value)
+        this.setState({chartType:event.target.value})
+        console.log(this.state.chartType)
     }
     render() {
 
@@ -27,23 +60,66 @@ export class Dashboard extends React.Component{
             }
             return <div>{accsArray}</div>
         }
-        return (
+        function DashBoardChart(props){
+            const chartType = props.state.chartType
 
-            <context.Consumer>{({accounts}) => (
-
-                <div>
-                <h1>Dashboard</h1>
-                <Chart
-                    //width={'500px'}
+            console.log(chartType)
+            if (chartType === "balances"){
+                const data = props.getBalances(props.accounts);
+                return <Chart
+                    //width={'100%'}
                     //height={'300px'}
 
                     chartType="PieChart"
                     loader={<div>Loading Chart</div>}
-                    data={this.getChartData(accounts)}
+                    data={data}
                     options={{
-                        title: 'Account Balances',
-                        backgroundColor: {fill:"transparent"}
+                        backgroundColor: {fill:"transparent"},
+                        fontSize:12,
+                        legend: {position:"right",maxLines:99},
+                        chartArea:{width:"100%",height:"50%"},
+                        width:"100%",
+                        height:"300px"
+
                     }}
+                />
+            }
+            else if(chartType === "expenditure"){
+                const data = props.getExpenditure(props.transactions,props.vendors);
+                return <Chart
+                    //width={'100%'}
+                    //height={'300px'}
+
+                    chartType="PieChart"
+                    loader={<div>Loading Chart</div>}
+                    data={data}
+                    options={{
+                        backgroundColor: {fill:"transparent"},
+                        fontSize:12,
+                        legend: {position:"right",maxLines:99},
+                        chartArea:{width:"100%",height:"50%"},
+                        width:"100%",
+                        height:"300px"
+
+                    }}
+                />
+            }
+        }
+
+        return (
+
+            <context.Consumer>{({accounts,transactions,vendors}) => (
+                <div>
+                <h1>Dashboard</h1>
+                    <select onChange={event => this.handleChange(event)}>
+                        <option value={"balances"}>Balances</option>
+                        <option value={"expenditure"}>Expenditure</option>
+                    </select>
+                <DashBoardChart state = {this.state} accounts = {accounts}
+                                getBalances={(accounts) => this.getBalances(accounts)}
+                                transactions = {transactions}
+                                getExpenditure = {((transactions,vendors) => this.getExpenditure(transactions,vendors))}
+                                vendors = {vendors}
                 />
                 <Accounts/>
                 <div>
