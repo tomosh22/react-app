@@ -1,5 +1,5 @@
 import React from "react";
-import GetDate from "./MoveMoneyFunctions";
+import {GetDate, GetDateAndMinutes} from "./MoveMoneyFunctions";
 import styled from "styled-components";
 import Icon from '@mdi/react';
 import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeft,} from '@mdi/js';
@@ -27,7 +27,8 @@ const initialState = {
     amount: "",
     reference: "",
     password:"",
-    dateToday:"",
+    date:"",
+    dateAndMinutes:"",
     payLater: false,
     payToday: false,
     accountFromError: "",
@@ -76,11 +77,13 @@ export class TransferToAccount extends React.Component {
         this.setState({[event.target.name]: event.target.checked})
         if (event.target.checked===true){
             if (event.target.name==="payLater"){
-                this.setState({payToday:false})
+                let dateAndMinutes="";
+                this.setState({payToday:false, dateAndMinutes})
             }else{
                 this.setState({payLater:false});
-                let date= GetDate();
-                this.setState({date});
+                let dateAndMinutes= GetDateAndMinutes();
+                let date = GetDate();
+                this.setState({date, dateAndMinutes});
             }
         }
     }
@@ -154,6 +157,7 @@ export class TransferToAccount extends React.Component {
         let tagError="";
         let referenceError="";
         let display = 0;
+        let date=this.state.date;
 
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
@@ -185,10 +189,17 @@ export class TransferToAccount extends React.Component {
         }
 
         if (!accountToError && !accountFromError && !amountError && !dateError && !tagError && !referenceError) {
+            if(!this.state.dateAndMinutes){
+                date=this.state.date + " 00:00:00";
+            }
+            else{
+                date=this.state.dateAndMinutes;
+            }
+
             display = 1;
         }
 
-        this.setState({accountFromError, accountToError, amountError, dateError, tagError, referenceError, display})
+        this.setState({accountFromError, accountToError, amountError, dateError, tagError, referenceError, display,date})
     }
 
     validateAccountTo = () =>{
@@ -211,8 +222,8 @@ export class TransferToAccount extends React.Component {
         //validates the account to send from
         let display = 5;
         let details=(this.state.accountFrom).split(",");
-        let accountFrom=details[0]
-        let accountFromName=details[1]
+        let accountFrom=details[0];
+        let accountFromName=details[1];
         let accountFromError="";
         if (!this.state.accountFrom) {
             accountFromError = "Account name is required"

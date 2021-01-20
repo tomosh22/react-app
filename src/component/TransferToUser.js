@@ -1,6 +1,6 @@
 import React from "react";
 import styled from 'styled-components';
-import GetDate from "./MoveMoneyFunctions";
+import {GetDate, GetDateAndMinutes} from "./MoveMoneyFunctions";
 import { Checkbox } from 'pretty-checkbox-react';
 import Icon from '@mdi/react';
 import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeftOutline} from '@mdi/js';
@@ -40,7 +40,8 @@ const initialState ={
     //Set default value as will not update if user does not select a different option to the default option
     amount: "",
     reference: "",
-    dateToday:"",
+    date:"",
+    dateAndMinutes: "",
     payLater: false,
     payToday: false,
     chosenPayee:"",
@@ -101,11 +102,13 @@ export class TransferToUser extends React.Component {
         this.setState({[event.target.name]: event.target.checked})
         if (event.target.checked===true){
             if (event.target.name==="payLater"){
-                this.setState({payToday:false})
+                let dateAndMinutes="";
+                this.setState({payToday:false, dateAndMinutes})
             }else if (event.target.name==="payToday"){
                 this.setState({payLater:false});
+                let dateAndMinutes= GetDateAndMinutes();
                 let date=GetDate();
-                this.setState({date});
+                this.setState({date, dateAndMinutes});
             }
         }
     }
@@ -142,8 +145,8 @@ export class TransferToUser extends React.Component {
     validateAccountFrom = () =>{
         //validates the account to send from
         let details=(this.state.accFrom).split(",");
-        let accFrom=details[0]
-        let accFromName=details[1]
+        let accFrom=details[0];
+        let accFromName=details[1];
         this.setState({accFrom, accFromName});
         console.log((accFrom))
         let accFromError = "";
@@ -218,6 +221,7 @@ export class TransferToUser extends React.Component {
         let dateError = "";
         let tagError="";
         let display = 0;
+        let date= this.state.date;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
         if (!this.state.accFrom){
@@ -250,10 +254,16 @@ export class TransferToUser extends React.Component {
         }
 
         if (!accFromError && !accToError && !amountError && !referenceError && !dateError && !tagError){
+            if(!this.state.dateAndMinutes){
+                date=this.state.date + " 00:00:00";
+            }
+            else{
+                date=this.state.dateAndMinutes;
+            }
             display = 1;
         }
 
-        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display})
+        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display,date})
     }
 
     async validateNewPayee(){
@@ -426,6 +436,11 @@ export class TransferToUser extends React.Component {
             await fetch("http://localhost:3002/insertTransaction/"
                 + this.state.accFrom + "/" + this.state.accNumber + "/" + this.state.currency + "/" + this.state.amount
                 + "/" + this.state.reference + "/" + this.state.tag + "/" + this.state.date + "/" + this.state.accName,
+                {
+                    method:"POST"
+                })
+            //ADD AMOUNT TO ACCOUNT TO
+            await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accNumber + "/" + this.state.amount,
                 {
                     method:"POST"
                 })
