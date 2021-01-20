@@ -14,6 +14,15 @@ function GetDateAndMinutes () {
     if(mm<10) {
         mm="0" +mm;
     }
+    if(mins<10) {
+        mins="0" +mins;
+    }
+    if(secs<10) {
+        secs="0" +secs;
+    }
+    if(hours<10) {
+        hours="0" +hours;
+    }
     let time = hours+":"+mins+":"+secs;
     date = yyyy+"-"+mm+"-"+dd+" "+time;
     return(date);
@@ -32,6 +41,7 @@ function GetDate () {
     if(mm<10) {
         mm="0" +mm;
     }
+
     date = yyyy+"-"+mm+"-"+dd;
     return(date);
 }

@@ -29,6 +29,7 @@ const initialState = {
     password:"",
     date:"",
     dateAndMinutes:"",
+    dateHold:"",
     payLater: false,
     payToday: false,
     accountFromError: "",
@@ -83,7 +84,8 @@ export class TransferToAccount extends React.Component {
                 this.setState({payLater:false});
                 let dateAndMinutes= GetDateAndMinutes();
                 let date = GetDate();
-                this.setState({date, dateAndMinutes});
+                let dateHold= date;
+                this.setState({date, dateAndMinutes,dateHold});
             }
         }
     }
@@ -158,6 +160,7 @@ export class TransferToAccount extends React.Component {
         let referenceError="";
         let display = 0;
         let date=this.state.date;
+        let dateHold=this.state.dateHold;
 
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
@@ -190,6 +193,7 @@ export class TransferToAccount extends React.Component {
 
         if (!accountToError && !accountFromError && !amountError && !dateError && !tagError && !referenceError) {
             if(!this.state.dateAndMinutes){
+                dateHold=date;
                 date=this.state.date + " 00:00:00";
             }
             else{
@@ -199,7 +203,7 @@ export class TransferToAccount extends React.Component {
             display = 1;
         }
 
-        this.setState({accountFromError, accountToError, amountError, dateError, tagError, referenceError, display,date})
+        this.setState({accountFromError, accountToError, amountError, dateError, tagError, referenceError, display,date,dateHold})
     }
 
     validateAccountTo = () =>{
@@ -272,7 +276,8 @@ export class TransferToAccount extends React.Component {
     ChangeDetails = () =>{
         //displays main transaction form
         let display = 0;
-        this.setState({display})
+        let date=this.state.dateHold;
+        this.setState({display,date})
     }
 
     authorisePayment = () =>{

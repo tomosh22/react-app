@@ -42,6 +42,7 @@ const initialState ={
     reference: "",
     date:"",
     dateAndMinutes: "",
+    dateHold:"",
     payLater: false,
     payToday: false,
     chosenPayee:"",
@@ -108,7 +109,8 @@ export class TransferToUser extends React.Component {
                 this.setState({payLater:false});
                 let dateAndMinutes= GetDateAndMinutes();
                 let date=GetDate();
-                this.setState({date, dateAndMinutes});
+                let dateHold=date;
+                this.setState({date, dateAndMinutes,dateHold});
             }
         }
     }
@@ -222,6 +224,7 @@ export class TransferToUser extends React.Component {
         let tagError="";
         let display = 0;
         let date= this.state.date;
+        let dateHold= this.state.dateHold;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
         if (!this.state.accFrom){
@@ -255,6 +258,7 @@ export class TransferToUser extends React.Component {
 
         if (!accFromError && !accToError && !amountError && !referenceError && !dateError && !tagError){
             if(!this.state.dateAndMinutes){
+                dateHold=date;
                 date=this.state.date + " 00:00:00";
             }
             else{
@@ -263,7 +267,7 @@ export class TransferToUser extends React.Component {
             display = 1;
         }
 
-        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display,date})
+        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display,date,dateHold})
     }
 
     async validateNewPayee(){
@@ -342,7 +346,8 @@ export class TransferToUser extends React.Component {
     ChangeDetails = () =>{
         //displays main transaction form
         let display =0;
-        this.setState({display})
+        let date=this.state.dateHold;
+        this.setState({display,date})
     }
 
     SelectNewPayee = () =>{
