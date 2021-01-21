@@ -9,7 +9,11 @@ import Chart from "react-google-charts"
 
 export class Dashboard extends React.Component{
     state = {
-        chartType:"balances"
+        chartType:"balances",
+
+        //-1 if not displaying any given account
+        // otherwise account number of displayed account
+        display:-1
     }
     getBalances(accounts){
         const data = [["Account Name","Balance"]]
@@ -52,11 +56,13 @@ export class Dashboard extends React.Component{
     render() {
 
 
-        function Accounts(){
+        function Accounts(props){
             const data = useContext(context);
             var accsArray = [];
             for(var x = 0; x < data.accounts.length;x++){
-                accsArray.push(<p key={x}>{data.accounts[x].name}</p>)
+                //accsArray.push(<p key={data.accounts[x].accNumber}>{data.accounts[x].name}</p>)
+
+                accsArray.push(<p onClick={(e)=>props.setState({display:e.target.id})}key={data.accounts[x].accNumber}id={data.accounts[x].accNumber}>{data.accounts[x].name}</p>)
             }
             return <div>{accsArray}</div>
         }
@@ -106,7 +112,7 @@ export class Dashboard extends React.Component{
             }
         }
 
-        return (
+        if(this.state.display === -1){return (
 
             <context.Consumer>{({accounts,transactions,vendors}) => (
                 <div>
@@ -121,7 +127,7 @@ export class Dashboard extends React.Component{
                                 getExpenditure = {((transactions,vendors) => this.getExpenditure(transactions,vendors))}
                                 vendors = {vendors}
                 />
-                <Accounts/>
+                <Accounts setState = {(state) => this.setState(state)}/>
                 <div>
                     <Link to={"/create_account"}><button className={style.nav_link}>Create Account</button></Link>
                     <Link to={"/move_money"}><button className={style.nav_link}>Make Payment</button></Link>
@@ -129,6 +135,31 @@ export class Dashboard extends React.Component{
             </div>
             )}
             </context.Consumer>
-        )
+        )}
+        else{
+            let account = null;
+            const accounts = this.props.accounts
+
+            for (var x of accounts){
+                console.log(x)
+                if (x.accNumber == this.state.display){
+                    account = x;
+                }
+            }
+            return(
+                <context.Consumer>{({accounts,transactions,vendors}) => (
+                    <div>
+                        <h1>Dashboard</h1>
+                        <p>{account.name}</p>
+                        <button onClick={() => this.setState({display:-1})}>Back to Dashboard</button>
+                        <div>
+                            <Link to={"/create_account"}><button className={style.nav_link}>Create Account</button></Link>
+                            <Link to={"/move_money"}><button className={style.nav_link}>Make Payment</button></Link>
+                        </div>
+                    </div>
+                )}
+                </context.Consumer>
+            )
+        }
     }
 }
