@@ -61,13 +61,10 @@ const initialState ={
     userAccounts: [],
     //example of what user accounts should look like
 
-    recentPayees: [["Katie","1234567"], ["Sam","2345678"], ["James","3456789"],
-        ["Sophie","4567890"], ["Lucy","5678901"]],
+    recentPayees: [],
     //example of what recent Payees should look like
     favourite: false,
     favouritePayees:[],
-
-    defaultTagCategories:["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"],
     tagCategories: [],
     tag:"",
     tagError:"",
@@ -448,7 +445,7 @@ export class TransferToUser extends React.Component {
         let i;
         let tagCategories=this.state.tagCategories;
         tagCategories.splice(0, tagCategories.length);
-        tagCategories=this.state.defaultTagCategories;
+        tagCategories=["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"];
 
         await fetch("http://localhost:3002/getTag/" + this.state.username,
             {

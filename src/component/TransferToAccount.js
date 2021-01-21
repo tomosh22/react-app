@@ -55,7 +55,6 @@ const initialState = {
     userPassword: "",
     salt: "",
     //user's hashed password and salt from database
-    defaultTagCategories:["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"],
     tagCategories: [],
     tagError:"",
     addTag:"",
@@ -396,13 +395,11 @@ export class TransferToAccount extends React.Component {
         let i;
         let tagCategories=this.state.tagCategories;
         tagCategories.splice(0, tagCategories.length);
-        tagCategories=this.state.defaultTagCategories;
-
+        tagCategories=["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"];
         await fetch("http://localhost:3002/getTag/" + this.state.username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){tagCategories.push(data[i].Tag)}})
-        console.log(tagCategories);
         this.setState({tagCategories});
     }
 
