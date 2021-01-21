@@ -36,7 +36,7 @@ export class Login extends React.Component{
             }).then(response => response.json()).then(data => {for(var x of data){addAccount(new Account(x.Name,x.Type,x.Balance,x.Currency,x.AccNumber))}})
             await fetch("http://localhost:3000/getUserTransactions/" + this.state.username, {
                 method: "GET"
-            }).then(response => response.json()).then(data => {for(var x of data){addTransaction(new Transaction(x.TransactionId,x.Amount,x.DateTime,x.AccNumberTo,x.AccNumberFrom))}})
+            }).then(response => response.json()).then(data => {console.log(data);for(var x of data){addTransaction(new Transaction(x.TransactionId,x.Amount,x.DateTime,x.NameTo,x.AccNumberTo,x.AccNumberFrom,x.Currency,x.Reference,x.Tag))}})
             //}).then(response => response.json()).then(data => console.log(data))
             setUsername(username);
             setFirstName(firstname);

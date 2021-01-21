@@ -29,12 +29,16 @@ export class Account{
 }
 
 export class Transaction{
-    constructor(id,amount,dateTime,accNumberTo,accNumberFrom){
+    constructor(id,amount,dateTime,nameTo,accNumberTo,accNumberFrom,currency,reference=null,tag=null){
         this.id = id;
         this.amount = amount;
         this.dateTime = dateTime;
+        this.nameTo = nameTo;
         this.accNumberTo = accNumberTo;
         this.accNumberFrom = accNumberFrom;
+        this.currency = currency;
+        this.reference = reference;
+        this.tag = tag
     }
 }
 const vendorCategories = {
