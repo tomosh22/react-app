@@ -67,7 +67,8 @@ const initialState ={
     favourite: false,
     favouritePayees:[],
 
-    tagCategories: ["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"],
+    defaultTagCategories:["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"],
+    tagCategories: [],
     tag:"",
     tagError:"",
     addTag:"",
@@ -190,6 +191,7 @@ export class TransferToUser extends React.Component {
             tagCategories.push(this.state.addTag);
             let addTag = "";
             let tag = this.state.addTag;
+            this.AddTag(tag);
             this.setState({tagCategories, addTag, tag});
         }
     }
@@ -203,6 +205,7 @@ export class TransferToUser extends React.Component {
             if(tagCategories[i]===this.state.deleteTag){
                 tagCategories.splice(i, 1);
                 found=true;
+                this.DeleteTag();
                 let deleteTag="";
                 let tag="";
                 this.setState({tagCategories,tag, deleteTag})
@@ -367,6 +370,7 @@ export class TransferToUser extends React.Component {
         let display=6;
         this.GetUserAccounts()
         this.GetFavourite()
+        this.GetTag();
         this.setState({display})
     }
 
@@ -412,8 +416,6 @@ export class TransferToUser extends React.Component {
             }).then(response => response.json()).then(data => {if (data.length<5){numToDisplay=data.length};
             let numOfPayees = data.length;
             while(numToDisplay>0 && numOfPayees>0){
-                console.log("numPayees" + numOfPayees)
-                console.log("numToDisplay" + numToDisplay)
                 if(!(data[i].NameTo===this.state.username)){
                     //prevents the user appearing in the recent payees
                     for (j=0;j<recentPayees.length; j++){
@@ -432,6 +434,36 @@ export class TransferToUser extends React.Component {
             //recentPayees should be a 2d array [accName,accNumber] of 5 most recent payees.
         console.log(recentPayees);
         this.setState({recentPayees})
+    }
+
+    async AddTag(tag){
+        await fetch("http://localhost:3002/setTag/"
+            + this.state.username + "/" + tag,
+            {
+                method:"POST"
+            })
+    }
+
+    async GetTag(){
+        let i;
+        let tagCategories=this.state.tagCategories;
+        tagCategories.splice(0, tagCategories.length);
+        tagCategories=this.state.defaultTagCategories;
+
+        await fetch("http://localhost:3002/getTag/" + this.state.username,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){tagCategories.push(data[i].Tag)}})
+        console.log(tagCategories);
+        this.setState({tagCategories});
+    }
+
+    async DeleteTag(){
+        await fetch("http://localhost:3002/deleteTag/"
+            + this.state.username + "/" + this.state.deleteTag,
+            {
+                method:"POST"
+            })
     }
 
 

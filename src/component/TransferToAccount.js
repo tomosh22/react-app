@@ -55,11 +55,11 @@ const initialState = {
     userPassword: "",
     salt: "",
     //user's hashed password and salt from database
-
-    tagCategories: ["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"],
-    tag:"",
+    defaultTagCategories:["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"],
+    tagCategories: [],
     tagError:"",
     addTag:"",
+    tag:"",
     deleteTag:"",
     username:"bobg",
 };
@@ -126,7 +126,8 @@ export class TransferToAccount extends React.Component {
             tagCategories.push(this.state.addTag);
             let addTag = "";
             let tag = this.state.addTag;
-            this.setState({tagCategories, addTag, tag});
+            this.AddTag(tag);
+            this.setState({tagCategories, addTag});
         }
     }
 
@@ -139,6 +140,7 @@ export class TransferToAccount extends React.Component {
             if(tagCategories[i]===this.state.deleteTag){
                 tagCategories.splice(i, 1);
                 found=true;
+                this.DeleteTag();
                 let deleteTag="";
                 let tag="";
                 this.setState({tagCategories,tag, deleteTag})
@@ -312,7 +314,8 @@ export class TransferToAccount extends React.Component {
     SelectAccountFrom=()=>{
         //get the users accounts
         let display=5;
-        this.GetUserAccounts()
+        this.GetUserAccounts();
+        this.GetTag();
         this.setState({display})
     }
 
@@ -379,6 +382,36 @@ export class TransferToAccount extends React.Component {
         console.log(userPassword);
         console.log(salt);
         this.setState({userPassword, salt})
+    }
+
+    async AddTag(tag){
+        await fetch("http://localhost:3002/setTag/"
+            + this.state.username + "/" + tag,
+            {
+                method:"POST"
+            })
+    }
+
+    async GetTag(){
+        let i;
+        let tagCategories=this.state.tagCategories;
+        tagCategories.splice(0, tagCategories.length);
+        tagCategories=this.state.defaultTagCategories;
+
+        await fetch("http://localhost:3002/getTag/" + this.state.username,
+            {
+                method:"GET"
+            }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){tagCategories.push(data[i].Tag)}})
+        console.log(tagCategories);
+        this.setState({tagCategories});
+    }
+
+    async DeleteTag(){
+        await fetch("http://localhost:3002/deleteTag/"
+            + this.state.username + "/" + this.state.deleteTag,
+            {
+                method:"POST"
+            })
     }
 
     render() {
