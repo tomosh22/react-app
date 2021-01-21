@@ -1,6 +1,5 @@
 import React, {Component, useContext} from "react";
 import {BrowserRouter as Router, Route} from "react-router-dom";
-import style from "../assets/css/homePageStyle.module.css";
 import {Header} from "./Header";
 import {Dashboard} from "./Dashboard";
 import {Login} from "./Login";
@@ -75,7 +74,7 @@ export class App extends Component{
                         <div className={style.main}>
                             <Switch>
                                 <Route exact path={"/"}> <Home /> </Route>
-                                <Route exact path={"/dashboard"}> <Dashboard /> </Route>
+                                <Route exact path={"/dashboard"}> <Dashboard accounts={this.state.accounts}/> </Route>
                                 <Route exact path={"/login"} component={Login}/>
                                 <Route exact path={"/create_account"}> <CreateAccount /> </Route>
                                 <Route exact path={"/register"}> <SignUp /> </Route>
