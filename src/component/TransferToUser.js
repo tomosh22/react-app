@@ -444,11 +444,19 @@ export class TransferToUser extends React.Component {
                 {
                     method:"POST"
                 })
-            //ADD AMOUNT TO ACCOUNT TO
-            await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accNumber + "/" + this.state.amount,
-                {
-                    method:"POST"
-                })
+            if (this.state.payToday) {
+                //ADD AMOUNT TO ACCOUNT TO
+                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accNumber + "/" + this.state.amount,
+                    {
+                        method: "POST"
+                    })
+                //DEDUCT AMOUNT FROM ACCOUNT FROM
+                let amountToDeduct = (this.state.amount) * (-1);
+                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accFrom + "/" + amountToDeduct,
+                    {
+                        method: "POST"
+                    })
+            }
         }
     }
 

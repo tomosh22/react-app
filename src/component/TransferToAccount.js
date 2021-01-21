@@ -341,6 +341,19 @@ export class TransferToAccount extends React.Component {
                 {
                     method:"POST"
                 })
+            if (this.state.payToday) {
+                //ADD AMOUNT TO ACCOUNT TO
+                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accountTo + "/" + this.state.amount,
+                    {
+                        method: "POST"
+                    })
+                //DEDUCT AMOUNT FROM ACCOUNT FROM
+                let amountToDeduct = (this.state.amount) * (-1);
+                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accountFrom + "/" + amountToDeduct,
+                    {
+                        method: "POST"
+                    })
+            }
         }
     }
 
