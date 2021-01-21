@@ -30,20 +30,52 @@ export class Dashboard extends React.Component{
 
         for(var x of transactions){
             let found = false;
+            let vendorExists = false;
+            if(vendors[x.accNumberTo]){
+                vendorExists = true
+            }
             //console.log("category: ",vendors[x.accNumberTo].category)
-            console.log("hi")
+            if(x.tag){
+                for (var y of data){
 
-            for (var y of data){
-
-                if(y[0] === vendors[x.accNumberTo].category){
-                    y[1] += x.amount
-                    found = true
-                    break;
+                    if(y[0] == x.tag){
+                        y[1] += x.amount
+                        found = true
+                        break;
+                    }
+                }
+                if(!found){
+                    data.push([x.tag,x.amount])
                 }
             }
-            if(!found){
-                data.push([vendors[x.accNumberTo].category,x.amount])
+            else if(vendorExists){
+                for (var y of data){
+
+                    if(y[0] === vendors[x.accNumberTo].category){
+                        y[1] += x.amount
+                        found = true
+                        break;
+                    }
+                }
+                if(!found){
+                    data.push([vendors[x.accNumberTo].category,x.amount])
+                }
             }
+            else{
+                //unknown category
+                for (var y of data){
+
+                    if(y[0] === "Unknown"){
+                        y[1] += x.amount
+                        found = true
+                        break;
+                    }
+                }
+                if(!found){
+                    data.push(["Unknown",x.amount])
+                }
+            }
+
         }
         console.log(data)
         return data
@@ -52,6 +84,17 @@ export class Dashboard extends React.Component{
         //console.log("value",event.target.value)
         this.setState({chartType:event.target.value})
         console.log(this.state.chartType)
+    }
+    getAccountTransactions(accNumber,allTransactions){
+        console.log(allTransactions)
+        const transactions = [];
+        for (var x of allTransactions){
+            if (x.accNumberFrom == accNumber){
+                transactions.push(x)
+            }
+        }
+        console.log(transactions)
+        return transactions
     }
     render() {
 
@@ -146,11 +189,19 @@ export class Dashboard extends React.Component{
                     account = x;
                 }
             }
+
             return(
-                <context.Consumer>{({accounts,transactions,vendors}) => (
+                <context.Consumer>{({vendors,transactions}) => (
                     <div>
                         <h1>Dashboard</h1>
                         <p>{account.name}</p>
+                        <DashBoardChart
+                            //manually overriding state so i dont have to change the chart component
+                            state = {{chartType:"expenditure"}}
+                            transactions = {this.getAccountTransactions(account.accNumber,transactions)}
+                            vendors = {vendors}
+                            getExpenditure={(transactions,vendors) => this.getExpenditure(transactions,vendors)}
+                        />
                         <button onClick={() => this.setState({display:-1})}>Back to Dashboard</button>
                         <div>
                             <Link to={"/create_account"}><button className={style.nav_link}>Create Account</button></Link>
