@@ -50,6 +50,7 @@ const initialState = {
     display: 0,
     // determines the display of the webpage
 
+    accountCurrency:"",
     balance: 0.00,
     //example of what balance should look like
 
@@ -378,12 +379,13 @@ export class TransferToAccount extends React.Component {
     async GetBalance (){
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0;
+        let accountCurrency="";
         await fetch("http://localhost:3002/getUserBalance/" + this.state.accountFrom,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => balance = data[0].Balance)
-        console.log(balance);
-        this.setState({balance})
+            }).then(response => response.json()).then(data => (balance = data[0].Balance, accountCurrency = data[0].Currency))
+        console.log(balance,accountCurrency);
+        this.setState({balance, accountCurrency})
     }
 
     async GetPassword (){
