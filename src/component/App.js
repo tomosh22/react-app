@@ -14,7 +14,6 @@ import {AdminPage} from "./Admin/AdminPage";
 import {Logout} from "./Logout";
 import {ErrorPage} from "./Error"
 import {Switch} from "react-router";
-import style from "../assets/css/homePageStyle.module.css"
 
 export const context = React.createContext()
 
