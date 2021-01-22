@@ -1,4 +1,5 @@
 import React from "react";
+import {context, Account} from "./App"
 
 export class CreateAccount extends React.Component {
 
@@ -10,8 +11,6 @@ export class CreateAccount extends React.Component {
         accountName: "",
         accountNameError: "",
         accountNumber: "",
-        // TODO: Pull username from context, when they signup/login.
-        username: "bobg",
     }
 
     handleChange = event => {
@@ -19,7 +18,7 @@ export class CreateAccount extends React.Component {
         this.setState({[event.target.name]: event.target.value})
     }
 
-    async handleSubmit(event) {
+    async handleSubmit(event, username) {
         // validates the user's input
         event.preventDefault();
         this.validate();
@@ -27,7 +26,7 @@ export class CreateAccount extends React.Component {
             this.state.accountNameError === ""
         ) {
             var abort = false;
-            await fetch("http://localhost:3000/getAccountNames/" + this.state.username + "/" + this.state.accountName, {
+            await fetch("http://localhost:3000/getAccountNames/" + username + "/" + this.state.accountName, {
                 method: "GET"
             }).then(response => response.json()).then(data => {
                 if (data[0]) {
@@ -38,7 +37,7 @@ export class CreateAccount extends React.Component {
             if (abort) return;
         }
 
-        console.log(this.state.username)
+        console.log(username)
         let isUnique = false;
         while (isUnique === false) {
             this.state.accountNumber = Math.floor(10000000 + Math.random() * 90000000)
@@ -51,7 +50,7 @@ export class CreateAccount extends React.Component {
             })
         }
 
-        await fetch("http://localhost:3000/insertAccount/" + this.state.accountName + "/" + this.state.type + "/" + this.state.balance + "/" + this.state.currency + "/" + this.state.username + "/" + this.state.accountNumber,
+        await fetch("http://localhost:3000/insertAccount/" + this.state.accountName + "/" + this.state.type + "/" + this.state.balance + "/" + this.state.currency + "/" + username + "/" + this.state.accountNumber,
             {
                 method: "POST"
             })
@@ -70,10 +69,11 @@ export class CreateAccount extends React.Component {
 
     render() {
         return (
+            <context.Consumer>{({username}) => (
                 <div>
                     <h1>Create Account</h1>
                     <form action="CreateAccount" id="createAccountForm" method="post"
-                          onSubmit={e => this.handleSubmit(e)}>
+                          onSubmit={e => this.handleSubmit(e, username)}>
                         <label htmlFor="type">Account Type:</label><br/>
                         <select id="type" name="type" value={this.state.type} onChange={this.handleChange}>
                             <option value="current">Current Account</option>
@@ -96,6 +96,8 @@ export class CreateAccount extends React.Component {
                         <button type="submit">Submit</button>
                     </form>
                 </div>
+            )}
+            </context.Consumer>
         );
     }
 }
