@@ -58,6 +58,9 @@ const initialState ={
     details:"",
     username: "bobg",
 
+    TagReferenceError:"",
+    reconfirm:0,
+
     userAccounts: [],
     //example of what user accounts should look like
 
@@ -122,7 +125,7 @@ export class TransferToUser extends React.Component {
         this.setState({details: ""})
     }
 
-     handleSubmit = (event) =>{
+    handleSubmit = (event) =>{
         event.preventDefault();
         if (this.state.display===0){this.validateTransaction()}
         else if (this.state.display===3){this.setPayeeDetails(); this.state.display = 0; this.GetBalance()}//uncomment this when connected to database
@@ -222,7 +225,9 @@ export class TransferToUser extends React.Component {
         let referenceError = "";
         let dateError = "";
         let tagError="";
+        let TagReferenceError="";
         let display = 0;
+        let reconfirm=this.state.reconfirm;
         let date= this.state.date;
         let dateHold= this.state.dateHold;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
@@ -242,9 +247,7 @@ export class TransferToUser extends React.Component {
             amountError = "Amount must be less than your balance"
         }
 
-        if (!this.state.reference){
-            referenceError = "Reference is required"
-        }else if ((this.state.reference).length>20){
+        if ((this.state.reference).length>20){
             referenceError = "Reference must be less than 20 characters"
         }
 
@@ -252,22 +255,35 @@ export class TransferToUser extends React.Component {
             dateError = "Date to pay is required"
         }
 
-        if(!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag..."){
-            tagError="Tag is required"
-        }
-
         if (!accFromError && !accToError && !amountError && !referenceError && !dateError && !tagError){
-            if(!this.state.dateAndMinutes){
-                dateHold=date;
-                date=this.state.date + " 00:00:00";
+
+            if (!this.state.reference && (!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag...")){
+                TagReferenceError="You have not entered a tag or reference. Would you like to send anyway?"
+                reconfirm++;
             }
-            else{
-                date=this.state.dateAndMinutes;
+            else if (!this.state.reference) {
+                TagReferenceError = "You have not entered a reference. Would you like to send anyway?"
+                reconfirm++;
             }
-            display = 1;
+            else if(!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag..."){
+                TagReferenceError="You have not entered a tag. Would you like to send anyway?"
+                reconfirm++;
+            }
+
+            if (!TagReferenceError||reconfirm==2) {
+                if (!this.state.dateAndMinutes) {
+                    dateHold = date;
+                    date = this.state.date + " 00:00:00";
+                } else {
+                    date = this.state.dateAndMinutes;
+                }
+                display = 1;
+                reconfirm=0;
+                TagReferenceError="";
+            }
         }
 
-        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display,date,dateHold})
+        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError,TagReferenceError, display,date,dateHold,reconfirm})
     }
 
     async validateNewPayee(){
@@ -424,11 +440,11 @@ export class TransferToUser extends React.Component {
                     if (found===false){
                         recentPayees.push([data[i].NameTo,data[i].AccNumberTo])
                         --numToDisplay}
-                    }
-                    i++
-                    --numOfPayees
+                }
+                i++
+                --numOfPayees
             }})
-            //recentPayees should be a 2d array [accName,accNumber] of 5 most recent payees.
+        //recentPayees should be a 2d array [accName,accNumber] of 5 most recent payees.
         console.log(recentPayees);
         this.setState({recentPayees})
     }
@@ -471,7 +487,7 @@ export class TransferToUser extends React.Component {
         if (this.state.balance>this.state.amount){
             //PROCESSES TRANSACTION
             await fetch("http://localhost:3002/insertTransaction/"
-                + this.state.accFrom + "/" + this.state.accNumber + "/" + this.state.currency + "/" + this.state.amount
+                + this.state.accFrom + "/" + this.state.accNumber + "/" + this.state.amount
                 + "/" + this.state.reference + "/" + this.state.tag + "/" + this.state.date + "/" + this.state.accName,
                 {
                     method:"POST"
@@ -544,83 +560,84 @@ export class TransferToUser extends React.Component {
         switch(this.state.display){
             case 0:
                 return (
-                //MAIN TRANSFER TO USER FORM PAGE
-                <div>
-                    <br/>
-                    <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
+                    //MAIN TRANSFER TO USER FORM PAGE
+                    <div>
+                        <br/>
+                        <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
 
-                        <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
-                        <label htmlFor="accFrom">From</label><br/>
-                        <div><b>{this.state.accFromName}  </b>{this.state.accFrom}</div>
-                        <button type="button" onClick={this.SelectAccountFrom}>Choose an account</button>
-                        <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
+                            <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
+                            <label htmlFor="accFrom">From</label><br/>
+                            <div><b>{this.state.accFromName}  </b>{this.state.accFrom}</div>
+                            <button type="button" onClick={this.SelectAccountFrom}>Choose an account</button>
+                            <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
 
-                        <Icon path={mdiAccountArrowLeftOutline} title={"accountTo"} size={0.75} />
-                        <label htmlFor={"accTo"}>To</label>
-                        <div><b>{this.state.accName}</b> {this.state.accNumber}</div>
-                        <button type="button" onClick={this.SelectNewPayee} disabled={!this.state.accFrom}>Add a new Payee</button>
-                        <button type="button" onClick={this.SelectRecentPayee} disabled={!this.state.accFrom}>Select Recent Payee</button>
-                        <div style={{color:"red"}}>{this.state.accToError}</div><br/>
+                            <Icon path={mdiAccountArrowLeftOutline} title={"accountTo"} size={0.75} />
+                            <label htmlFor={"accTo"}>To</label>
+                            <div><b>{this.state.accName}</b> {this.state.accNumber}</div>
+                            <button type="button" onClick={this.SelectNewPayee} disabled={!this.state.accFrom}>Add a new Payee</button>
+                            <button type="button" onClick={this.SelectRecentPayee} disabled={!this.state.accFrom}>Select Recent Payee</button>
+                            <div style={{color:"red"}}>{this.state.accToError}</div><br/>
 
-                        <label htmlFor="amount">Amount</label><br/>
-                        <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}
-                                disabled={!this.state.accName}>
-                            <option value="£">£</option>
-                            <option value="$">$</option>
-                            <option value="€">€</option>
-                        </select>
-                        <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
-                               onChange={this.handleChange} disabled={!this.state.accName} min={"0.00"} max={this.state.balance} />
-                        <div style={{color:"red"}}>{this.state.amountError}</div><br/>
+                            <label htmlFor="amount">Amount</label><br/>
+                            <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}
+                                    disabled={!this.state.accName}>
+                                <option value="£">£</option>
+                                <option value="$">$</option>
+                                <option value="€">€</option>
+                            </select>
+                            <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
+                                   onChange={this.handleChange} disabled={!this.state.accName} min={"0.00"} max={this.state.balance} />
+                            <div style={{color:"red"}}>{this.state.amountError}</div><br/>
 
-                        <label htmlFor="reference">Reference</label><br/>
-                        <input id="reference" name="reference" value={this.state.reference}
-                               onChange={this.handleChange} disabled={!this.state.accName}/>
-                        <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
+                            <label htmlFor="reference">Reference</label><br/>
+                            <input id="reference" name="reference" value={this.state.reference}
+                                   onChange={this.handleChange} disabled={!this.state.accName}/>
+                            <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
-                        <Icon path={mdiTag} title={"tag"} size={0.6}/>
-                        <label htmlFor="tag">Payment Category    </label><br/>
-                        <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
-                                disabled={!this.state.accName}>
-                            <option value="" disabled selected>Choose an tag</option>
-                            {this.state.tagCategories.map(list =>(
-                                <option key={list} value={list}>
-                                    {list}
-                                </option>
-                            )) }
-                            <option value={"Add tag..."}>Add tag...</option>
-                            <option value={"Delete tag..."}>Delete tag...</option>
-                        </select><br/>
-                        <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
-                               hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
-                        <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={this.addTagCategory}>Add</button>
-                        <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
-                               hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
-                        <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={this.deleteTagCategory}>Delete</button><br/>
-                        <div style={{color:"red"}}>{this.state.tagError}</div><br/>
+                            <Icon path={mdiTag} title={"tag"} size={0.6}/>
+                            <label htmlFor="tag">Payment Category    </label><br/>
+                            <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
+                                    disabled={!this.state.accName}>
+                                <option value="" disabled selected>Choose an tag</option>
+                                {this.state.tagCategories.map(list =>(
+                                    <option key={list} value={list}>
+                                        {list}
+                                    </option>
+                                )) }
+                                <option value={"Add tag..."}>Add tag...</option>
+                                <option value={"Delete tag..."}>Delete tag...</option>
+                            </select><br/>
+                            <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
+                                   hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
+                            <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={this.addTagCategory}>Add</button>
+                            <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
+                                   hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
+                            <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={this.deleteTagCategory}>Delete</button><br/>
+                            <div style={{color:"red"}}>{this.state.tagError}</div><br/>
 
-                        <Icon path={mdiCalendar} title={"calender"} size={0.6} />
-                        <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accName}
-                               checked={this.state.payToday} onChange={this.handleCheck}/>
-                        <label htmlFor="payToday">Pay Today</label><t/>
-                        <input type="checkbox" id="payLater" name="payLater" disabled={!this.state.accName}
-                               checked={this.state.payLater} onChange={this.handleCheck}/>
-                        <label htmlFor="payLater">Pay Later</label><br/>
-                        <input type="date" id="date" name="date" disabled={!this.state.payLater}
-                               value={this.state.date} onChange={this.handleChange} min={GetDate()}/>
-                        <div style={{color:"red"}}>{this.state.dateError}</div>
+                            <Icon path={mdiCalendar} title={"calender"} size={0.6} />
+                            <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accName}
+                                   checked={this.state.payToday} onChange={this.handleCheck}/>
+                            <label htmlFor="payToday">Pay Today</label><t/>
+                            <input type="checkbox" id="payLater" name="payLater" disabled={!this.state.accName}
+                                   checked={this.state.payLater} onChange={this.handleCheck}/>
+                            <label htmlFor="payLater">Pay Later</label><br/>
+                            <input type="date" id="date" name="date" disabled={!this.state.payLater}
+                                   value={this.state.date} onChange={this.handleChange} min={GetDate()}/>
+                            <div style={{color:"red"}}>{this.state.dateError}</div>
+                            <br/>
+                            <div style={{color:"red"}}>{this.state.TagReferenceError}</div>
+                            <Button type="submit">Send Money</Button>
 
-                        <Button type="submit">Send Money</Button>
+                        </form>
 
-                    </form>
-
-                </div>
+                    </div>
                 )
                 break;
 
             case 1:
                 return(
-                // REVIEW DETAILS PAGE
+                    // REVIEW DETAILS PAGE
                     <div>
                         <h1>Review Details</h1>
                         <p>From: <b>{this.state.accFromName}  </b>{this.state.accFrom}</p>
@@ -638,25 +655,25 @@ export class TransferToUser extends React.Component {
 
             case 2:
                 return(
-                // ADD A NEW PAYEE PAGE
+                    // ADD A NEW PAYEE PAGE
                     <div>
                         <br/>
                         <form action="AddNewPayee" id="AddNewPayeeForm" method="post" onSubmit={this.handleSubmit}>
-                        <label htmlFor="accName">Name on Account</label><br/>
-                        <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
-                        <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
+                            <label htmlFor="accName">Name on Account</label><br/>
+                            <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
+                            <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
 
-                        <label htmlFor="accNumber">Account Number</label><br/>
-                        <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
-                               onChange={this.handleChange}/>
-                        <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
-                        <>
-                            <Checkbox animation="pulse" shape="round" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}></Checkbox>
-                        </>
-                        <label htmlFor="favourite">Add payee to your favourite payees?</label>
-                        <br/><br/>
-                        <Button type="button" onClick={this.ChangeDetails}>Back</Button>
-                        <Button type="submit">Submit</Button>
+                            <label htmlFor="accNumber">Account Number</label><br/>
+                            <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
+                                   onChange={this.handleChange}/>
+                            <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
+                            <>
+                                <Checkbox animation="pulse" shape="round" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}></Checkbox>
+                            </>
+                            <label htmlFor="favourite">Add payee to your favourite payees?</label>
+                            <br/><br/>
+                            <Button type="button" onClick={this.ChangeDetails}>Back</Button>
+                            <Button type="submit">Submit</Button>
                         </form>
                     </div>
                 )
@@ -671,7 +688,7 @@ export class TransferToUser extends React.Component {
                             <label htmlFor="recentPayees" hidden={this.state.recentPayees.length===0}>Recent Payees:</label><br/>
                             {this.state.recentPayees.map(list =>(
                                 <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
-                                        onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
+                                                   onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
                                 </CirclePayeeButton>
                             )) }
@@ -679,7 +696,7 @@ export class TransferToUser extends React.Component {
                             <label htmlFor="favouritePayees" hidden={this.state.favouritePayees.length===0}>Favourite Payees:</label><br/>
                             {this.state.favouritePayees.map(list =>(
                                 <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
-                                        onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
+                                                   onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
                                 </CirclePayeeButton>
                             )) }
@@ -716,7 +733,7 @@ export class TransferToUser extends React.Component {
                         <Button type={"button"} onClick={this.resetState}>Close</Button>
                     </div>
                 )
-            break;
+                break;
 
             case 6:
                 //SELECT ACCOUNT FROM PAGE
@@ -742,5 +759,6 @@ export class TransferToUser extends React.Component {
                 )
                 break;
 
-    };
-}}
+        };
+    }
+}
