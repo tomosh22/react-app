@@ -324,7 +324,6 @@ export class TransferToUser extends React.Component {
         //password = hash;
         //userPassword = this.state.userPassword;
 
-
         if (!this.state.password){
             passwordError = "Password is required"
         } else{
@@ -388,6 +387,7 @@ export class TransferToUser extends React.Component {
 
 
     async GetUserAccounts () {
+        //USES USERNAME
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
         let userAccounts = [];
         let i;
@@ -434,6 +434,7 @@ export class TransferToUser extends React.Component {
     }
 
     async AddTag(tag){
+        //USES USERNAME
         await fetch("http://localhost:3002/setTag/"
             + this.state.username + "/" + tag,
             {
@@ -442,6 +443,7 @@ export class TransferToUser extends React.Component {
     }
 
     async GetTag(){
+        //USES USERNAME
         let i;
         let tagCategories=this.state.tagCategories;
         tagCategories.splice(0, tagCategories.length);
@@ -456,6 +458,7 @@ export class TransferToUser extends React.Component {
     }
 
     async DeleteTag(){
+        //USES USERNAME
         await fetch("http://localhost:3002/deleteTag/"
             + this.state.username + "/" + this.state.deleteTag,
             {
@@ -501,6 +504,7 @@ export class TransferToUser extends React.Component {
     }
 
     async GetPassword (){
+        //USES USERNAME
         // GETS THE USER'S HASHED PASSWORD AND SALT
         let userPassword;
         let salt;
@@ -514,6 +518,7 @@ export class TransferToUser extends React.Component {
     }
 
     async GetFavourite (){
+        //USES USERNAME
         //GETS THE USER'S FAVOURITE PAYEES
         let favouritePayees=[];
         let i;
@@ -526,6 +531,7 @@ export class TransferToUser extends React.Component {
     }
 
     async SetFavourite (){
+        //USES USERNAME
         // SETS THE USER'S FAVOURITE PAYEES
         await fetch("http://localhost:3002/setFavouritePayees/" + this.state.username + "/" + this.state.accName + "/" + this.state.accNumber,
             {
