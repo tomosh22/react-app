@@ -1,62 +1,103 @@
 import React from "react";
+import {context, Account} from "./App"
 
-export class CreateAccount extends React.Component{
+export class CreateAccount extends React.Component {
 
-    state= {
-        type: "Current",
+    state = {
+        type: "current",
         currency: "£",
+        balance: 0.00,
         //Set default values as will not update if user does not select a different option to the default option
         accountName: "",
-        accountNameError: ""
+        accountNameError: "",
+        accountNumber: "",
     }
 
     handleChange = event => {
         // stores what user types in form in React
-        this.setState ({[event.target.name] : event.target.value})
+        this.setState({[event.target.name]: event.target.value})
     }
 
-    handleSubmit = event => {
+    async handleSubmit(event, username) {
+        // validates the user's input
         event.preventDefault();
         this.validate();
+        if (
+            this.state.accountNameError === ""
+        ) {
+            var abort = false;
+            await fetch("http://localhost:3000/getAccountNames/" + username + "/" + this.state.accountName, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {
+                if (data[0]) {
+                    alert("Account name already exists.");
+                    abort = true
+                }
+            })
+            if (abort) return;
+        }
+
+        console.log(username)
+        let isUnique = false;
+        while (isUnique === false) {
+            this.state.accountNumber = Math.floor(10000000 + Math.random() * 90000000)
+            await fetch("http://localhost:3000/getAccountNumbers/" + this.state.accountNumber, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {
+                if (!data[0]) {
+                    isUnique = true;
+                }
+            })
+        }
+
+        await fetch("http://localhost:3000/insertAccount/" + this.state.accountName + "/" + this.state.type + "/" + this.state.balance + "/" + this.state.currency + "/" + username + "/" + this.state.accountNumber,
+            {
+                method: "POST"
+            })
+        // Not currently working
+        //this.props.history.push("/dashboard");
     }
 
-    validate = event =>{
+    validate = event => {
         // validates the user's input
-        let accountNameError= "";
-        if (!this.state.accountName){
+        let accountNameError = "";
+        if (!this.state.accountName) {
             accountNameError = "Account name is required"
         }
         this.setState({accountNameError})
     }
 
-
     render() {
         return (
-            <div>
-                <h1>Create Account</h1>
-                <form action="CreateAccount" id="createAccountForm" method="post" onSubmit={this.handleSubmit}>
-                    <label htmlFor="type">Type:</label><br/>
-                    <select id="type" name="type" value={this.state.type} onChange={this.handleChange}>
-                        <option value="current">Current</option>
-                        <option value="savings">Savings</option>
-                    </select><br/><br/>
+            <context.Consumer>{({username}) => (
+                <div>
+                    <h1>Create Account</h1>
+                    <form action="CreateAccount" id="createAccountForm" method="post"
+                          onSubmit={e => this.handleSubmit(e, username)}>
+                        <label htmlFor="type">Account Type:</label><br/>
+                        <select id="type" name="type" value={this.state.type} onChange={this.handleChange}>
+                            <option value="current">Current Account</option>
+                            <option value="savings">Savings Account</option>
+                        </select><br/><br/>
 
 
-                    <label htmlFor="currency">Currency:</label><br/>
-                    <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
-                        <option value="£">£</option>
-                        <option value="$">$</option>
-                        <option value="€">€</option>
-                    </select><br/><br/>
+                        <label htmlFor="currency">Currency:</label><br/>
+                        <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
+                            <option value="£">£</option>
+                            <option value="$">$</option>
+                            <option value="€">€</option>
+                        </select><br/><br/>
 
-                    <label htmlFor="accountName">Account Name:</label><br/>
-                    <input type="text" id="accountName" name="accountName" value={this.state.username}
-    onChange={this.handleChange}/>
-                    <div style={{color:"red"}}>{this.state.accountNameError}</div><br/>
+                        <label htmlFor="accountName">Account Name:</label><br/>
+                        <input type="text" id="accountName" name="accountName" onChange={this.handleChange}/>
+                        <div style={{color: "red"}}>{this.state.accountNameError}</div>
+                        <br/>
 
-                    <button type="submit" >Submit</button>
-                </form>
-            </div>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            )}
+            </context.Consumer>
         );
     }
 }
