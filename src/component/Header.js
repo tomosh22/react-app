@@ -30,7 +30,6 @@ export class Header extends React.Component{
                         </div>
                         <nav>
                             <Link to={"/dashboard"}><button className={style.nav_link}>Dashboard</button></Link>
-                            <Link to={"/move_money"}><button className={style.nav_link}>Move Money</button></Link>
                             <LoginControl/>
                         </nav>
                     </div>
