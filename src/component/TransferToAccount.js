@@ -1,5 +1,5 @@
 import React from "react";
-import {GetDate, GetDateAndMinutes} from "./MoveMoneyFunctions";
+import {GetDate, GetDateAndMinutes, currencyConverter} from "./MoveMoneyFunctions";
 import styled from "styled-components";
 import Icon from '@mdi/react';
 import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeft,} from '@mdi/js';
@@ -51,6 +51,8 @@ const initialState = {
     // determines the display of the webpage
 
     accountCurrency:"",
+    convertedAmount:"",
+    convert:false,
     balance: 0.00,
     //example of what balance should look like
 
@@ -168,6 +170,8 @@ export class TransferToAccount extends React.Component {
         let reconfirm=this.state.reconfirm;
         let date=this.state.date;
         let dateHold=this.state.dateHold;
+        let convertedAmount=0;
+        let convert=false;
 
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
@@ -213,14 +217,18 @@ export class TransferToAccount extends React.Component {
                 } else {
                     date = this.state.dateAndMinutes;
                 }
-
+                if (this.state.currency!==this.state.accountCurrency){
+                    convert=true;
+                }
+                convertedAmount = currencyConverter(this.state.currency, this.state.accountCurrency, this.state.amount);
                 display = 1;
                 reconfirm=0;
                 TagReferenceError="";
             }
         }
 
-        this.setState({accountFromError, accountToError, amountError, dateError, tagError, referenceError,TagReferenceError, display,date,dateHold,reconfirm})
+        this.setState({accountFromError, accountToError, amountError, dateError, tagError, referenceError,
+            TagReferenceError, display,date,dateHold,reconfirm, convertedAmount,convert})
     }
 
     validateAccountTo = () =>{
@@ -300,8 +308,12 @@ export class TransferToAccount extends React.Component {
     authorisePayment = () =>{
         //displays authorise payment form
         let display = 3;
+        let amount=this.state.amount;
+        if (this.state.convert){
+            amount=this.state.convertedAmount
+        }
         this.GetPassword();
-        this.setState({display})
+        this.setState({display, amount})
     }
 
     resetState = () =>{
@@ -520,10 +532,12 @@ export class TransferToAccount extends React.Component {
                         <h1>Review Details</h1>
                         <p>From: <b>{this.state.accountFromName}   </b>{this.state.accountFrom}</p>
                         <p>To: <b>{this.state.accountToName}   </b>{this.state.accountTo}</p>
-                        <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
+                        <p hidden={!this.state.convert}>Amount: <b>{this.state.currency}{this.state.amount}→ {this.state.accountCurrency}{this.state.convertedAmount}</b></p>
+                        <p hidden={this.state.convert}>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                         <p>Reference: <b>{this.state.reference}</b></p>
                         <p>Category: <b>{this.state.tag}</b></p>
-                        <p>Date: <b>{this.state.date}</b></p>
+                        <p>Date: <b>{this.state.date}</b></p><br/>
+                        <p hidden={!this.state.convert}>Before confirming, please make sure you are happy with the exchange rate</p>
                         <Button type="button" onClick={this.authorisePayment}>Confirm details</Button>
                         <br/>
                         <Button type="button" onClick={this.ChangeDetails}>Change details</Button>

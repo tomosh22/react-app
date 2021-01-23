@@ -45,4 +45,32 @@ function GetDate () {
     date = yyyy+"-"+mm+"-"+dd;
     return(date);
 }
-export {GetDate, GetDateAndMinutes};
+
+function currencyConverter(currencyFrom,currencyTo,amount){
+    let GBRtoUSD=1.37;
+    let GBRtoEUR=1.12;
+    let USDtoEUR=0.82;
+    let USDtoGBR=(1/GBRtoUSD);
+    let EURtoGBR=(1/GBRtoEUR);
+    let EURtoUSD=(1/USDtoEUR);
+
+    let newAmount=0;
+
+    if (currencyFrom!==currencyTo){
+        if (currencyFrom==="£"){
+            if (currencyTo==="$"){newAmount=(amount*GBRtoUSD).toFixed(2)}
+            else if (currencyTo==="€"){newAmount=(amount*GBRtoEUR).toFixed(2)}
+        }
+        else if (currencyFrom==="$"){
+            if (currencyTo==="£"){newAmount=(amount*USDtoGBR).toFixed(2)}
+            else if (currencyTo==="€"){newAmount=(amount*USDtoEUR).toFixed(2)}
+        }
+        else if (currencyFrom==="€"){
+            if (currencyTo==="$"){newAmount=(amount*EURtoUSD).toFixed(2)}
+            else if (currencyTo==="£"){newAmount=(amount*EURtoGBR).toFixed(2)}
+        }
+    }
+    return(newAmount);
+
+}
+export {GetDate, GetDateAndMinutes,currencyConverter};
