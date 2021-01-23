@@ -1,6 +1,7 @@
 import React from "react";
 import styled from 'styled-components';
 import {currencyConverter, GetDate, GetDateAndMinutes} from "./MoveMoneyFunctions";
+import {AddTag,DeleteTag,SetFavourite,ProcessPayment} from "./MoveMoneyDatabaseFunctions";
 import { Checkbox } from 'pretty-checkbox-react';
 import Icon from '@mdi/react';
 import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeftOutline} from '@mdi/js';
@@ -194,7 +195,7 @@ export class TransferToUser extends React.Component {
             tagCategories.push(this.state.addTag);
             let addTag = "";
             let tag = this.state.addTag;
-            this.AddTag(tag);
+            AddTag(tag,this.state.username);
             this.setState({tagCategories, addTag, tag});
         }
     }
@@ -208,7 +209,7 @@ export class TransferToUser extends React.Component {
             if(tagCategories[i]===this.state.deleteTag){
                 tagCategories.splice(i, 1);
                 found=true;
-                this.DeleteTag();
+                DeleteTag(this.state.deleteTag,this.state.username);
                 let deleteTag="";
                 let tag="";
                 this.setState({tagCategories,tag, deleteTag})
@@ -325,7 +326,7 @@ export class TransferToUser extends React.Component {
                 }
                 if (!found){
                     favouritePayees.push(newFavourite);
-                    this.SetFavourite();
+                    SetFavourite(this.state.username, this.state.accName, this.state.accNumber);
                     this.setState({favouritePayees})
                 }
             }
@@ -359,7 +360,8 @@ export class TransferToUser extends React.Component {
                     passwordError = passwordAttempts + " login attempts remaining"
                 }
                 else{
-                    this.ProcessPayment()
+                    ProcessPayment(this.state.balance,this.state.amount,this.state.accFrom,this.state.accNumber,
+                        this.state.reference,this.state.tag,this.state.date,this.state.accName,this.state.payToday);
                     display = 5;
                 }
             }
@@ -463,15 +465,6 @@ export class TransferToUser extends React.Component {
         this.setState({recentPayees})
     }
 
-    async AddTag(tag){
-        //USES USERNAME
-        await fetch("http://localhost:3002/setTag/"
-            + this.state.username + "/" + tag,
-            {
-                method:"POST"
-            })
-    }
-
     async GetTag(){
         //USES USERNAME
         let i;
@@ -485,41 +478,6 @@ export class TransferToUser extends React.Component {
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){tagCategories.push(data[i].Tag)}})
         console.log(tagCategories);
         this.setState({tagCategories});
-    }
-
-    async DeleteTag(){
-        //USES USERNAME
-        await fetch("http://localhost:3002/deleteTag/"
-            + this.state.username + "/" + this.state.deleteTag,
-            {
-                method:"POST"
-            })
-    }
-
-
-    async ProcessPayment (){
-        if (this.state.balance>this.state.amount){
-            //PROCESSES TRANSACTION
-            await fetch("http://localhost:3002/insertTransaction/"
-                + this.state.accFrom + "/" + this.state.accNumber + "/" + this.state.amount
-                + "/" + this.state.reference + "/" + this.state.tag + "/" + this.state.date + "/" + this.state.accName,
-                {
-                    method:"POST"
-                })
-            if (this.state.payToday) {
-                //ADD AMOUNT TO ACCOUNT TO
-                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accNumber + "/" + this.state.amount,
-                    {
-                        method: "POST"
-                    })
-                //DEDUCT AMOUNT FROM ACCOUNT FROM
-                let amountToDeduct = (this.state.amount) * (-1);
-                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accFrom + "/" + amountToDeduct,
-                    {
-                        method: "POST"
-                    })
-            }
-        }
     }
 
     async GetBalance (){
@@ -559,15 +517,6 @@ export class TransferToUser extends React.Component {
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){favouritePayees.push([data[i].Name, data[i].AccNumber])}})
         console.log(favouritePayees);
         this.setState({favouritePayees})
-    }
-
-    async SetFavourite (){
-        //USES USERNAME
-        // SETS THE USER'S FAVOURITE PAYEES
-        await fetch("http://localhost:3002/setFavouritePayees/" + this.state.username + "/" + this.state.accName + "/" + this.state.accNumber,
-            {
-                method:"POST"
-            })
     }
 
 

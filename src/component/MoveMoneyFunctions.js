@@ -47,6 +47,7 @@ function GetDate () {
 }
 
 function currencyConverter(currencyFrom,currencyTo,amount){
+    //Returns the new amount corresponding to the currency of the users account
     let GBRtoUSD=1.37;
     let GBRtoEUR=1.12;
     let USDtoEUR=0.82;

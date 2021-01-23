@@ -1,5 +1,6 @@
 import React from "react";
 import {GetDate, GetDateAndMinutes, currencyConverter} from "./MoveMoneyFunctions";
+import {AddTag, DeleteTag, ProcessPayment} from "./MoveMoneyDatabaseFunctions";
 import styled from "styled-components";
 import Icon from '@mdi/react';
 import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeft,} from '@mdi/js';
@@ -131,7 +132,7 @@ export class TransferToAccount extends React.Component {
             tagCategories.push(this.state.addTag);
             let addTag = "";
             let tag = this.state.addTag;
-            this.AddTag(tag);
+            AddTag(tag,this.state.username);
             this.setState({tagCategories, addTag});
         }
     }
@@ -145,7 +146,7 @@ export class TransferToAccount extends React.Component {
             if(tagCategories[i]===this.state.deleteTag){
                 tagCategories.splice(i, 1);
                 found=true;
-                this.DeleteTag();
+                DeleteTag(this.state.deleteTag,this.state.username);
                 let deleteTag="";
                 let tag="";
                 this.setState({tagCategories,tag, deleteTag})
@@ -287,7 +288,8 @@ export class TransferToAccount extends React.Component {
                     passwordError = passwordAttempts + " login attempts remaining"
                 }
                 else{
-                    this.ProcessPayment();
+                    ProcessPayment(this.state.balance,this.state.amount,this.state.accountFrom,this.state.accountTo,
+                        this.state.reference,this.state.tag,this.state.date,this.state.username,this.state.payToday);
                     display=4;
 
                 }
@@ -363,30 +365,6 @@ export class TransferToAccount extends React.Component {
         this.setState({userAccounts})
     }
 
-    async ProcessPayment (){
-        if (this.state.balance>this.state.amount){
-            //PROCESSES TRANSACTION
-            await fetch("http://localhost:3002/insertTransaction/"
-                + this.state.accountFrom + "/" + this.state.accountTo + "/" + this.state.amount + "/" +
-                this.state.reference+ "/" + this.state.tag + "/"  + this.state.date  + "/"  + this.state.username,
-                {
-                    method:"POST"
-                })
-            if (this.state.payToday) {
-                //ADD AMOUNT TO ACCOUNT TO
-                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accountTo + "/" + this.state.amount,
-                    {
-                        method: "POST"
-                    })
-                //DEDUCT AMOUNT FROM ACCOUNT FROM
-                let amountToDeduct = (this.state.amount) * (-1);
-                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accountFrom + "/" + amountToDeduct,
-                    {
-                        method: "POST"
-                    })
-            }
-        }
-    }
 
     async GetBalance (){
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
@@ -414,15 +392,6 @@ export class TransferToAccount extends React.Component {
         this.setState({userPassword, salt})
     }
 
-    async AddTag(tag){
-        //USES USERNAME
-        await fetch("http://localhost:3002/setTag/"
-            + this.state.username + "/" + tag,
-            {
-                method:"POST"
-            })
-    }
-
     async GetTag(){
         //USES USERNAME
         let i;
@@ -434,15 +403,6 @@ export class TransferToAccount extends React.Component {
                 method:"GET"
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){tagCategories.push(data[i].Tag)}})
         this.setState({tagCategories});
-    }
-
-    async DeleteTag(){
-        //USES USERNAME
-        await fetch("http://localhost:3002/deleteTag/"
-            + this.state.username + "/" + this.state.deleteTag,
-            {
-                method:"POST"
-            })
     }
 
     render() {
