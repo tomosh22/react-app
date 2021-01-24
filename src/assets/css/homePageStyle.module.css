@@ -22,7 +22,7 @@ a:active,
 a:link,
 a:hover{
     font-size: 300%;
-    font-weight: 1000;
+    font-weight: 750;
     color: #1a4008;
     text-decoration: none;
     margin-left: 0.6%;
@@ -32,6 +32,7 @@ a:hover{
 .navigation_container{
     font-size: 0.5vh;
     display: inline-flex;
+    align-items: center;
 }
 
 .nav_link{
@@ -72,6 +73,7 @@ a:hover{
     opacity: 1;
 }
 
+
 /* Header*/
 header{
     position: relative;
@@ -100,9 +102,10 @@ header{
 .logo{
     display: inline-flex;
     margin-bottom: 0;
+    align-items: center;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 768px) {
     .header_inner{
         flex-direction: column;
     }
@@ -118,23 +121,21 @@ header{
         width: 100%;
         max-width: 100%;
         justify-content: space-between;
+        font-size: .7vh;
     }
 
     .favicon{
-        width: 9vw;
+        width: 5vh;
     }
     header{
         position: sticky;
-        background-color: rgba(253, 255, 253, 1) !important;
+        background-color: rgba(243, 255, 245, 1) !important;
     }
 }
 
 @media only screen and (min-width: 768px) {
-    .favicon{
-        width: 3.5vw;
-    }
-    .navigation_container{
-        padding: 2vw 0 0 0;
+    .favicon {
+        width: 6vh;
     }
 }
 
@@ -153,6 +154,6 @@ header{
 
 .main{
     text-align:center;
-    font-size: medium;
+    font-size: small;
     margin: 3vw 5vw 0 5vw;
 }
