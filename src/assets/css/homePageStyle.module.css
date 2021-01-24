@@ -1,8 +1,6 @@
 
 body {
     margin: 0 0 0 0;
-    font-size: 1.5vmin;
-    color: #333;
     font-family: 'Montserrat', sans-serif;
     max-width: 98%;
 }
@@ -34,9 +32,6 @@ a:hover{
 .navigation_container{
     font-size: 0.5vh;
     display: inline-flex;
-    justify-content: end;
-    padding: 2.7vh 0 0 0;
-    max-width: 90%;
 }
 
 .nav_link{
@@ -113,13 +108,33 @@ header{
     }
     .logo{
         justify-content: center;
+        font-size: xx-small;
     }
 
     .navigation_container{
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
         width: 100%;
         max-width: 100%;
-        padding: 2.5vw 0 0 0;
         justify-content: space-between;
+    }
+
+    .favicon{
+        width: 9vw;
+    }
+    header{
+        position: sticky;
+        background-color: rgba(253, 255, 253, 1) !important;
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    .favicon{
+        width: 3.5vw;
+    }
+    .navigation_container{
+        padding: 2vw 0 0 0;
     }
 }
 
@@ -132,11 +147,12 @@ header{
 
 .favicon{
     object-fit: contain;
-    width: 3.5vw;
     padding-right: 0.2vw;
     height: auto;
 }
 
 .main{
     text-align:center;
+    font-size: medium;
+    margin: 3vw 5vw 0 5vw;
 }
