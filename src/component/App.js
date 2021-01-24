@@ -1,6 +1,5 @@
 import React, {Component, useContext} from "react";
 import {BrowserRouter as Router, Route} from "react-router-dom";
-import style from "../assets/css/homePageStyle.module.css";
 import {Header} from "./Header";
 import {Dashboard} from "./Dashboard";
 import {Login} from "./Login";
@@ -14,6 +13,8 @@ import {AdminPage} from "./Admin/AdminPage";
 import {Logout} from "./Logout";
 import {ErrorPage} from "./Error"
 import {Switch} from "react-router";
+
+import style from "../assets/css/homePageStyle.module.css";
 
 export const context = React.createContext()
 
