@@ -78,7 +78,7 @@ export class App extends Component{
                         <div className={style.main}>
                             <Switch>
                                 <Route exact path={"/"}> <Home /> </Route>
-                                <Route exact path={"/dashboard"}> <Dashboard accounts={this.state.accounts}/> </Route>
+                                <Route exact path={"/dashboard"}> <Dashboard transactions = {this.state.transactions} accounts={this.state.accounts}/> </Route>
                                 <Route exact path={"/login"} component={Login}/>
                                 <Route exact path={"/create_account"}> <CreateAccount /> </Route>
                                 <Route exact path={"/register"}> <SignUp /> </Route>
