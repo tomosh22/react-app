@@ -189,6 +189,27 @@ export class Dashboard extends React.Component{
                     account = x;
                 }
             }
+            let fields = []
+            let tableRows = []
+            fields.push(<td className={style.dashboardTable}>Amount</td>)
+            fields.push(<td className={style.dashboardTable}>Time</td>)
+            fields.push(<td className={style.dashboardTable}>Name of Recipient</td>)
+            fields.push(<td className={style.dashboardTable}>Account Number of Recipient</td>)
+            fields.push(<td className={style.dashboardTable}>Reference</td>)
+            tableRows.push(<tr key={-1}>{fields}</tr>)
+
+
+            for(var x of this.getAccountTransactions(account.accNumber,this.props.transactions)){
+                fields = []
+                fields.push(<td className={style.dashboardTable}>{account.currency + x.amount}</td>)
+                fields.push(<td className={style.dashboardTable}>{x.dateTime}</td>)
+                fields.push(<td className={style.dashboardTable}>{x.nameTo}</td>)
+                fields.push(<td className={style.dashboardTable}>{x.accNumberTo}</td>)
+                fields.push(<td className={style.dashboardTable}>{x.reference}</td>)
+                tableRows.push(<tr key={x.id}>{fields}</tr>)
+            }
+
+
 
             return(
                 <context.Consumer>{({vendors,transactions}) => (
@@ -202,6 +223,8 @@ export class Dashboard extends React.Component{
                             vendors = {vendors}
                             getExpenditure={(transactions,vendors) => this.getExpenditure(transactions,vendors)}
                         />
+                        <table className={style.dashboardTable}><tbody className={style.dashboardTable}>{tableRows}</tbody></table>
+                        <br/>
                         <button onClick={() => this.setState({display:-1})}>Back to Dashboard</button>
                         <div>
                             <Link to={"/create_account"}><button className={style.nav_link}>Create Account</button></Link>
