@@ -1,11 +1,11 @@
 
-body{
-    margin: 0;
-    font-size: 15px;
+body {
+    margin: 0 0 0 0;
+    font-size: 1.5vmin;
     color: #333;
     font-family: 'Montserrat', sans-serif;
+    max-width: 98%;
 }
-
 /*
     root is the main div, so we style it as container
 */
@@ -31,21 +31,23 @@ a:hover{
 }
 
 /* Navigation bar */
-nav{
-    font-size: 14px;
-    text-transform: uppercase;
+.navigation_container{
+    font-size: 0.5vh;
     display: inline-flex;
+    justify-content: end;
+    padding: 2.7vh 0 0 0;
+    max-width: 90%;
 }
 
 .nav_link{
-    display: inline-block;
-    vertical-align: center;
     position: relative;
     margin: 0 10px;
-    font-size: 40%;
+    font-size: 120%;
     font-weight: 600;
+
     background-color: Transparent;
     transition: color .1s linear;
+
     background-repeat:no-repeat;
     outline:none;
     border: none;
@@ -60,7 +62,7 @@ nav{
 .nav_link:after{
     content: "";
     width: 100%;
-    height: 3px;
+    height: 2px;
     display: block;
     background-color: darkslategray;
     top: 100%;
@@ -78,10 +80,12 @@ nav{
 /* Header*/
 header{
     position: relative;
+    margin: 0 0 0 2vw;
 
     color: #78bc55;
-    width: 100%;
-    height: 7vh;
+    min-width: 90%;
+    max-width: 100%;
+    height: auto;
     top: 0;
     left: 0;
     right: 0;
@@ -95,24 +99,44 @@ header{
     justify-content: space-between;
     flex-direction: row;
     width: 100%;
-    margin-top: 7px;
+    margin-top: 0.3645833333333333vw;
 }
 
 .logo{
     display: inline-flex;
+    margin-bottom: 0;
+}
+
+@media only screen and (max-width: 600px) {
+    .header_inner{
+        flex-direction: column;
+    }
+    .logo{
+        justify-content: center;
+    }
+
+    .navigation_container{
+        width: 100%;
+        max-width: 100%;
+        padding: 2.5vw 0 0 0;
+        justify-content: space-between;
+    }
+}
+
+.favicon_container{
+    display: inline;
+    height: auto;
+    overflow: hidden;
+    margin-right: 0.5vw;
 }
 
 .favicon{
-    margin-left: 1.5%;
     object-fit: contain;
-    height: 40px;
+    width: 3.5vw;
+    padding-right: 0.2vw;
+    height: auto;
 }
 
 .main{
-    position: absolute;
-    left: 33.33%;
-    width:33.33%;
     text-align:center;
-    background: #78bc55;
-    border-radius: 0 0 50px 50px;
 }
