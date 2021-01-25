@@ -1,6 +1,19 @@
 import React from "react";
-import {context, Account} from "./App"
+import {context} from "./App";
+import styled from "styled-components";
 
+const Button = styled.button`
+    background-color: #78bc55;
+    border: none;
+    color: white;
+    padding: 4px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 6px;
+`
 export class CreateAccount extends React.Component {
 
     state = {
@@ -18,7 +31,7 @@ export class CreateAccount extends React.Component {
         this.setState({[event.target.name]: event.target.value})
     }
 
-    async handleSubmit(event, username) {
+    async handleSubmit(event, userName) {
         // validates the user's input
         event.preventDefault();
         this.validate();
@@ -26,7 +39,7 @@ export class CreateAccount extends React.Component {
             this.state.accountNameError === ""
         ) {
             var abort = false;
-            await fetch("http://localhost:3000/getAccountNames/" + username + "/" + this.state.accountName, {
+            await fetch("http://localhost:3000/getAccountNames/" + userName + "/" + this.state.accountName, {
                 method: "GET"
             }).then(response => response.json()).then(data => {
                 if (data[0]) {
@@ -37,7 +50,6 @@ export class CreateAccount extends React.Component {
             if (abort) return;
         }
 
-        console.log(username)
         let isUnique = false;
         while (isUnique === false) {
             this.state.accountNumber = Math.floor(10000000 + Math.random() * 90000000)
@@ -50,12 +62,11 @@ export class CreateAccount extends React.Component {
             })
         }
 
-        await fetch("http://localhost:3000/insertAccount/" + this.state.accountName + "/" + this.state.type + "/" + this.state.balance + "/" + this.state.currency + "/" + username + "/" + this.state.accountNumber,
+        await fetch("http://localhost:3000/insertAccount/" + this.state.accountName + "/" + this.state.type + "/" + this.state.balance + "/" + this.state.currency + "/" + userName + "/" + this.state.accountNumber,
             {
                 method: "POST"
             })
-        // Not currently working
-        //this.props.history.push("/dashboard");
+        this.props.history.push("/dashboard");
     }
 
     validate = event => {
@@ -69,17 +80,16 @@ export class CreateAccount extends React.Component {
 
     render() {
         return (
-            <context.Consumer>{({username}) => (
+            <context.Consumer>{({userName}) => (
                 <div>
                     <h1>Create Account</h1>
                     <form action="CreateAccount" id="createAccountForm" method="post"
-                          onSubmit={e => this.handleSubmit(e, username)}>
+                          onSubmit={e => this.handleSubmit(e, userName)}>
                         <label htmlFor="type">Account Type:</label><br/>
                         <select id="type" name="type" value={this.state.type} onChange={this.handleChange}>
                             <option value="current">Current Account</option>
                             <option value="savings">Savings Account</option>
                         </select><br/><br/>
-
 
                         <label htmlFor="currency">Currency:</label><br/>
                         <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
@@ -93,7 +103,7 @@ export class CreateAccount extends React.Component {
                         <div style={{color: "red"}}>{this.state.accountNameError}</div>
                         <br/>
 
-                        <button type="submit">Submit</button>
+                        <Button type="submit">Submit</Button>
                     </form>
                 </div>
             )}
