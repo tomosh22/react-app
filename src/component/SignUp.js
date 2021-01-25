@@ -33,7 +33,7 @@ export class SignUp extends React.Component{
 
 
 
-    async handleSubmit(event,setFirstName,setLoggedIn,addAccount){
+    async handleSubmit(event,setFirstName,setLoggedIn,addAccount,setUsername){
         this.state.lastName = this.state.lastName.replace("\'","");
         // validates the user's input
         event.preventDefault();
@@ -90,8 +90,9 @@ export class SignUp extends React.Component{
             await fetch("http://localhost:3000/getUserAccounts/" + this.state.username, {
                 method: "GET"
             }).then(response => response.json()).then(data => {for(x of data){addAccount(new Account(data.Name,data.Type,data.Balance,data.Currency,data.AccNumber))}})
-            setFirstName(this.state.firstName)
-            setLoggedIn(true)
+            setUsername(this.state.username);
+            setFirstName(this.state.firstName);
+            setLoggedIn(true);
             this.props.history.push("/dashboard");
         }
     }
@@ -157,10 +158,10 @@ export class SignUp extends React.Component{
     };
     render(){
         return (
-            <context.Consumer>{({setFirstName,setLoggedIn,addAccount}) => (
+            <context.Consumer>{({setFirstName,setLoggedIn,addAccount,setUsername}) => (
                 <div>
                     <h1>Sign up</h1>
-                    <form action="SignUp" id="signUpForm" method="post" onSubmit={e => this.handleSubmit(e,setFirstName,setLoggedIn,addAccount)}>
+                    <form action="SignUp" id="signUpForm" method="post" onSubmit={e => this.handleSubmit(e,setFirstName,setLoggedIn,addAccount,setUsername)}>
                         <label htmlFor="username">Username: </label><br/>
                         <input type="text" id="username" name="username" value={this.state.username}
                                onChange={this.handleChange}/>

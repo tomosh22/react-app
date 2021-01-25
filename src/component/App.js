@@ -1,6 +1,5 @@
 import React, {Component, useContext} from "react";
 import {BrowserRouter as Router, Route} from "react-router-dom";
-import style from "../assets/css/homePageStyle.module.css";
 import {Header} from "./Header";
 import {Dashboard} from "./Dashboard";
 import {Login} from "./Login";
@@ -14,6 +13,8 @@ import {AdminPage} from "./Admin/AdminPage";
 import {Logout} from "./Logout";
 import {ErrorPage} from "./Error"
 import {Switch} from "react-router";
+
+import style from "../assets/css/homePageStyle.module.css";
 
 export const context = React.createContext()
 
@@ -29,12 +30,16 @@ export class Account{
 }
 
 export class Transaction{
-    constructor(id,amount,dateTime,accNumberTo,accNumberFrom){
+    constructor(id,amount,dateTime,nameTo,accNumberTo,accNumberFrom,currency,reference=null,tag=null){
         this.id = id;
         this.amount = amount;
         this.dateTime = dateTime;
+        this.nameTo = nameTo;
         this.accNumberTo = accNumberTo;
         this.accNumberFrom = accNumberFrom;
+        this.currency = currency;
+        this.reference = reference;
+        this.tag = tag
     }
 }
 const vendorCategories = {
@@ -74,13 +79,13 @@ export class App extends Component{
                         <div className={style.main}>
                             <Switch>
                                 <Route exact path={"/"}> <Home /> </Route>
-                                <Route exact path={"/dashboard"}> <Dashboard /> </Route>
+                                <Route exact path={"/dashboard"}> <Dashboard transactions = {this.state.transactions} accounts={this.state.accounts}/> </Route>
                                 <Route exact path={"/login"} component={Login}/>
-                                <Route exact path={"/create_account"}> <CreateAccount /> </Route>
+                                <Route exact path={"/create_account"} component={CreateAccount}/>
                                 <Route exact path={"/register"}> <SignUp /> </Route>
                                 <Route exact path={"/transfer"}> <TransferToAccount /> </Route>
                                 <Route exact path={"/move_money"}> <MoveMoney /> </Route>
-                                <Route exact path={"/signup"}> <SignUp /> </Route>
+                                <Route exact path={"/signup"} component={SignUp}/>
                                 <Route exact path={"/logout"}><Logout /></Route>
                                 <Route exact path={"*"}><ErrorPage /></Route>
                             </Switch>
@@ -94,9 +99,9 @@ export class App extends Component{
     state = {
         resetState:() => this.resetState(),
         //resetState:()=>console.log("dfsingdsoi"),
-        username:"usr",
+        userName:null,
         setUsername:(usr) => this.setState({userName:usr}),
-        firstName:"bob",
+        firstName:null,
         setFirstName:(name) => this.setState({firstName:name}),
         lastName:null,
         setLastName:(name) => this.setState({lastName:name}),
