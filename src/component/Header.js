@@ -1,6 +1,6 @@
 import style from "../assets/css/homePageStyle.module.css";
 import favicon from "../assets/images/favicon.ico";
-import {Link} from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
 import React, {useContext} from "react";
 import {context} from "./App";
 
@@ -22,14 +22,14 @@ export class Header extends React.Component{
 
         return(
             <header>
-                <div className={style.container}>
-                    <div className={style.header_inner}>
-                        <div className={style.logo}>
-                            <a  href={"/"}><img className={style.favicon} src={favicon} alt={"Transparent logo"}/></a>
+                <div id={'head_container'} className={style.container}>
+                    <div id={'inner_container'} className={style.header_inner}>
+                        <div id={'logo_container'} className={style.logo}>
+                            <a  href={"/"} className={style.favicon_container}><img className={style.favicon} src={favicon} alt={"Transparent logo"}/></a>
                             <a  href={"/"}>StuBank</a>
                         </div>
-                        <nav>
-                            <Link to={"/dashboard"}><button className={style.nav_link}>Dashboard</button></Link>
+                        <nav id={'nav_container'} className={style.navigation_container}>
+                            <NavLink to={"/dashboard"} ><button className={style.nav_link}>Dashboard</button></NavLink>
                             <LoginControl/>
                         </nav>
                     </div>
