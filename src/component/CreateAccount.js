@@ -1,5 +1,5 @@
 import React from "react";
-import {context} from "./App";
+import {Account, context} from "./App";
 import styled from "styled-components";
 
 const Button = styled.button`
@@ -31,7 +31,7 @@ export class CreateAccount extends React.Component {
         this.setState({[event.target.name]: event.target.value})
     }
 
-    async handleSubmit(event, userName) {
+    async handleSubmit(event, userName,addAccount) {
         // validates the user's input
         event.preventDefault();
         this.validate();
@@ -66,6 +66,7 @@ export class CreateAccount extends React.Component {
             {
                 method: "POST"
             })
+        addAccount(new Account(this.state.accountName,this.state.type,this.state.balance,this.state.currency,this.state.accountNumber))
         this.props.history.push("/dashboard");
     }
 
@@ -80,11 +81,11 @@ export class CreateAccount extends React.Component {
 
     render() {
         return (
-            <context.Consumer>{({userName}) => (
+            <context.Consumer>{({userName,addAccount}) => (
                 <div>
                     <h1>Create Account</h1>
                     <form action="CreateAccount" id="createAccountForm" method="post"
-                          onSubmit={e => this.handleSubmit(e, userName)}>
+                          onSubmit={e => this.handleSubmit(e, userName,addAccount)}>
                         <label htmlFor="type">Account Type:</label><br/>
                         <select id="type" name="type" value={this.state.type} onChange={this.handleChange}>
                             <option value="current">Current Account</option>
