@@ -37,7 +37,7 @@ export class SignUp extends React.Component{
         this.state.lastName = this.state.lastName.replace("\'","");
         // validates the user's input
         event.preventDefault();
-        //this.validate();
+        this.validate();
         if (
             this.state.usernameError === "" &&
             this.state.passwordError === "" &&
