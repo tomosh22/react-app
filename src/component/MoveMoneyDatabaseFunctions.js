@@ -32,20 +32,20 @@ async function ProcessPayment (balance,amount,accFrom,accNumber,reference,tag,da
     //then update the payer and payees balances in the Account Table in the database
 
     if (balance>amount){
-        await fetch("http://localhost:3002/insertTransaction/"
+        await fetch("http://localhost:3000/insertTransaction/"
             + accFrom + "/" + accNumber + "/" + amount + "/" + reference + "/" + tag + "/" + date + "/" + accName,
             {
                 method:"POST"
             })
         if (payToday) {
             //ADD AMOUNT TO ACCOUNT TO
-            await fetch("http://localhost:3002/updateAccountBalance/" + accNumber + "/" + amount,
+            await fetch("http://localhost:3000/updateAccountBalance/" + accNumber + "/" + amount,
                 {
                     method: "POST"
                 })
             //DEDUCT AMOUNT FROM ACCOUNT FROM
             let amountToDeduct = (amount) * (-1);
-            await fetch("http://localhost:3002/updateAccountBalance/" + accFrom + "/" + amountToDeduct,
+            await fetch("http://localhost:3000/updateAccountBalance/" + accFrom + "/" + amountToDeduct,
                 {
                     method: "POST"
                 })

@@ -147,7 +147,7 @@ export class TransferToUser extends React.Component {
         }
     }
 
-    validateAccountFrom = (event,username) =>{
+    validateAccountFrom = (event,userName) =>{
         //validates the account to send from
         event.preventDefault();
         let details=(this.state.accFrom).split(",");
@@ -163,11 +163,11 @@ export class TransferToUser extends React.Component {
         if (!accFromError){
             display=0;
         }
-        this.GetRecentPayees(event,username,accFrom);
+        this.GetRecentPayees(event,userName,accFrom);
         this.setState({accFromError, display})
     }
 
-    addTagCategory = (event,username) =>{
+    addTagCategory = (event,userName) =>{
         //add new tag to the tag list
         let tagCategories= this.state.tagCategories;
         let i;
@@ -194,12 +194,12 @@ export class TransferToUser extends React.Component {
             tagCategories.push(this.state.addTag);
             let addTag = "";
             let tag = this.state.addTag;
-            AddTag(tag,username);
+            AddTag(tag,userName);
             this.setState({tagCategories, addTag, tag});
         }
     }
 
-    deleteTagCategory = (event,username) =>{
+    deleteTagCategory = (event,userName) =>{
         //deletes tag from the tag list
         let tagCategories= this.state.tagCategories;
         let i;
@@ -208,7 +208,7 @@ export class TransferToUser extends React.Component {
             if(tagCategories[i]===this.state.deleteTag){
                 tagCategories.splice(i, 1);
                 found=true;
-                DeleteTag(this.state.deleteTag,username);
+                DeleteTag(this.state.deleteTag,userName);
                 let deleteTag="";
                 let tag="";
                 this.setState({tagCategories,tag, deleteTag})
@@ -296,7 +296,7 @@ export class TransferToUser extends React.Component {
         this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError,TagReferenceError, display,date,dateHold,reconfirm, convert, convertedAmount})
     }
 
-    async validateNewPayee(event, username){
+    async validateNewPayee(event, userName){
         // validates the user's input for new payee
         event.preventDefault();
 
@@ -327,7 +327,7 @@ export class TransferToUser extends React.Component {
                 }
                 if (!found){
                     favouritePayees.push(newFavourite);
-                    SetFavourite(username, this.state.accName, this.state.accNumber);
+                    SetFavourite(userName, this.state.accName, this.state.accNumber);
                     this.setState({favouritePayees})
                 }
             }
@@ -390,23 +390,23 @@ export class TransferToUser extends React.Component {
         this.setState({display});
     }
 
-    SelectAccountFrom=(event,username)=>{
+    SelectAccountFrom=(event,userName)=>{
         //get the users accounts
         let display=6;
-        this.GetUserAccounts(event,username)
-        this.GetFavourite(event,username)
-        this.GetTag(event,username);
+        this.GetUserAccounts(event,userName)
+        this.GetFavourite(event,userName)
+        this.GetTag(event,userName);
         this.setState({display})
     }
 
-    authorisePayment = (event,username) =>{
+    authorisePayment = (event,userName) =>{
         //displays authorise payment form
         let display = 4;
         let amount=this.state.amount;
         if (this.state.convert){
             amount=this.state.convertedAmount
         }
-        this.GetPassword(event,username);
+        this.GetPassword(event,userName);
         this.setState({display,amount})
     }
 
@@ -419,12 +419,12 @@ export class TransferToUser extends React.Component {
     //DATABASE FUNCTIONS
 
 
-    async GetUserAccounts (event,username) {
-        //USES USERNAME
+    async GetUserAccounts (event,userName) {
+        //USES userName
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
         let userAccounts = [];
         let i;
-        await fetch("http://localhost:3002/getUserAccounts/" + username,
+        await fetch("http://localhost:3000/getUserAccounts/" + userName,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){userAccounts.push([data[i].AccNumber,data[i].Name])}})
@@ -432,7 +432,7 @@ export class TransferToUser extends React.Component {
         this.setState({userAccounts})
     }
 
-    async GetRecentPayees (event,username,accFrom) {
+    async GetRecentPayees (event,userName,accFrom) {
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
         let recentPayees = [];
         let i=0;
@@ -440,13 +440,13 @@ export class TransferToUser extends React.Component {
         let found= false;
         let numToDisplay=5;
         console.log(accFrom)
-        await fetch("http://localhost:3002/getAccountPayees/" + accFrom,
+        await fetch("http://localhost:3000/getAccountPayees/" + accFrom,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {if (data.length<5){numToDisplay=data.length};
             let numOfPayees = data.length;
             while(numToDisplay>0 && numOfPayees>0){
-                if(!(data[i].NameTo===this.state.username)){
+                if(!(data[i].NameTo===this.state.userName)){
                     //prevents the user appearing in the recent payees
                     for (j=0;j<recentPayees.length; j++){
                         //prevents the same payee appearing multiple times in recent payees
@@ -466,14 +466,14 @@ export class TransferToUser extends React.Component {
         this.setState({recentPayees})
     }
 
-    async GetTag(event,username){
-        //USES USERNAME
+    async GetTag(event,userName){
+        //USES userName
         let i;
         let tagCategories=this.state.tagCategories;
         tagCategories.splice(0, tagCategories.length);
         tagCategories=["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"];
 
-        await fetch("http://localhost:3002/getTag/" + username,
+        await fetch("http://localhost:3000/getTag/" + userName,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){tagCategories.push(data[i].Tag)}})
@@ -485,7 +485,7 @@ export class TransferToUser extends React.Component {
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0.00;
         let accountCurrency="";
-        await fetch("http://localhost:3002/getUserBalance/" + this.state.accFrom,
+        await fetch("http://localhost:3000/getUserBalance/" + this.state.accFrom,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => (balance = data[0].Balance, accountCurrency = data[0].Currency))
@@ -493,12 +493,12 @@ export class TransferToUser extends React.Component {
         this.setState({balance, accountCurrency})
     }
 
-    async GetPassword (event,username){
-        //USES USERNAME
+    async GetPassword (event,userName){
+        //USES userName
         // GETS THE USER'S HASHED PASSWORD AND SALT
         let userPassword;
         let salt;
-        await fetch("http://localhost:3002/selectHashAndSalt/" + username,
+        await fetch("http://localhost:3000/selectHashAndSalt/" + userName,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => (userPassword = data[0].Password, salt = data[0].Salt))
@@ -507,12 +507,12 @@ export class TransferToUser extends React.Component {
         this.setState({userPassword, salt})
     }
 
-    async GetFavourite (event,username){
-        //USES USERNAME
+    async GetFavourite (event,userName){
+        //USES userName
         //GETS THE USER'S FAVOURITE PAYEES
         let favouritePayees=[];
         let i;
-        await fetch("http://localhost:3002/getFavouritePayees/" + username,
+        await fetch("http://localhost:3000/getFavouritePayees/" + userName,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){favouritePayees.push([data[i].Name, data[i].AccNumber])}})
@@ -526,7 +526,7 @@ export class TransferToUser extends React.Component {
             case 0:
                 //MAIN TRANSFER TO USER FORM PAGE
                 return (
-                    <context.Consumer>{({username}) => (
+                    <context.Consumer>{({userName}) => (
                     <div>
                         <br/>
                         <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
@@ -534,7 +534,7 @@ export class TransferToUser extends React.Component {
                             <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
                             <label htmlFor="accFrom">From</label><br/>
                             <div><b>{this.state.accFromName}  </b>{this.state.accFrom}</div>
-                            <button type="button" onClick={e => this.SelectAccountFrom(e,username)}>Choose an account</button>
+                            <button type="button" onClick={e => this.SelectAccountFrom(e,userName)}>Choose an account</button>
                             <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
 
                             <Icon path={mdiAccountArrowLeftOutline} title={"accountTo"} size={0.75} />
@@ -575,10 +575,10 @@ export class TransferToUser extends React.Component {
                             </select><br/>
                             <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
                                    hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
-                            <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={e => this.addTagCategory(e,username)}>Add</button>
+                            <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={e => this.addTagCategory(e,userName)}>Add</button>
                             <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
                                    hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
-                            <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={e =>this.deleteTagCategory(e,username)}>Delete</button><br/>
+                            <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={e =>this.deleteTagCategory(e,userName)}>Delete</button><br/>
                             <div style={{color:"red"}}>{this.state.tagError}</div><br/>
 
                             <Icon path={mdiCalendar} title={"calender"} size={0.6} />
@@ -606,7 +606,7 @@ export class TransferToUser extends React.Component {
             case 1:
                 return(
                     // REVIEW DETAILS PAGE
-                    <context.Consumer>{({username}) => (
+                    <context.Consumer>{({userName}) => (
                     <div>
                         <h1>Review Details</h1>
                         <p>From: <b>{this.state.accFromName}  </b>{this.state.accFrom}</p>
@@ -619,7 +619,7 @@ export class TransferToUser extends React.Component {
                         <p>Date: <b>{this.state.date}</b></p><br/>
                         <p hidden={!this.state.convert}>Before confirming, please make sure you are happy with the exchange rate</p>
 
-                        <Button type="button" onClick={e => this.authorisePayment(e,username)}>Confirm details</Button><br />
+                        <Button type="button" onClick={e => this.authorisePayment(e,userName)}>Confirm details</Button><br />
                         <Button type="button" onClick={this.ChangeDetails}>Change details</Button>
                     </div>
                     )}
@@ -630,10 +630,10 @@ export class TransferToUser extends React.Component {
             case 2:
                 return(
                     // ADD A NEW PAYEE PAGE
-                    <context.Consumer>{({username}) => (
+                    <context.Consumer>{({userName}) => (
                     <div>
                         <br/>
-                        <form action="AddNewPayee" id="AddNewPayeeForm" method="post" onSubmit={e => this.validateNewPayee(e,username)}>
+                        <form action="AddNewPayee" id="AddNewPayeeForm" method="post" onSubmit={e => this.validateNewPayee(e,userName)}>
                             <label htmlFor="accName">Name on Account</label><br/>
                             <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
                             <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
@@ -716,10 +716,10 @@ export class TransferToUser extends React.Component {
             case 6:
                 //SELECT ACCOUNT FROM PAGE
                 return(
-                    <context.Consumer>{({username}) => (
+                    <context.Consumer>{({userName}) => (
                     <div>
                         <br></br>
-                        <form action="SelectAccount" id="SelectAccount" method="post" onSubmit={e=> this.validateAccountFrom(e,username)}>
+                        <form action="SelectAccount" id="SelectAccount" method="post" onSubmit={e=> this.validateAccountFrom(e,userName)}>
                             <select id="accFrom" name="accFrom" value={this.state.accFrom}
                                     onChange={this.handleChange}>
                                 <option value="" disabled selected>Choose an account</option>
