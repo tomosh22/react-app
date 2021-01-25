@@ -1,6 +1,7 @@
 import React from "react";
 import {Account, context,Transaction} from "./App";
 const crypto = require("crypto");
+const twofactor = require("node-2fa")
 
 export class Login extends React.Component{
 
@@ -8,7 +9,8 @@ export class Login extends React.Component{
         username: "",
         password: "",
         usernameError: "",
-        passwordError: ""
+        passwordError: "",
+        secret: ""
     };
     handleChange = event => {
         // stores what user types in form in React
@@ -17,17 +19,20 @@ export class Login extends React.Component{
     async handleSubmit(event,setUsername,setFirstName,setLastName,setLoggedIn,addAccount,addTransaction){
         event.preventDefault();
         //this.validate();
-        var username,hash,salt,firstname,secondname,email
-        await fetch("http://localhost:3000/selectHashAndSalt/" + this.state.username, {
+        var username,hash,salt,firstname,secondname,email,secret
+        await fetch("http://localhost:3000/selectHashAndSaltAndSecret/" + this.state.username, {
             method: "GET"
-        }).then(response => response.json()).then(data => {hash = data[0].Password;salt = data[0].Salt})
+        }).then(response => response.json()).then(data => {hash = data[0].Password;salt = data[0].Salt;secret = data[0].Secret})
         console.log(hash);
         console.log(salt);
         var hashCheck = crypto.createHmac("sha512",salt)
         hashCheck.update(this.state.password + salt)
         hashCheck = hashCheck.digest("hex")
+
+        const newToken = twofactor.generateToken(secret)
         //if password is correct
-        if(hash == hashCheck){
+        if(true){
+        // if(hash == hashCheck && twofactor.verifyToken(secret,this.state.secret)){
             await fetch("http://localhost:3000/selectLoginUser/" + this.state.username, {
                 method: "GET"
             }).then(response => response.json()).then(data => {username=data[0].Username;salt=data[0].Salt;firstname=data[0].FirstName;secondname=data[0].SecondName;email=data[0].Email})
@@ -82,6 +87,10 @@ export class Login extends React.Component{
                                onChange={this.handleChange}/>
                         <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
 
+                        <label htmlFor="secret">Google Authenticator Code: </label><br/>
+                        <input id="secret" name="secret" value={this.state.secret}
+                               onChange={this.handleChange}/>
+                        <br/>
                         <button type="submit">Submit</button>
                     </form>
                 </div>
