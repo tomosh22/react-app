@@ -1,10 +1,12 @@
 import React from "react";
 import styled from 'styled-components';
-import {GetDate, GetDateAndMinutes} from "./MoveMoneyFunctions";
+import {currencyConverter, GetDate, GetDateAndMinutes} from "./MoveMoneyFunctions";
+import {AddTag,DeleteTag,SetFavourite,ProcessPayment} from "./MoveMoneyDatabaseFunctions";
 import { Checkbox } from 'pretty-checkbox-react';
 import Icon from '@mdi/react';
 import { mdiCalendar, mdiTag,mdiAccountArrowRight, mdiAccountArrowLeftOutline} from '@mdi/js';
 import '@djthoms/pretty-checkbox';
+import {context} from "./App";
 
 const CirclePayeeButton = styled.button`
     background-color: #5FA9EF;
@@ -56,7 +58,9 @@ const initialState ={
     passwordError:"",
     dateError:"",
     details:"",
-    username: "bobg",
+
+    TagReferenceError:"",
+    reconfirm:0,
 
     userAccounts: [],
     //example of what user accounts should look like
@@ -71,6 +75,9 @@ const initialState ={
     addTag:"",
     deleteTag:"",
 
+    accountCurrency:"",
+    convertedAmount:"",
+    convert:false,
     balance: 0.00,
     //example of what balance should look like
 
@@ -122,13 +129,11 @@ export class TransferToUser extends React.Component {
         this.setState({details: ""})
     }
 
-     handleSubmit = (event) =>{
+    handleSubmit = (event) =>{
         event.preventDefault();
         if (this.state.display===0){this.validateTransaction()}
         else if (this.state.display===3){this.setPayeeDetails(); this.state.display = 0; this.GetBalance()}//uncomment this when connected to database
         else if (this.state.display===4){this.validatePassword();}
-        else if (this.state.display===6){this.validateAccountFrom()}
-        else{this.validateNewPayee()}
     }
 
     setPayeeDetails = () => {
@@ -142,8 +147,9 @@ export class TransferToUser extends React.Component {
         }
     }
 
-    validateAccountFrom = () =>{
+    validateAccountFrom = (event,username) =>{
         //validates the account to send from
+        event.preventDefault();
         let details=(this.state.accFrom).split(",");
         let accFrom=details[0];
         let accFromName=details[1];
@@ -157,11 +163,11 @@ export class TransferToUser extends React.Component {
         if (!accFromError){
             display=0;
         }
-        this.GetRecentPayees(accFrom)
+        this.GetRecentPayees(event,username,accFrom);
         this.setState({accFromError, display})
     }
 
-    addTagCategory = () =>{
+    addTagCategory = (event,username) =>{
         //add new tag to the tag list
         let tagCategories= this.state.tagCategories;
         let i;
@@ -188,12 +194,12 @@ export class TransferToUser extends React.Component {
             tagCategories.push(this.state.addTag);
             let addTag = "";
             let tag = this.state.addTag;
-            this.AddTag(tag);
+            AddTag(tag,username);
             this.setState({tagCategories, addTag, tag});
         }
     }
 
-    deleteTagCategory = () =>{
+    deleteTagCategory = (event,username) =>{
         //deletes tag from the tag list
         let tagCategories= this.state.tagCategories;
         let i;
@@ -202,7 +208,7 @@ export class TransferToUser extends React.Component {
             if(tagCategories[i]===this.state.deleteTag){
                 tagCategories.splice(i, 1);
                 found=true;
-                this.DeleteTag();
+                DeleteTag(this.state.deleteTag,username);
                 let deleteTag="";
                 let tag="";
                 this.setState({tagCategories,tag, deleteTag})
@@ -222,9 +228,13 @@ export class TransferToUser extends React.Component {
         let referenceError = "";
         let dateError = "";
         let tagError="";
+        let TagReferenceError="";
         let display = 0;
+        let reconfirm=this.state.reconfirm;
         let date= this.state.date;
         let dateHold= this.state.dateHold;
+        let convertedAmount=0;
+        let convert=false;
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
         if (!this.state.accFrom){
@@ -242,9 +252,7 @@ export class TransferToUser extends React.Component {
             amountError = "Amount must be less than your balance"
         }
 
-        if (!this.state.reference){
-            referenceError = "Reference is required"
-        }else if ((this.state.reference).length>20){
+        if ((this.state.reference).length>20){
             referenceError = "Reference must be less than 20 characters"
         }
 
@@ -252,26 +260,46 @@ export class TransferToUser extends React.Component {
             dateError = "Date to pay is required"
         }
 
-        if(!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag..."){
-            tagError="Tag is required"
-        }
-
         if (!accFromError && !accToError && !amountError && !referenceError && !dateError && !tagError){
-            if(!this.state.dateAndMinutes){
-                dateHold=date;
-                date=this.state.date + " 00:00:00";
+
+            if (!this.state.reference && (!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag...")){
+                TagReferenceError="You have not entered a tag or reference. Would you like to send anyway?"
+                reconfirm++;
             }
-            else{
-                date=this.state.dateAndMinutes;
+            else if (!this.state.reference) {
+                TagReferenceError = "You have not entered a reference. Would you like to send anyway?"
+                reconfirm++;
             }
-            display = 1;
+            else if(!this.state.tag || this.state.tag==="Add tag..." || this.state.tag==="Delete tag..."){
+                TagReferenceError="You have not entered a tag. Would you like to send anyway?"
+                reconfirm++;
+            }
+
+            if (!TagReferenceError||reconfirm==2) {
+                if (!this.state.dateAndMinutes) {
+                    dateHold = date;
+                    date = this.state.date + " 00:00:00";
+                } else {
+                    date = this.state.dateAndMinutes;
+                }
+                if (this.state.currency!==this.state.accountCurrency){
+                    convert=true;
+                }
+                convertedAmount = currencyConverter(this.state.currency, this.state.accountCurrency, this.state.amount);
+
+                display = 1;
+                reconfirm=0;
+                TagReferenceError="";
+            }
         }
 
-        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError, display,date,dateHold})
+        this.setState({accFromError,accToError, amountError, referenceError, dateError, tagError,TagReferenceError, display,date,dateHold,reconfirm, convert, convertedAmount})
     }
 
-    async validateNewPayee(){
+    async validateNewPayee(event, username){
         // validates the user's input for new payee
+        event.preventDefault();
+
         let accNameError ="";
         let accNumberError ="";
         let display = 2;
@@ -299,7 +327,7 @@ export class TransferToUser extends React.Component {
                 }
                 if (!found){
                     favouritePayees.push(newFavourite);
-                    this.SetFavourite();
+                    SetFavourite(username, this.state.accName, this.state.accNumber);
                     this.setState({favouritePayees})
                 }
             }
@@ -333,7 +361,8 @@ export class TransferToUser extends React.Component {
                     passwordError = passwordAttempts + " login attempts remaining"
                 }
                 else{
-                    this.ProcessPayment()
+                    ProcessPayment(this.state.balance,this.state.amount,this.state.accFrom,this.state.accNumber,
+                        this.state.reference,this.state.tag,this.state.date,this.state.accName,this.state.payToday);
                     display = 5;
                 }
             }
@@ -361,20 +390,24 @@ export class TransferToUser extends React.Component {
         this.setState({display});
     }
 
-    SelectAccountFrom=()=>{
+    SelectAccountFrom=(event,username)=>{
         //get the users accounts
         let display=6;
-        this.GetUserAccounts()
-        this.GetFavourite()
-        this.GetTag();
+        this.GetUserAccounts(event,username)
+        this.GetFavourite(event,username)
+        this.GetTag(event,username);
         this.setState({display})
     }
 
-    authorisePayment = () =>{
+    authorisePayment = (event,username) =>{
         //displays authorise payment form
         let display = 4;
-        this.GetPassword();
-        this.setState({display})
+        let amount=this.state.amount;
+        if (this.state.convert){
+            amount=this.state.convertedAmount
+        }
+        this.GetPassword(event,username);
+        this.setState({display,amount})
     }
 
     resetState = () => {
@@ -386,12 +419,12 @@ export class TransferToUser extends React.Component {
     //DATABASE FUNCTIONS
 
 
-    async GetUserAccounts () {
+    async GetUserAccounts (event,username) {
         //USES USERNAME
         //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
         let userAccounts = [];
         let i;
-        await fetch("http://localhost:3002/getUserAccounts/" + this.state.username,
+        await fetch("http://localhost:3002/getUserAccounts/" + username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){userAccounts.push([data[i].AccNumber,data[i].Name])}})
@@ -399,7 +432,7 @@ export class TransferToUser extends React.Component {
         this.setState({userAccounts})
     }
 
-    async GetRecentPayees (accFrom) {
+    async GetRecentPayees (event,username,accFrom) {
         //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
         let recentPayees = [];
         let i=0;
@@ -424,32 +457,23 @@ export class TransferToUser extends React.Component {
                     if (found===false){
                         recentPayees.push([data[i].NameTo,data[i].AccNumberTo])
                         --numToDisplay}
-                    }
-                    i++
-                    --numOfPayees
+                }
+                i++
+                --numOfPayees
             }})
-            //recentPayees should be a 2d array [accName,accNumber] of 5 most recent payees.
+        //recentPayees should be a 2d array [accName,accNumber] of 5 most recent payees.
         console.log(recentPayees);
         this.setState({recentPayees})
     }
 
-    async AddTag(tag){
-        //USES USERNAME
-        await fetch("http://localhost:3002/setTag/"
-            + this.state.username + "/" + tag,
-            {
-                method:"POST"
-            })
-    }
-
-    async GetTag(){
+    async GetTag(event,username){
         //USES USERNAME
         let i;
         let tagCategories=this.state.tagCategories;
         tagCategories.splice(0, tagCategories.length);
         tagCategories=["Shopping","Groceries","Eating Out","Bills","Transport","Entertainment"];
 
-        await fetch("http://localhost:3002/getTag/" + this.state.username,
+        await fetch("http://localhost:3002/getTag/" + username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){tagCategories.push(data[i].Tag)}})
@@ -457,58 +481,24 @@ export class TransferToUser extends React.Component {
         this.setState({tagCategories});
     }
 
-    async DeleteTag(){
-        //USES USERNAME
-        await fetch("http://localhost:3002/deleteTag/"
-            + this.state.username + "/" + this.state.deleteTag,
-            {
-                method:"POST"
-            })
-    }
-
-
-    async ProcessPayment (){
-        if (this.state.balance>this.state.amount){
-            //PROCESSES TRANSACTION
-            await fetch("http://localhost:3002/insertTransaction/"
-                + this.state.accFrom + "/" + this.state.accNumber + "/" + this.state.currency + "/" + this.state.amount
-                + "/" + this.state.reference + "/" + this.state.tag + "/" + this.state.date + "/" + this.state.accName,
-                {
-                    method:"POST"
-                })
-            if (this.state.payToday) {
-                //ADD AMOUNT TO ACCOUNT TO
-                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accNumber + "/" + this.state.amount,
-                    {
-                        method: "POST"
-                    })
-                //DEDUCT AMOUNT FROM ACCOUNT FROM
-                let amountToDeduct = (this.state.amount) * (-1);
-                await fetch("http://localhost:3002/updateAccountBalance/" + this.state.accFrom + "/" + amountToDeduct,
-                    {
-                        method: "POST"
-                    })
-            }
-        }
-    }
-
     async GetBalance (){
         //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
         let balance=0.00;
+        let accountCurrency="";
         await fetch("http://localhost:3002/getUserBalance/" + this.state.accFrom,
             {
                 method:"GET"
-            }).then(response => response.json()).then(data => {balance = data[0].Balance})
-        console.log(balance);
-        this.setState({balance})
+            }).then(response => response.json()).then(data => (balance = data[0].Balance, accountCurrency = data[0].Currency))
+        console.log(balance, accountCurrency);
+        this.setState({balance, accountCurrency})
     }
 
-    async GetPassword (){
+    async GetPassword (event,username){
         //USES USERNAME
         // GETS THE USER'S HASHED PASSWORD AND SALT
         let userPassword;
         let salt;
-        await fetch("http://localhost:3002/selectHashAndSalt/" + this.state.username,
+        await fetch("http://localhost:3002/selectHashAndSalt/" + username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => (userPassword = data[0].Password, salt = data[0].Salt))
@@ -517,12 +507,12 @@ export class TransferToUser extends React.Component {
         this.setState({userPassword, salt})
     }
 
-    async GetFavourite (){
+    async GetFavourite (event,username){
         //USES USERNAME
         //GETS THE USER'S FAVOURITE PAYEES
         let favouritePayees=[];
         let i;
-        await fetch("http://localhost:3002/getFavouritePayees/" + this.state.username,
+        await fetch("http://localhost:3002/getFavouritePayees/" + username,
             {
                 method:"GET"
             }).then(response => response.json()).then(data => {for(i=0; i<data.length; i++){favouritePayees.push([data[i].Name, data[i].AccNumber])}})
@@ -530,135 +520,140 @@ export class TransferToUser extends React.Component {
         this.setState({favouritePayees})
     }
 
-    async SetFavourite (){
-        //USES USERNAME
-        // SETS THE USER'S FAVOURITE PAYEES
-        await fetch("http://localhost:3002/setFavouritePayees/" + this.state.username + "/" + this.state.accName + "/" + this.state.accNumber,
-            {
-                method:"POST"
-            })
-    }
-
 
     render() {
         switch(this.state.display){
             case 0:
-                return (
                 //MAIN TRANSFER TO USER FORM PAGE
-                <div>
-                    <br/>
-                    <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
+                return (
+                    <context.Consumer>{({username}) => (
+                    <div>
+                        <br/>
+                        <form action="TransferMoneyToUser" id="TransferMoneyToUserForm" method="post" onSubmit={this.handleSubmit}>
 
-                        <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
-                        <label htmlFor="accFrom">From</label><br/>
-                        <div><b>{this.state.accFromName}  </b>{this.state.accFrom}</div>
-                        <button type="button" onClick={this.SelectAccountFrom}>Choose an account</button>
-                        <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
+                            <Icon path={mdiAccountArrowRight} title={"accountFrom"} size={0.75} />
+                            <label htmlFor="accFrom">From</label><br/>
+                            <div><b>{this.state.accFromName}  </b>{this.state.accFrom}</div>
+                            <button type="button" onClick={e => this.SelectAccountFrom(e,username)}>Choose an account</button>
+                            <div style={{color:"red"}}>{this.state.accFromError}</div><br/>
 
-                        <Icon path={mdiAccountArrowLeftOutline} title={"accountTo"} size={0.75} />
-                        <label htmlFor={"accTo"}>To</label>
-                        <div><b>{this.state.accName}</b> {this.state.accNumber}</div>
-                        <button type="button" onClick={this.SelectNewPayee} disabled={!this.state.accFrom}>Add a new Payee</button>
-                        <button type="button" onClick={this.SelectRecentPayee} disabled={!this.state.accFrom}>Select Recent Payee</button>
-                        <div style={{color:"red"}}>{this.state.accToError}</div><br/>
+                            <Icon path={mdiAccountArrowLeftOutline} title={"accountTo"} size={0.75} />
+                            <label htmlFor={"accTo"}>To</label>
+                            <div><b>{this.state.accName}</b> {this.state.accNumber}</div>
+                            <button type="button" onClick={this.SelectNewPayee} disabled={!this.state.accFrom}>Add a new Payee</button>
+                            <button type="button" onClick={this.SelectRecentPayee} disabled={!this.state.accFrom}>Select Recent Payee</button>
+                            <div style={{color:"red"}}>{this.state.accToError}</div><br/>
 
-                        <label htmlFor="amount">Amount</label><br/>
-                        <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}
-                                disabled={!this.state.accName}>
-                            <option value="£">£</option>
-                            <option value="$">$</option>
-                            <option value="€">€</option>
-                        </select>
-                        <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
-                               onChange={this.handleChange} disabled={!this.state.accName} min={"0.00"} max={this.state.balance} />
-                        <div style={{color:"red"}}>{this.state.amountError}</div><br/>
+                            <label htmlFor="amount">Amount</label><br/>
+                            <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}
+                                    disabled={!this.state.accName}>
+                                <option value="£">£</option>
+                                <option value="$">$</option>
+                                <option value="€">€</option>
+                            </select>
+                            <input type="number" id="amount" name="amount" step=".01" value={this.state.amount}
+                                   onChange={this.handleChange} disabled={!this.state.accName} min={"0.00"} max={this.state.balance} />
+                            <div style={{color:"red"}}>{this.state.amountError}</div><br/>
 
-                        <label htmlFor="reference">Reference</label><br/>
-                        <input id="reference" name="reference" value={this.state.reference}
-                               onChange={this.handleChange} disabled={!this.state.accName}/>
-                        <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
+                            <label htmlFor="reference">Reference</label><br/>
+                            <input id="reference" name="reference" value={this.state.reference}
+                                   onChange={this.handleChange} disabled={!this.state.accName}/>
+                            <div style={{color:"red"}}>{this.state.referenceError}</div><br/>
 
-                        <Icon path={mdiTag} title={"tag"} size={0.6}/>
-                        <label htmlFor="tag">Payment Category    </label><br/>
-                        <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
-                                disabled={!this.state.accName}>
-                            <option value="" disabled selected>Choose an tag</option>
-                            {this.state.tagCategories.map(list =>(
-                                <option key={list} value={list}>
-                                    {list}
-                                </option>
-                            )) }
-                            <option value={"Add tag..."}>Add tag...</option>
-                            <option value={"Delete tag..."}>Delete tag...</option>
-                        </select><br/>
-                        <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
-                               hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
-                        <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={this.addTagCategory}>Add</button>
-                        <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
-                               hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
-                        <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={this.deleteTagCategory}>Delete</button><br/>
-                        <div style={{color:"red"}}>{this.state.tagError}</div><br/>
+                            <Icon path={mdiTag} title={"tag"} size={0.6}/>
+                            <label htmlFor="tag">Payment Category    </label><br/>
+                            <select id="tag" name="tag"  value={this.state.tag} onChange={this.handleChange}
+                                    disabled={!this.state.accName}>
+                                <option value="" disabled selected>Choose an tag</option>
+                                {this.state.tagCategories.map(list =>(
+                                    <option key={list} value={list}>
+                                        {list}
+                                    </option>
+                                )) }
+                                <option value={"Add tag..."}>Add tag...</option>
+                                <option value={"Delete tag..."}>Delete tag...</option>
+                            </select><br/>
+                            <input id="addTag" name="addTag" value={this.state.addTag} onChange={this.handleChange}
+                                   hidden={!(this.state.tag==="Add tag...")} placeholder={"New tag name"}/>
+                            <button type={"button"} hidden={!(this.state.tag==="Add tag...")} onClick={e => this.addTagCategory(e,username)}>Add</button>
+                            <input id="deleteTag" name="deleteTag" value={this.state.deleteTag} onChange={this.handleChange}
+                                   hidden={!(this.state.tag==="Delete tag...")} placeholder={"Tag name"}/>
+                            <button type={"button"} hidden={!(this.state.tag==="Delete tag...")} onClick={e =>this.deleteTagCategory(e,username)}>Delete</button><br/>
+                            <div style={{color:"red"}}>{this.state.tagError}</div><br/>
 
-                        <Icon path={mdiCalendar} title={"calender"} size={0.6} />
-                        <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accName}
-                               checked={this.state.payToday} onChange={this.handleCheck}/>
-                        <label htmlFor="payToday">Pay Today</label><t/>
-                        <input type="checkbox" id="payLater" name="payLater" disabled={!this.state.accName}
-                               checked={this.state.payLater} onChange={this.handleCheck}/>
-                        <label htmlFor="payLater">Pay Later</label><br/>
-                        <input type="date" id="date" name="date" disabled={!this.state.payLater}
-                               value={this.state.date} onChange={this.handleChange} min={GetDate()}/>
-                        <div style={{color:"red"}}>{this.state.dateError}</div>
+                            <Icon path={mdiCalendar} title={"calender"} size={0.6} />
+                            <input type="checkbox" id="payToday" name="payToday" disabled={!this.state.accName}
+                                   checked={this.state.payToday} onChange={this.handleCheck}/>
+                            <label htmlFor="payToday">Pay Today</label><t/>
+                            <input type="checkbox" id="payLater" name="payLater" disabled={!this.state.accName}
+                                   checked={this.state.payLater} onChange={this.handleCheck}/>
+                            <label htmlFor="payLater">Pay Later</label><br/>
+                            <input type="date" id="date" name="date" disabled={!this.state.payLater}
+                                   value={this.state.date} onChange={this.handleChange} min={GetDate()}/>
+                            <div style={{color:"red"}}>{this.state.dateError}</div>
+                            <br/>
+                            <div style={{color:"red"}}>{this.state.TagReferenceError}</div>
+                            <Button type="submit">Send Money</Button>
 
-                        <Button type="submit">Send Money</Button>
+                        </form>
 
-                    </form>
-
-                </div>
+                    </div>
+                    )}
+                    </context.Consumer>
                 )
                 break;
 
             case 1:
                 return(
-                // REVIEW DETAILS PAGE
+                    // REVIEW DETAILS PAGE
+                    <context.Consumer>{({username}) => (
                     <div>
                         <h1>Review Details</h1>
                         <p>From: <b>{this.state.accFromName}  </b>{this.state.accFrom}</p>
                         <p>Payee: <b>{this.state.accName}</b></p>
                         <p>Payee Details: <b>{this.state.accNumber}</b></p>
-                        <p>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
+                        <p hidden={!this.state.convert}>Amount: <b>{this.state.currency}{this.state.amount} → {this.state.accountCurrency}{this.state.convertedAmount}</b></p>
+                        <p hidden={this.state.convert}>Amount: <b>{this.state.currency}{this.state.amount}</b></p>
                         <p>Reference: <b>{this.state.reference}</b></p>
                         <p>Category: <b>{this.state.tag}</b></p>
-                        <p>Date: <b>{this.state.date}</b></p>
-                        <Button type="button" onClick={this.authorisePayment}>Confirm details</Button><br />
+                        <p>Date: <b>{this.state.date}</b></p><br/>
+                        <p hidden={!this.state.convert}>Before confirming, please make sure you are happy with the exchange rate</p>
+
+                        <Button type="button" onClick={e => this.authorisePayment(e,username)}>Confirm details</Button><br />
                         <Button type="button" onClick={this.ChangeDetails}>Change details</Button>
                     </div>
+                    )}
+                    </context.Consumer>
                 )
                 break;
 
             case 2:
                 return(
-                // ADD A NEW PAYEE PAGE
+                    // ADD A NEW PAYEE PAGE
+                    <context.Consumer>{({username}) => (
                     <div>
                         <br/>
-                        <form action="AddNewPayee" id="AddNewPayeeForm" method="post" onSubmit={this.handleSubmit}>
-                        <label htmlFor="accName">Name on Account</label><br/>
-                        <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
-                        <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
+                        <form action="AddNewPayee" id="AddNewPayeeForm" method="post" onSubmit={e => this.validateNewPayee(e,username)}>
+                            <label htmlFor="accName">Name on Account</label><br/>
+                            <input id="accName" name="accName" value={this.state.accName} onChange={this.handleChange}/>
+                            <div style={{color:"red"}}>{this.state.accNameError}</div><br/>
 
-                        <label htmlFor="accNumber">Account Number</label><br/>
-                        <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
-                               onChange={this.handleChange}/>
-                        <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
-                        <>
-                            <Checkbox animation="pulse" shape="round" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}></Checkbox>
-                        </>
-                        <label htmlFor="favourite">Add payee to your favourite payees?</label>
-                        <br/><br/>
-                        <Button type="button" onClick={this.ChangeDetails}>Back</Button>
-                        <Button type="submit">Submit</Button>
+                            <label htmlFor="accNumber">Account Number</label><br/>
+                            <input type="number" id="accNumber" name="accNumber" value={this.state.accNumber}
+                                   onChange={this.handleChange}/>
+                            <div style={{color:"red"}}>{this.state.accNumberError}</div><br/>
+                            <>
+                                <Checkbox animation="pulse" shape="round" id="favourite" name="favourite" checked={this.state.favourite} onChange={this.handleCheck}></Checkbox>
+                            </>
+                            <label htmlFor="favourite">Add payee to your favourite payees?</label>
+                            <br/><br/>
+                            <Button type="button" onClick={this.ChangeDetails}>Back</Button>
+                            <Button type="submit">Submit</Button>
                         </form>
                     </div>
+
+                    )}
+                    </context.Consumer>
                 )
                 break;
 
@@ -671,7 +666,7 @@ export class TransferToUser extends React.Component {
                             <label htmlFor="recentPayees" hidden={this.state.recentPayees.length===0}>Recent Payees:</label><br/>
                             {this.state.recentPayees.map(list =>(
                                 <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
-                                        onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
+                                                   onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
                                 </CirclePayeeButton>
                             )) }
@@ -679,7 +674,7 @@ export class TransferToUser extends React.Component {
                             <label htmlFor="favouritePayees" hidden={this.state.favouritePayees.length===0}>Favourite Payees:</label><br/>
                             {this.state.favouritePayees.map(list =>(
                                 <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
-                                        onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
+                                                   onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
                                     {list[0]}
                                 </CirclePayeeButton>
                             )) }
@@ -716,14 +711,15 @@ export class TransferToUser extends React.Component {
                         <Button type={"button"} onClick={this.resetState}>Close</Button>
                     </div>
                 )
-            break;
+                break;
 
             case 6:
                 //SELECT ACCOUNT FROM PAGE
                 return(
+                    <context.Consumer>{({username}) => (
                     <div>
                         <br></br>
-                        <form action="SelectAccount" id="SelectAccount" method="post" onSubmit={this.handleSubmit}>
+                        <form action="SelectAccount" id="SelectAccount" method="post" onSubmit={e=> this.validateAccountFrom(e,username)}>
                             <select id="accFrom" name="accFrom" value={this.state.accFrom}
                                     onChange={this.handleChange}>
                                 <option value="" disabled selected>Choose an account</option>
@@ -739,8 +735,11 @@ export class TransferToUser extends React.Component {
                             <Button type="submit">Submit</Button>
                         </form>
                     </div>
+                    )}
+                    </context.Consumer>
                 )
                 break;
 
-    };
-}}
+        };
+    }
+}

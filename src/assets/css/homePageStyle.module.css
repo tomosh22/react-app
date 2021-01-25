@@ -156,4 +156,14 @@ header{
     text-align:center;
     font-size: small;
     margin: 3vw 5vw 0 5vw;
+    background: #78bc55;
+    border-radius: 0 0 50px 50px;
 }
+.dashboardTable{
+    padding:0px;
+    margin:0px;
+    font-size:15px;
+    border:1px solid darkgreen;
+    border-spacing: 0px;
+}
+
