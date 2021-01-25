@@ -38,7 +38,7 @@ export class Login extends React.Component{
                 method: "GET"
             }).then(response => response.json()).then(data => {for(var x of data){addTransaction(new Transaction(x.TransactionId,x.Amount,x.DateTime,x.AccNumberTo,x.AccNumberFrom))}})
             //}).then(response => response.json()).then(data => console.log(data))
-            setUsername(username);
+            setUsername(this.state.username);
             setFirstName(firstname);
             setLastName(secondname);
             setLoggedIn(true);

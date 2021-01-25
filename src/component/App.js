@@ -76,11 +76,11 @@ export class App extends Component{
                                 <Route exact path={"/"}> <Home /> </Route>
                                 <Route exact path={"/dashboard"}> <Dashboard /> </Route>
                                 <Route exact path={"/login"} component={Login}/>
-                                <Route exact path={"/create_account"}> <CreateAccount /> </Route>
+                                <Route exact path={"/create_account"} component={CreateAccount}/>
                                 <Route exact path={"/register"}> <SignUp /> </Route>
                                 <Route exact path={"/transfer"}> <TransferToAccount /> </Route>
                                 <Route exact path={"/move_money"}> <MoveMoney /> </Route>
-                                <Route exact path={"/signup"}> <SignUp /> </Route>
+                                <Route exact path={"/signup"} component={SignUp}/>
                                 <Route exact path={"/logout"}><Logout /></Route>
                                 <Route exact path={"*"}><ErrorPage /></Route>
                             </Switch>
@@ -94,9 +94,9 @@ export class App extends Component{
     state = {
         resetState:() => this.resetState(),
         //resetState:()=>console.log("dfsingdsoi"),
-        username:"usr",
+        userName:null,
         setUsername:(usr) => this.setState({userName:usr}),
-        firstName:"bob",
+        firstName:null,
         setFirstName:(name) => this.setState({firstName:name}),
         lastName:null,
         setLastName:(name) => this.setState({lastName:name}),

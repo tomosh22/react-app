@@ -18,7 +18,7 @@ export class CreateAccount extends React.Component {
         this.setState({[event.target.name]: event.target.value})
     }
 
-    async handleSubmit(event, username) {
+    async handleSubmit(event, userName) {
         // validates the user's input
         event.preventDefault();
         this.validate();
@@ -26,7 +26,7 @@ export class CreateAccount extends React.Component {
             this.state.accountNameError === ""
         ) {
             var abort = false;
-            await fetch("http://localhost:3000/getAccountNames/" + username + "/" + this.state.accountName, {
+            await fetch("http://localhost:3000/getAccountNames/" + userName + "/" + this.state.accountName, {
                 method: "GET"
             }).then(response => response.json()).then(data => {
                 if (data[0]) {
@@ -37,7 +37,6 @@ export class CreateAccount extends React.Component {
             if (abort) return;
         }
 
-        console.log(username)
         let isUnique = false;
         while (isUnique === false) {
             this.state.accountNumber = Math.floor(10000000 + Math.random() * 90000000)
@@ -50,12 +49,11 @@ export class CreateAccount extends React.Component {
             })
         }
 
-        await fetch("http://localhost:3000/insertAccount/" + this.state.accountName + "/" + this.state.type + "/" + this.state.balance + "/" + this.state.currency + "/" + username + "/" + this.state.accountNumber,
+        await fetch("http://localhost:3000/insertAccount/" + this.state.accountName + "/" + this.state.type + "/" + this.state.balance + "/" + this.state.currency + "/" + userName + "/" + this.state.accountNumber,
             {
                 method: "POST"
             })
-        // Not currently working
-        //this.props.history.push("/dashboard");
+        this.props.history.push("/dashboard");
     }
 
     validate = event => {
@@ -69,11 +67,11 @@ export class CreateAccount extends React.Component {
 
     render() {
         return (
-            <context.Consumer>{({username}) => (
+            <context.Consumer>{({userName}) => (
                 <div>
                     <h1>Create Account</h1>
                     <form action="CreateAccount" id="createAccountForm" method="post"
-                          onSubmit={e => this.handleSubmit(e, username)}>
+                          onSubmit={e => this.handleSubmit(e, userName)}>
                         <label htmlFor="type">Account Type:</label><br/>
                         <select id="type" name="type" value={this.state.type} onChange={this.handleChange}>
                             <option value="current">Current Account</option>
