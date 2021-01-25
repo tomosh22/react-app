@@ -1,7 +1,5 @@
 import React from "react";
 import {Account, context,Transaction} from "./App";
-import {LoginButton, LogoutButton} from "./AuthButtons";
-
 const crypto = require("crypto");
 
 export class Login extends React.Component{
@@ -84,9 +82,7 @@ export class Login extends React.Component{
                                onChange={this.handleChange}/>
                         <div style={{color:"red"}}>{this.state.passwordError}</div><br/>
 
-                        <LoginButton />
                         <button type="submit">Submit</button>
-                        <LogoutButton />
                     </form>
                 </div>
             )}
