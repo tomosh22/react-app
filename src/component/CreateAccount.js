@@ -1,6 +1,19 @@
 import React from "react";
-import {context, Account} from "./App"
+import {context} from "./App";
+import styled from "styled-components";
 
+const Button = styled.button`
+    background-color: #78bc55;
+    border: none;
+    color: white;
+    padding: 4px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 6px;
+`
 export class CreateAccount extends React.Component {
 
     state = {
@@ -78,7 +91,6 @@ export class CreateAccount extends React.Component {
                             <option value="savings">Savings Account</option>
                         </select><br/><br/>
 
-
                         <label htmlFor="currency">Currency:</label><br/>
                         <select id="currency" name="currency" value={this.state.currency} onChange={this.handleChange}>
                             <option value="£">£</option>
@@ -91,7 +103,7 @@ export class CreateAccount extends React.Component {
                         <div style={{color: "red"}}>{this.state.accountNameError}</div>
                         <br/>
 
-                        <button type="submit">Submit</button>
+                        <Button type="submit">Submit</Button>
                     </form>
                 </div>
             )}
