@@ -1,7 +1,5 @@
 import React from "react"
 import {context} from "./App";
-import {LogoutButton} from "./AuthButtons";
-
 export class Logout extends React.Component{
     render(){
         return(
@@ -10,7 +8,6 @@ export class Logout extends React.Component{
                     <div>
                         <p>firstname,{firstName}</p>
                         <button onClick={resetState}>Logout</button>
-                        <LogoutButton />
                     </div>
 
                 )}
