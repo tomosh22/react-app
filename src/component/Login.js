@@ -31,8 +31,8 @@ export class Login extends React.Component{
 
         const newToken = twofactor.generateToken(secret)
         //if password is correct
-        if(true){
-        // if(hash == hashCheck && twofactor.verifyToken(secret,this.state.secret)){
+        //if(true){
+        if(hash == hashCheck && twofactor.verifyToken(secret,this.state.secret)){
             await fetch("http://localhost:3000/selectLoginUser/" + this.state.username, {
                 method: "GET"
             }).then(response => response.json()).then(data => {username=data[0].Username;salt=data[0].Salt;firstname=data[0].FirstName;secondname=data[0].SecondName;email=data[0].Email})
