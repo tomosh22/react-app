@@ -31,7 +31,10 @@ export class SignUp extends React.Component{
     handleChange = event => {
         // stores what user types in form in React
         this.setState ({[event.target.name] : event.target.value})
-        this.setState({newSecret:twofactor.generateSecret({name:"Stubank",account:this.state.username})})
+        if (event.target.name === "username"){
+            this.setState({newSecret:twofactor.generateSecret({name:"Stubank",account:this.state.username})})
+
+        }
 
     }
 
@@ -234,6 +237,7 @@ export class SignUp extends React.Component{
 
                                 : <div>
                                 <img src={this.state.newSecret.qr} id="qr"/>
+                                <p>On mobile devices, copy and paste key into Google Authenticator</p>
                                 <p>{this.state.newSecret.secret}</p>
                                 <br/>
                                 </div>
