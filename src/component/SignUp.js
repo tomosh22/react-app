@@ -234,6 +234,7 @@ export class SignUp extends React.Component{
 
                                 : <div>
                                 <img src={this.state.newSecret.qr} id="qr"/>
+                                <p>If you are on mobile, copy and paste key into Google Authenticator</p>
                                 <p>{this.state.newSecret.secret}</p>
                                 <br/>
                                 </div>
