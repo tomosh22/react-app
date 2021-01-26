@@ -82,11 +82,12 @@ export class App extends Component {
                         <Header/>
                         <div className={style.main}>
                             <Switch>
-                                <Route exact path={"/"}> <Home /> </Route>
+                                <Route exact path={"/"}> <Home/> </Route>
                                 <Route exact path={"/dashboard"}>
                                     {this.state.loggedIn
-                                        ?<Dashboard transactions = {this.state.transactions} accounts={this.state.accounts}/>
-                                        :<Redirect to="/login"/>
+                                        ? <Dashboard transactions={this.state.transactions}
+                                                     accounts={this.state.accounts}/>
+                                        : <Redirect to="/login"/>
                                     }
                                 </Route>
                                 <Route exact path={"/login"} component={Login}/>
