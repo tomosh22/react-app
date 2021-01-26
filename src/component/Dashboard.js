@@ -177,10 +177,10 @@ export class Dashboard extends React.Component {
                         <Accounts setState={(state) => this.setState(state)}/>
                         <div>
                             <Link to={"/create_account"}>
-                                <button className={style.nav_link}>Create Account</button>
+                                <button className={style.navLink}>Create Account</button>
                             </Link>
                             <Link to={"/move_money"}>
-                                <button className={style.nav_link}>Make Payment</button>
+                                <button className={style.navLink}>Make Payment</button>
                             </Link>
                         </div>
                     </div>
@@ -237,10 +237,10 @@ export class Dashboard extends React.Component {
                         <button onClick={() => this.setState({display: -1})}>Back to Dashboard</button>
                         <div>
                             <Link to={"/create_account"}>
-                                <button className={style.nav_link}>Create Account</button>
+                                <button className={style.navLink}>Create Account</button>
                             </Link>
                             <Link to={"/move_money"}>
-                                <button className={style.nav_link}>Make Payment</button>
+                                <button className={style.navLink}>Make Payment</button>
                             </Link>
                         </div>
                     </div>

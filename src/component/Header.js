@@ -12,15 +12,15 @@ export class Header extends React.Component {
             if (!data.loggedIn) {
                 return <>
                     <Link to={"/login"}>
-                        <button className={style.nav_link}>Log in</button>
+                        <button className={style.navLink}>Log in</button>
                     </Link>
                     <Link to={"/signup"}>
-                        <button className={style.nav_link}>Sign up</button>
+                        <button className={style.navLink}>Sign up</button>
                     </Link>
                 </>
             } else {
                 return <Link to={"/logout"}>
-                    <button className={style.nav_link}>Log out</button>
+                    <button className={style.navLink}>Log out</button>
                 </Link>
             }
         }
@@ -28,22 +28,22 @@ export class Header extends React.Component {
         return (
             <header>
                 <div id={'head_container'} className={style.container}>
-                    <div id={'inner_container'} className={style.header_inner}>
+                    <div id={'inner_container'} className={style.headerInner}>
                         <div id={'logo_container'} className={style.logo}>
-                            <a href={"/"} className={style.favicon_container}><img className={style.favicon}
-                                                                                   src={favicon}
-                                                                                   alt={"Transparent logo"}/></a>
+                            <a href={"/"} className={style.faviconContainer}><img className={style.favicon}
+                                                                                  src={favicon}
+                                                                                  alt={"Transparent logo"}/></a>
                             <a href={"/"}>StuBank</a>
                         </div>
-                        <nav id={'nav_container'} className={style.navigation_container}>
+                        <nav id={'nav_container'} className={style.navigationContainer}>
                             <NavLink to={"/dashboard"}>
-                                <button className={style.nav_link}>Dashboard</button>
+                                <button className={style.navLink}>Dashboard</button>
                             </NavLink>
                             <NavLink to={"/faq"}>
-                                <button className={style.nav_link}>FAQ</button>
+                                <button className={style.navLink}>FAQ</button>
                             </NavLink>
                             <NavLink to={"/contactus"}>
-                                <button className={style.nav_link}>Contact Us</button>
+                                <button className={style.navLink}>Contact Us</button>
                             </NavLink>
                             <LoginControl/>
                         </nav>

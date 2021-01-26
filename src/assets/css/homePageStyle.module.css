@@ -30,13 +30,13 @@ a:hover {
 }
 
 /* Navigation bar */
-.navigation_container {
+.navigationContainer {
     font-size: 0.5vh;
     display: inline-flex;
     align-items: center;
 }
 
-.nav_link {
+.navLink {
     position: relative;
     margin: 0 10px;
     font-size: 120%;
@@ -51,12 +51,12 @@ a:hover {
     white-space: nowrap;
 }
 
-.nav_link:hover {
+.navLink:hover {
     color: darkslategray;
     border-width: 0;
 }
 
-.nav_link:after {
+.navLink:after {
     content: "";
     width: 100%;
     height: 2px;
@@ -70,7 +70,7 @@ a:hover {
     transition: opacity 0.1s;
 }
 
-.nav_link:hover:after {
+.navLink:hover:after {
     opacity: 1;
 }
 
@@ -92,7 +92,7 @@ header {
     border-bottom: 2px solid currentColor;
 }
 
-.header_inner {
+.headerInner {
     display: flex;
     justify-content: space-between;
     flex-direction: row;
@@ -107,7 +107,7 @@ header {
 }
 
 @media only screen and (max-width: 768px) {
-    .header_inner {
+    .headerInner {
         flex-direction: column;
     }
 
@@ -116,7 +116,7 @@ header {
         font-size: xx-small;
     }
 
-    .navigation_container {
+    .navigationContainer {
         position: -webkit-sticky;
         position: sticky;
         top: 0;
@@ -124,6 +124,12 @@ header {
         max-width: 100%;
         justify-content: space-between;
         font-size: .7vh;
+        overflow: scroll;
+        -ms-overflow-style: none;  /* IE and Edge */
+    }
+
+    .navigationContainer::-webkit-scrollbar {
+        display: none;
     }
 
     .favicon {
@@ -142,7 +148,7 @@ header {
     }
 }
 
-.favicon_container {
+.faviconContainer {
     display: inline;
     height: auto;
     overflow: hidden;
@@ -158,16 +164,15 @@ header {
 .main {
     text-align: center;
     font-size: small;
-    margin: 0vw 5vw 0 5vw;
-    background: #78bc55;
-    border-radius: 0 0 50px 50px;
+    margin: 0 5vw 0 5vw;
+    overflow-x: hidden;
 }
 
 .dashboardTable {
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
     font-size: 15px;
     border: 1px solid darkgreen;
-    border-spacing: 0px;
+    border-spacing: 0;
 }
 

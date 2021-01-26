@@ -12,10 +12,10 @@ export class MoveMoney extends React.Component {
                 <h1>Move Money</h1>
                 <Router>
                     <Link to={"/transfer_to_user"}>
-                        <button className={style.nav_link}>To someone else</button>
+                        <button className={style.navLink}>To someone else</button>
                     </Link>
                     <Link to={"/transfer_account"}>
-                        <button className={style.nav_link}>To one of your accounts</button>
+                        <button className={style.navLink}>To one of your accounts</button>
                     </Link>
                     <Route path={"/transfer_to_user"}> <TransferToUser/> </Route>
                     <Route path={"/transfer_account"}> <TransferToAccount/> </Route>
