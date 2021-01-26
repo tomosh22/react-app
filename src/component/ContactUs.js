@@ -23,7 +23,7 @@ export class ContactUs extends React.Component {
             this.state.messageError === "" &&
             this.state.emailError === ""
         ) {
-            fetch('http://localhost:3002/send', {
+            fetch('http://localhost:3005/send', {
                 method: "POST",
                 body: JSON.stringify(this.state),
                 headers: {
