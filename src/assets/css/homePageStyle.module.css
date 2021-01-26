@@ -4,15 +4,16 @@ body {
     font-family: 'Montserrat', sans-serif;
     max-width: 98%;
 }
+
 /*
     root is the main div, so we style it as container
 */
 :root,
- .container{
-     width: 100%;
-     max-width: 1200px;
-     margin: 0 auto;
- }
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
 
 /* Style link in a way they do not change depending on the state */
@@ -20,7 +21,7 @@ a,
 a:visited,
 a:active,
 a:link,
-a:hover{
+a:hover {
     font-size: 300%;
     font-weight: 750;
     color: #1a4008;
@@ -29,13 +30,13 @@ a:hover{
 }
 
 /* Navigation bar */
-.navigation_container{
+.navigation_container {
     font-size: 0.5vh;
     display: inline-flex;
     align-items: center;
 }
 
-.nav_link{
+.nav_link {
     position: relative;
     margin: 0 10px;
     font-size: 120%;
@@ -44,18 +45,18 @@ a:hover{
     background-color: Transparent;
     transition: color .1s linear;
 
-    background-repeat:no-repeat;
-    outline:none;
+    background-repeat: no-repeat;
+    outline: none;
     border: none;
     white-space: nowrap;
 }
 
-.nav_link:hover{
+.nav_link:hover {
     color: darkslategray;
     border-width: 0;
 }
 
-.nav_link:after{
+.nav_link:after {
     content: "";
     width: 100%;
     height: 2px;
@@ -69,13 +70,13 @@ a:hover{
     transition: opacity 0.1s;
 }
 
-.nav_link:hover:after{
+.nav_link:hover:after {
     opacity: 1;
 }
 
 
 /* Header*/
-header{
+header {
     position: relative;
     margin: 0 0 0 2vw;
 
@@ -91,7 +92,7 @@ header{
     border-bottom: 2px solid currentColor;
 }
 
-.header_inner{
+.header_inner {
     display: flex;
     justify-content: space-between;
     flex-direction: row;
@@ -99,22 +100,23 @@ header{
     margin-top: 0.3645833333333333vw;
 }
 
-.logo{
+.logo {
     display: inline-flex;
     margin-bottom: 0;
     align-items: center;
 }
 
 @media only screen and (max-width: 768px) {
-    .header_inner{
+    .header_inner {
         flex-direction: column;
     }
-    .logo{
+
+    .logo {
         justify-content: center;
         font-size: xx-small;
     }
 
-    .navigation_container{
+    .navigation_container {
         position: -webkit-sticky;
         position: sticky;
         top: 0;
@@ -124,10 +126,11 @@ header{
         font-size: .7vh;
     }
 
-    .favicon{
+    .favicon {
         width: 5vh;
     }
-    header{
+
+    header {
         position: sticky;
         background-color: rgba(243, 255, 245, 1) !important;
     }
@@ -139,31 +142,32 @@ header{
     }
 }
 
-.favicon_container{
+.favicon_container {
     display: inline;
     height: auto;
     overflow: hidden;
     margin-right: 0.5vw;
 }
 
-.favicon{
+.favicon {
     object-fit: contain;
     padding-right: 0.2vw;
     height: auto;
 }
 
-.main{
-    text-align:center;
+.main {
+    text-align: center;
     font-size: small;
     margin: 0vw 5vw 0 5vw;
     background: #78bc55;
     border-radius: 0 0 50px 50px;
 }
-.dashboardTable{
-    padding:0px;
-    margin:0px;
-    font-size:15px;
-    border:1px solid darkgreen;
+
+.dashboardTable {
+    padding: 0px;
+    margin: 0px;
+    font-size: 15px;
+    border: 1px solid darkgreen;
     border-spacing: 0px;
 }
 

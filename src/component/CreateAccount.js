@@ -14,12 +14,13 @@ const Button = styled.button`
     margin: 4px 2px;
     border-radius: 6px;
 `
+
 export class CreateAccount extends React.Component {
 
     state = {
         type: "current",
         currency: "£",
-        balance: 0.00,
+        balance: 1000,
         //Set default values as will not update if user does not select a different option to the default option
         accountName: "",
         accountNameError: "",
@@ -31,7 +32,7 @@ export class CreateAccount extends React.Component {
         this.setState({[event.target.name]: event.target.value})
     }
 
-    async handleSubmit(event, userName,addAccount) {
+    async handleSubmit(event, userName, addAccount) {
         // validates the user's input
         event.preventDefault();
         this.validate();
@@ -66,7 +67,7 @@ export class CreateAccount extends React.Component {
             {
                 method: "POST"
             })
-        addAccount(new Account(this.state.accountName,this.state.type,this.state.balance,this.state.currency,this.state.accountNumber))
+        addAccount(new Account(this.state.accountName, this.state.type, this.state.balance, this.state.currency, this.state.accountNumber))
         this.props.history.push("/dashboard");
     }
 
@@ -81,11 +82,11 @@ export class CreateAccount extends React.Component {
 
     render() {
         return (
-            <context.Consumer>{({userName,addAccount}) => (
+            <context.Consumer>{({userName, addAccount}) => (
                 <div>
                     <h1>Create Account</h1>
                     <form action="CreateAccount" id="createAccountForm" method="post"
-                          onSubmit={e => this.handleSubmit(e, userName,addAccount)}>
+                          onSubmit={e => this.handleSubmit(e, userName, addAccount)}>
                         <label htmlFor="type">Account Type:</label><br/>
                         <select id="type" name="type" value={this.state.type} onChange={this.handleChange}>
                             <option value="current">Current Account</option>
