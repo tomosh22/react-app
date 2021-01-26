@@ -1,5 +1,5 @@
 import React, {Component, useContext} from "react";
-import {BrowserRouter as Router, Route} from "react-router-dom";
+import {BrowserRouter as Router, Redirect, Route} from "react-router-dom";
 import {Header} from "./Header";
 import {Dashboard} from "./Dashboard";
 import {Login} from "./Login";
@@ -79,7 +79,12 @@ export class App extends Component{
                         <div className={style.main}>
                             <Switch>
                                 <Route exact path={"/"}> <Home /> </Route>
-                                <Route exact path={"/dashboard"}> <Dashboard transactions = {this.state.transactions} accounts={this.state.accounts}/> </Route>
+                                <Route exact path={"/dashboard"}>
+                                    {this.state.loggedIn
+                                        ?<Dashboard transactions = {this.state.transactions} accounts={this.state.accounts}/>
+                                        :<Redirect to="/login"/>
+                                    }
+                                </Route>
                                 <Route exact path={"/login"} component={Login}/>
                                 <Route exact path={"/create_account"} component={CreateAccount}/>
                                 <Route exact path={"/register"}> <SignUp /> </Route>

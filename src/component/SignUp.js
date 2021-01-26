@@ -1,6 +1,7 @@
 import React, {useContext} from "react";
 import {context, Account} from "./App"
 const crypto = require("crypto");
+const twofactor = require("node-2fa");
 
 export class SignUp extends React.Component{
     state = {
@@ -24,11 +25,14 @@ export class SignUp extends React.Component{
         address3Error: "",
         address4Error: "",
         postcodeError: "",
+        newSecret:""
     };
 
     handleChange = event => {
         // stores what user types in form in React
         this.setState ({[event.target.name] : event.target.value})
+        this.setState({newSecret:twofactor.generateSecret({name:"Stubank",account:this.state.username})})
+
     }
 
 
@@ -83,7 +87,7 @@ export class SignUp extends React.Component{
                     method: "GET"
                 }).then(response => response.json()).then(data => {AddressId = data[0].AddressId; this.data = data[0]})
             }
-            await fetch("http://localhost:3000/insertUser/"+this.state.username+"/"+hash+"/"+salt+"/"+this.state.firstName+"/"+this.state.lastName+"/"+this.state.email+"/"+AddressId,
+            await fetch("http://localhost:3000/insertUser/"+this.state.username+"/"+hash+"/"+salt+"/"+this.state.firstName+"/"+this.state.lastName+"/"+this.state.email+"/"+AddressId+"/"+this.state.newSecret.secret,
                 {
                     method:"POST"
                 })
@@ -157,6 +161,7 @@ export class SignUp extends React.Component{
             address2Error,address3Error,address4Error, postcodeError})
     };
     render(){
+
         return (
             <context.Consumer>{({setFirstName,setLoggedIn,addAccount,setUsername}) => (
                 <div>
@@ -222,7 +227,23 @@ export class SignUp extends React.Component{
                         <div style={{color: "red"}}>{this.state.postcodeError}</div>
                         <br/>
 
+                        <label htmlFor="qr">Google Authenticator QR Code</label><br/>
+                        <div>
+                            {this.state.newSecret === ""
+                                ?<div></div>
+
+                                : <div>
+                                <img src={this.state.newSecret.qr} id="qr"/>
+                                <p>{this.state.newSecret.secret}</p>
+                                <br/>
+                                </div>
+                            }
+                        </div>
+
+
+
                         <button type="submit">Submit</button>
+
                     </form>
                 </div>
                 )}
