@@ -30,6 +30,8 @@ export class Header extends React.Component{
                         </div>
                         <nav id={'nav_container'} className={style.navigation_container}>
                             <NavLink to={"/dashboard"} ><button className={style.nav_link}>Dashboard</button></NavLink>
+                            <NavLink to={"/faq"} ><button className={style.nav_link}>FAQ</button></NavLink>
+                            <NavLink to={"/contactus"} ><button className={style.nav_link}>Contact Us</button></NavLink>
                             <LoginControl/>
                         </nav>
                     </div>
