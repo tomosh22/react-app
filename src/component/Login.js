@@ -10,7 +10,8 @@ export class Login extends React.Component{
         password: "",
         usernameError: "",
         passwordError: "",
-        secret: ""
+        secret: "",
+        secretError:""
     };
     handleChange = event => {
         // stores what user types in form in React
@@ -18,7 +19,10 @@ export class Login extends React.Component{
     }
     async handleSubmit(event,setUsername,setFirstName,setLastName,setLoggedIn,addAccount,addTransaction){
         event.preventDefault();
-        //this.validate();
+        await this.validate();
+        if (this.state.usernameError || this.state.passwordError || this.state.secretError){
+            return null
+        }
         var username,hash,salt,firstname,secondname,email,secret
         await fetch("http://localhost:3000/selectHashAndSaltAndSecret/" + this.state.username, {
             method: "GET"
@@ -56,10 +60,11 @@ export class Login extends React.Component{
 
     }
 
-    validate = event =>{
+    async validate(event){
         // validates the user's input
        let usernameError = "";
        let passwordError = "";
+       let secretError = "";
 
         if (!this.state.username){
             usernameError = "Username is required"
@@ -67,8 +72,11 @@ export class Login extends React.Component{
         if (!this.state.password){
             passwordError= "Password is required"
         }
+        if (!this.state.secret){
+            secretError = "Google Authenticator code is required"
+        }
 
-       this.setState({usernameError, passwordError})
+       this.setState({usernameError, passwordError, secretError})
     }
 
     render() {
@@ -90,6 +98,7 @@ export class Login extends React.Component{
                         <label htmlFor="secret">Google Authenticator Code: </label><br/>
                         <input id="secret" name="secret" value={this.state.secret}
                                onChange={this.handleChange}/>
+                        <div style={{color:"red"}}>{this.state.secretError}</div><br/>
                         <br/>
                         <button type="submit">Submit</button>
                     </form>
