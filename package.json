@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "node-2fa": "^2.0.1",
     "nodemailer": "^6.4.17",
     "pretty-checkbox": "^3.0.3",
     "pretty-checkbox-react": "^3.1.0",
