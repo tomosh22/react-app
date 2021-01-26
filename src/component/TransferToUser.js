@@ -730,8 +730,7 @@ export class TransferToUser extends React.Component {
                         <br/>
                         <form action="SelectRecentPayee" id="SelectRecentPayee" method="post"
                               onSubmit={this.handleSubmit}>
-                            <label htmlFor="recentPayees" hidden={this.state.recentPayees.length === 0}>Recent
-                                Payees:</label><br/>
+                            <label htmlFor="recentPayees">Recent Payees:</label><br/>
                             {this.state.recentPayees.map(list => (
                                 <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
                                                    onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
@@ -739,8 +738,7 @@ export class TransferToUser extends React.Component {
                                 </CirclePayeeButton>
                             ))}
                             <br/><br/>
-                            <label htmlFor="favouritePayees" hidden={this.state.favouritePayees.length === 0}>Favourite
-                                Payees:</label><br/>
+                            <label htmlFor="favouritePayees">Favourite Payees:</label><br/>
                             {this.state.favouritePayees.map(list => (
                                 <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
                                                    onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
