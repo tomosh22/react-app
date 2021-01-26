@@ -531,7 +531,7 @@ export class TransferToUser extends React.Component {
         // GETS THE USER'S HASHED PASSWORD AND SALT
         let userPassword;
         let salt;
-        await fetch("http://localhost:3000/selectHashAndSalt/" + userName,
+        await fetch("http://localhost:3000/selectHashAndSaltAndSecret/" + userName,
             {
                 method: "GET"
             }).then(response => response.json()).then(data => (userPassword = data[0].Password, salt = data[0].Salt))
