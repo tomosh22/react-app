@@ -270,13 +270,13 @@ export class TransferToUser extends React.Component {
         if (!accFromError && !accToError && !amountError && !referenceError && !dateError && !tagError) {
 
             if (!this.state.reference && (!this.state.tag || this.state.tag === "Add tag..." || this.state.tag === "Delete tag...")) {
-                TagReferenceError = "You have not entered a tag or reference. Would you like to send anyway?"
+                TagReferenceError = "You have not entered a tag or reference. Would you like to send anyway?";
                 reconfirm++;
             } else if (!this.state.reference) {
-                TagReferenceError = "You have not entered a reference. Would you like to send anyway?"
+                TagReferenceError = "You have not entered a reference. Would you like to send anyway?";
                 reconfirm++;
             } else if (!this.state.tag || this.state.tag === "Add tag..." || this.state.tag === "Delete tag...") {
-                TagReferenceError = "You have not entered a tag. Would you like to send anyway?"
+                TagReferenceError = "You have not entered a tag. Would you like to send anyway?";
                 reconfirm++;
             }
 
@@ -486,7 +486,7 @@ export class TransferToUser extends React.Component {
                         --numToDisplay
                     }
                 }
-                i++
+                i++;
                 --numOfPayees
             }
         })
