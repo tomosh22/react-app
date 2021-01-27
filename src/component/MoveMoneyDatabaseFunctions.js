@@ -1,30 +1,30 @@
 async function AddTag(tag, username) {
     //Insert new tag into the Tags table in the database
 
-    await fetch("http://localhost:3002/setTag/"
+    await fetch("http://localhost:3000/setTag/"
         + username + "/" + tag,
         {
             method: "POST"
-        })
+        });
 }
 
 async function DeleteTag(tag, username) {
     //Delete tag from the Tags table in the database
 
-    await fetch("http://localhost:3002/deleteTag/"
+    await fetch("http://localhost:3000/deleteTag/"
         + username + "/" + tag,
         {
             method: "POST"
-        })
+        });
 }
 
 async function SetFavourite(username, accName, accNumber) {
     //Insert new favourite into the Favourites Table in the database
 
-    await fetch("http://localhost:3002/setFavouritePayees/" + username + "/" + accName + "/" + accNumber,
+    await fetch("http://localhost:3000/setFavouritePayees/" + username + "/" + accName + "/" + accNumber,
         {
             method: "POST"
-        })
+        });
 }
 
 async function ProcessPayment(balance, amount, accFrom, accNumber, reference, tag, date, accName, payToday) {
