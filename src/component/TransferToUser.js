@@ -418,7 +418,8 @@ export class TransferToUser extends React.Component {
                     passwordError = passwordAttempts + " login attempts remaining";
                 } else {
                     ProcessPayment(this.state.balance, this.state.amount, this.state.accFrom, this.state.accNumber,
-                        this.state.reference, this.state.tag, this.state.date, this.state.accName, this.state.payToday);
+                        this.state.reference, this.state.tag, this.state.date, this.state.accName, this.state.payToday,
+                        this.state.accountCurrency);
                     display = 5;
                 }
             } else {

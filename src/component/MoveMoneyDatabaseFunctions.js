@@ -1,5 +1,7 @@
 //Component and functions created by Maisie Eddleston
 
+import {currencyConverter} from "./MoveMoneyFunctions";
+
 async function AddTag(tag, username) {
     /*
     Insert new tag into the Tags table in the database
@@ -35,7 +37,7 @@ async function SetFavourite(username, accName, accNumber) {
         });
 }
 
-async function ProcessPayment(balance, amount, accFrom, accNumber, reference, tag, date, accName, payToday) {
+async function ProcessPayment(balance, amount, accFrom, accNumber, reference, tag, date, accName, payToday, currency) {
     /*
     Insert new payment into the Transaction Table/ Future Transaction Table
     then update the payer and payees balances in the Account Table in the database
@@ -49,14 +51,29 @@ async function ProcessPayment(balance, amount, accFrom, accNumber, reference, ta
                 {
                     method: "POST"
                 });
-            //Add amount to account to
-            await fetch("http://localhost:3000/updateAccountBalance/" + accNumber + "/" + amount,
-                {
-                    method: "POST"
-                });
+
             //Deduct amount from account from
             let amountToDeduct = (amount) * (-1);
             await fetch("http://localhost:3000/updateAccountBalance/" + accFrom + "/" + amountToDeduct,
+                {
+                    method: "POST"
+                });
+
+            //Gets currency of account to
+            let payeeCurrency;
+            await fetch("http://localhost:3000/getUserBalance/" + accNumber,
+                {
+                    method: "GET"
+                }).then(response => response.json()).then(data => (payeeCurrency = data[0].Currency));
+
+            //If they are not the same currency then converts amount
+            if (currency!==payeeCurrency){
+                let newAmount = currencyConverter(currency,payeeCurrency,amount);
+                amount=newAmount;
+            }
+
+            //Add amount to account to
+            await fetch("http://localhost:3000/updateAccountBalance/" + accNumber + "/" + amount,
                 {
                     method: "POST"
                 });
