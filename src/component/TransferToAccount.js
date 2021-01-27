@@ -1,3 +1,5 @@
+//Component created by Maisie Eddleston
+
 import React from "react";
 import {GetDate, GetDateAndMinutes, currencyConverter} from "./MoveMoneyFunctions";
 import {AddTag, DeleteTag, ProcessPayment} from "./MoveMoneyDatabaseFunctions";

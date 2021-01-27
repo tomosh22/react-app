@@ -1,3 +1,5 @@
+//Component created by Maisie Eddleston
+
 async function AddTag(tag, username) {
     //Insert new tag into the Tags table in the database
 

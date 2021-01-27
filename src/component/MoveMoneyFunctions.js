@@ -1,3 +1,5 @@
+//Component created by Maisie Eddleston
+
 function GetDateAndMinutes() {
     //Return current date and time
     let date = new Date();

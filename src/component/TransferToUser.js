@@ -1,3 +1,5 @@
+//Component created by Maisie Eddleston
+
 import React from "react";
 import styled from 'styled-components';
 import {currencyConverter, GetDate, GetDateAndMinutes} from "./MoveMoneyFunctions";
