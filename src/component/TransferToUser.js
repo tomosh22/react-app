@@ -7,6 +7,7 @@ import Icon from '@mdi/react';
 import {mdiCalendar, mdiTag, mdiAccountArrowRight, mdiAccountArrowLeftOutline} from '@mdi/js';
 import '@djthoms/pretty-checkbox';
 import {context} from "./App";
+const crypto = require("crypto");
 
 const CirclePayeeButton = styled.button`
     background-color: #5FA9EF;
@@ -336,8 +337,6 @@ export class TransferToUser extends React.Component {
         let accNumberError = "";
         let display = 2;
 
-        const sortCodeRegex = new RegExp("^[0-9]{2}-[0-9]{2}-[0-9]{2}");
-
         if (!this.state.accName) {
             accNameError = "Account name is required";
         }
@@ -347,6 +346,8 @@ export class TransferToUser extends React.Component {
 
 
         if (!accNameError && !accNumberError) {
+            this.GetBalance();
+
             if (this.state.favourite) {
                 let favouritePayees = this.state.favouritePayees;
                 let newFavourite = [this.state.accName, this.state.accNumber];
