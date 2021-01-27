@@ -1,7 +1,9 @@
-//Component created by Maisie Eddleston
+//Component and functions created by Maisie Eddleston
 
 async function AddTag(tag, username) {
-    //Insert new tag into the Tags table in the database
+    /*
+    Insert new tag into the Tags table in the database
+     */
 
     await fetch("http://localhost:3000/setTag/"
         + username + "/" + tag,
@@ -11,7 +13,9 @@ async function AddTag(tag, username) {
 }
 
 async function DeleteTag(tag, username) {
-    //Delete tag from the Tags table in the database
+    /*
+    Delete tag from the Tags table in the database
+     */
 
     await fetch("http://localhost:3000/deleteTag/"
         + username + "/" + tag,
@@ -21,7 +25,9 @@ async function DeleteTag(tag, username) {
 }
 
 async function SetFavourite(username, accName, accNumber) {
-    //Insert new favourite into the Favourites Table in the database
+    /*
+    Insert new favourite into the Favourites Table in the database
+     */
 
     await fetch("http://localhost:3000/setFavouritePayees/" + username + "/" + accName + "/" + accNumber,
         {
@@ -30,8 +36,10 @@ async function SetFavourite(username, accName, accNumber) {
 }
 
 async function ProcessPayment(balance, amount, accFrom, accNumber, reference, tag, date, accName, payToday) {
-    //Insert new payment into the Transaction Table/ Future Transaction Table
-    //then update the payer and payees balances in the Account Table in the database
+    /*
+    Insert new payment into the Transaction Table/ Future Transaction Table
+    then update the payer and payees balances in the Account Table in the database
+     */
 
     if (balance > amount) {
         if (payToday) {

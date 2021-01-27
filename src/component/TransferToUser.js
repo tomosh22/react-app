@@ -1,4 +1,4 @@
-//Component created by Maisie Eddleston
+//Component and functions created by Maisie Eddleston
 
 import React from "react";
 import styled from 'styled-components';
@@ -107,13 +107,17 @@ export class TransferToUser extends React.Component {
     state = initialState;
 
     handleChange = event => {
-        // stores what user types in form in React
+        /*
+         stores what user types in form in React
+         */
         this.setState({[event.target.name]: event.target.value});
 
     };
 
     handleCheck = event => {
-        // stores what user types in form in React
+        /*
+         stores what user types in form in React
+         */
         this.setState({[event.target.name]: event.target.checked});
         if (event.target.checked === true) {
             if (event.target.name === "payLater") {
@@ -130,12 +134,16 @@ export class TransferToUser extends React.Component {
     };
 
     handleDetails = event => {
-        //stores details of payees user mouse is hovering over
+        /*
+        stores details of payees user mouse is hovering over
+         */
         this.setState({details: event.target.value});
     };
 
     resetDetails = () => {
-        //resets details to an empty string
+        /*
+        resets details to an empty string
+         */
         this.setState({details: ""});
     };
 
@@ -154,7 +162,9 @@ export class TransferToUser extends React.Component {
     };
 
     setPayeeDetails = () => {
-        //put the payees details in the correct format
+        /*
+        put the payees details in the correct format
+         */
         if (this.state.chosenPayee) {
             let details = (this.state.chosenPayee).split(",");
             let accName = details[0];
@@ -165,7 +175,9 @@ export class TransferToUser extends React.Component {
     };
 
     validateAccountFrom = (event, userName) => {
-        //validates the account to send from
+        /*
+        validates the account to send from
+         */
         event.preventDefault();
         let details = (this.state.accFrom).split(",");
         let accFrom = details[0];
@@ -184,8 +196,10 @@ export class TransferToUser extends React.Component {
     };
 
     addTagCategory = (event, userName) => {
-        //add new tag to the tag list after tag has been validated
-        //store this tag in the database
+        /*
+        add new tag to the tag list after tag has been validated
+        store this tag in the database
+         */
 
         let tagCategories = this.state.tagCategories;
         let i;
@@ -218,7 +232,9 @@ export class TransferToUser extends React.Component {
     };
 
     deleteTagCategory = (event, userName) => {
-        //delete tag from the tag list and the database
+        /*
+        delete tag from the tag list and the database
+         */
 
         let tagCategories = this.state.tagCategories;
         let i;
@@ -240,7 +256,9 @@ export class TransferToUser extends React.Component {
     };
 
     validateTransaction = () => {
-        // validate the user's input for transaction form
+        /*
+         validate the user's input for transaction form
+         */
 
         let accFromError = "";
         let accToError = "";
@@ -330,8 +348,11 @@ export class TransferToUser extends React.Component {
     };
 
     async validateNewPayee(event, userName) {
-        // validate the user's input for new payee
-        //check if a favourite payee, and if so, add to the Favourites table in the database
+        /*
+         validate the user's input for new payee
+         check if a favourite payee, and if so, add to the Favourites table in the database
+         */
+
 
         event.preventDefault();
 
@@ -373,7 +394,9 @@ export class TransferToUser extends React.Component {
     }
 
     async validatePassword() {
-        // validate user's password to authorise payment then process the payment
+        /*
+         validate user's password to authorise payment then process the payment
+         */
 
         let passwordError = "";
         let password = this.state.password;
@@ -406,26 +429,34 @@ export class TransferToUser extends React.Component {
     }
 
     ChangeDetails = () => {
-        //display main transaction form
+        /*
+        display main transaction form
+         */
         let display = 0;
         let date = this.state.dateHold;
         this.setState({display, date});
     };
 
     SelectNewPayee = () => {
-        //display add new payee form
+        /*
+        display add new payee form
+         */
         let display = 2;
         this.setState({display});
     };
 
     SelectRecentPayee = () => {
-        //display select recent/favourite payee form
+        /*
+        display select recent/favourite payee form
+         */
         let display = 3;
         this.setState({display});
     };
 
     SelectAccountFrom = (event, userName) => {
-        //Get the users accounts,favourite payees and additional tags
+        /*
+        Get the users accounts,favourite payees and additional tags
+         */
         let display = 6;
         this.GetUserAccounts(event, userName);
         this.GetFavourite(event, userName);
@@ -434,7 +465,9 @@ export class TransferToUser extends React.Component {
     };
 
     authorisePayment = (event, userName) => {
-        //Get the user's password from the database then display authorise payment form
+        /*
+        Get the user's password from the database then display authorise payment form
+         */
         let display = 4;
         let amount = this.state.amount;
         if (this.state.convert) {
@@ -445,7 +478,9 @@ export class TransferToUser extends React.Component {
     };
 
     resetState = () => {
-        //reset all details to their initial state
+        /*
+        reset all details to their initial state
+         */
         this.setState(initialState);
     };
 
@@ -454,7 +489,9 @@ export class TransferToUser extends React.Component {
 
 
     async GetUserAccounts(event, userName) {
-        //Get all of the user's accounts and store in a 2D array [account number, account name]
+        /*
+        Get all of the user's accounts and store in a 2D array [account number, account name]
+         */
 
         let userAccounts = [];
         let i;
@@ -470,7 +507,9 @@ export class TransferToUser extends React.Component {
     }
 
     async GetRecentPayees(event, userName, accFrom) {
-        //Get all of the user's payees and select the 5 most recent ones, store in a 2D array [name of payee, account number]
+        /*
+        Get all of the user's payees and select the 5 most recent ones, store in a 2D array [name of payee, account number]
+         */
 
         let recentPayees = [];
         let i = 0;
@@ -508,8 +547,10 @@ export class TransferToUser extends React.Component {
     }
 
     async GetTag(event, userName) {
-        //Get the additional tags for the user from the Tags table in database
-        //Stores these tags in an array, along with the default tags
+        /*
+        Get the additional tags for the user from the Tags table in database
+        Stores these tags in an array, along with the default tags
+         */
 
         let i;
         let tagCategories = this.state.tagCategories;
@@ -529,7 +570,9 @@ export class TransferToUser extends React.Component {
     }
 
     async GetBalance() {
-        //Get the user's account balance from database to confirm they have enough to pay
+        /*
+        Get the user's account balance from database to confirm they have enough to pay
+         */
 
         let balance = 0.00;
         let accountCurrency = "";
@@ -542,7 +585,9 @@ export class TransferToUser extends React.Component {
     }
 
     async GetPassword(event, userName) {
-        //Get the user's hashed password and salt from the database
+        /*
+        Get the user's hashed password and salt from the database
+         */
 
         let userPassword;
         let salt;
@@ -555,7 +600,9 @@ export class TransferToUser extends React.Component {
     }
 
     async GetFavourite(event, userName) {
-        //Get all of the user's favourite payees and store in 2D array [name of payee, account number]
+        /*
+        Get all of the user's favourite payees and store in 2D array [name of payee, account number]
+         */
 
         let favouritePayees = [];
         let i;

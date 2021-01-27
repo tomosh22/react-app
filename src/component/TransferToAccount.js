@@ -1,4 +1,4 @@
-//Component created by Maisie Eddleston
+//Component and functions created by Maisie Eddleston
 
 import React from "react";
 import {GetDate, GetDateAndMinutes, currencyConverter} from "./MoveMoneyFunctions";
@@ -83,12 +83,16 @@ export class TransferToAccount extends React.Component {
     state = initialState;
 
     handleChange = event => {
-        // stores what user types in form in React
+        /*
+         stores what user types in form in React
+         */
         this.setState({[event.target.name]: event.target.value});
     };
 
     handleCheck = event => {
-        // stores what user types in form in React
+        /*
+         stores what user types in form in React
+         */
         this.setState({[event.target.name]: event.target.checked});
         if (event.target.checked === true) {
             if (event.target.name === "payLater") {
@@ -118,8 +122,10 @@ export class TransferToAccount extends React.Component {
     };
 
     addTagCategory = (event, userName) => {
-        //add new tag to the tag list after tag has been validated
-        //store this tag in the database
+        /*
+         add new tag to the tag list after tag has been validated
+         store this tag in the database
+         */
 
         let tagCategories = this.state.tagCategories;
         let i;
@@ -153,7 +159,9 @@ export class TransferToAccount extends React.Component {
     };
 
     deleteTagCategory = (event, userName) => {
-        //delete tag from the tag list and the database
+        /*
+        delete tag from the tag list and the database
+         */
 
         let tagCategories = this.state.tagCategories;
         let i;
@@ -175,7 +183,9 @@ export class TransferToAccount extends React.Component {
     };
 
     validate = () => {
-        // validate the user's input for transaction form
+        /*
+         validate the user's input for transaction form
+         */
 
         let accountFromError = "";
         let accountToError = "";
@@ -251,7 +261,9 @@ export class TransferToAccount extends React.Component {
     };
 
     validateAccountTo = () => {
-        //validates the account to send to
+        /*
+        validates the account to send to
+         */
 
         let accountToError = "";
         let details = (this.state.accountTo).split(",");
@@ -268,7 +280,9 @@ export class TransferToAccount extends React.Component {
     };
 
     validateAccountFrom = () => {
-        //validates the account to send from
+        /*
+        validates the account to send from
+         */
 
         let display = 5;
         let details = (this.state.accountFrom).split(",");
@@ -285,7 +299,9 @@ export class TransferToAccount extends React.Component {
     };
 
     async validatePassword() {
-        // validates user's password to authorise payment
+        /*
+         validates user's password to authorise payment
+         */
 
         let passwordError = "";
         let password = this.state.password;
@@ -322,14 +338,18 @@ export class TransferToAccount extends React.Component {
 
 
     ChangeDetails = () => {
-        //displays main transaction form
+        /*
+        displays main transaction form
+         */
         let display = 0;
         let date = this.state.dateHold;
         this.setState({display, date});
     };
 
     authorisePayment = (event, userName) => {
-        //displays authorise payment form
+        /*
+        displays authorise payment form
+         */
         let display = 3;
         let amount = this.state.amount;
         if (this.state.convert) {
@@ -340,12 +360,16 @@ export class TransferToAccount extends React.Component {
     };
 
     resetState = () => {
-        //resets all details to their initial state
+        /*
+        resets all details to their initial state
+         */
         this.setState(initialState);
     };
 
     SelectAccountTo = () => {
-        //remove accountFrom from the list of accounts that can be sent to
+        /*
+        remove accountFrom from the list of accounts that can be sent to
+         */
         let display = 2;
         let updatedUserAccounts = [];
         let i;
@@ -362,7 +386,9 @@ export class TransferToAccount extends React.Component {
     };
 
     SelectAccountFrom = (event, userName) => {
-        //get the users accounts
+        /*
+        get the users accounts
+         */
         let display = 5;
         this.GetUserAccounts(event, userName);
         this.GetTag(event, userName);
@@ -374,7 +400,9 @@ export class TransferToAccount extends React.Component {
 
 
     async GetUserAccounts(event, userName) {
-        //Get all of the user's accounts and store in a 2D array [account number, account name]
+        /*
+        Get all of the user's accounts and store in a 2D array [account number, account name]
+         */
 
         let userAccounts = [];
         let i;
@@ -392,7 +420,9 @@ export class TransferToAccount extends React.Component {
 
 
     async GetBalance() {
-        //Get the user's account balance from database to confirm they have enough to pay
+        /*
+        Get the user's account balance from database to confirm they have enough to pay
+         */
 
         let balance = 0;
         let accountCurrency = "";
@@ -405,7 +435,9 @@ export class TransferToAccount extends React.Component {
     }
 
     async GetPassword(event, userName) {
-        //Get the user's hashed password and salt from the database
+        /*
+        Get the user's hashed password and salt from the database
+         */
 
         let userPassword;
         let salt;
@@ -418,8 +450,10 @@ export class TransferToAccount extends React.Component {
     }
 
     async GetTag(event, userName) {
-        //Get the additional tags for the user from the Tags table in database
-        //Stores these tags in an array, along with the default tags
+        /*
+        Get the additional tags for the user from the Tags table in database
+        Stores these tags in an array, along with the default tags
+         */
 
         let i;
         let tagCategories = this.state.tagCategories;

@@ -1,7 +1,9 @@
-//Component created by Maisie Eddleston
+//Component and functions created by Maisie Eddleston
 
 function GetDateAndMinutes() {
-    //Return current date and time
+    /*
+    Return current date and time
+     */
     let date = new Date();
     let dd = date.getDate();
     let mm = date.getMonth() + 1;
@@ -31,7 +33,9 @@ function GetDateAndMinutes() {
 }
 
 function GetDate() {
-    //Return current date
+    /*
+    Return current date
+     */
     let date = new Date();
     let dd = date.getDate();
     let mm = date.getMonth() + 1;
@@ -49,7 +53,9 @@ function GetDate() {
 }
 
 function currencyConverter(currencyFrom, currencyTo, amount) {
-    //Return the new amount corresponding to the currency of the users account
+    /*
+    Return the new amount corresponding to the currency of the users account
+     */
     let GBRtoUSD = 1.37;
     let GBRtoEUR = 1.12;
     let USDtoEUR = 0.82;
