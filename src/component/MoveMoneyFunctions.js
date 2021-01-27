@@ -1,5 +1,9 @@
+//Component and functions created by Maisie Eddleston
+
 function GetDateAndMinutes() {
-    //Returns current date and time
+    /*
+    Return current date and time
+     */
     let date = new Date();
     let dd = date.getDate();
     let mm = date.getMonth() + 1;
@@ -29,7 +33,9 @@ function GetDateAndMinutes() {
 }
 
 function GetDate() {
-    //Returns current date
+    /*
+    Return current date
+     */
     let date = new Date();
     let dd = date.getDate();
     let mm = date.getMonth() + 1;
@@ -47,7 +53,9 @@ function GetDate() {
 }
 
 function currencyConverter(currencyFrom, currencyTo, amount) {
-    //Returns the new amount corresponding to the currency of the users account
+    /*
+    Return the new amount corresponding to the currency of the users account
+     */
     let GBRtoUSD = 1.37;
     let GBRtoEUR = 1.12;
     let USDtoEUR = 0.82;
@@ -60,21 +68,21 @@ function currencyConverter(currencyFrom, currencyTo, amount) {
     if (currencyFrom !== currencyTo) {
         if (currencyFrom === "£") {
             if (currencyTo === "$") {
-                newAmount = (amount * GBRtoUSD).toFixed(2)
+                newAmount = (amount * GBRtoUSD).toFixed(2);
             } else if (currencyTo === "€") {
-                newAmount = (amount * GBRtoEUR).toFixed(2)
+                newAmount = (amount * GBRtoEUR).toFixed(2);
             }
         } else if (currencyFrom === "$") {
             if (currencyTo === "£") {
-                newAmount = (amount * USDtoGBR).toFixed(2)
+                newAmount = (amount * USDtoGBR).toFixed(2);
             } else if (currencyTo === "€") {
-                newAmount = (amount * USDtoEUR).toFixed(2)
+                newAmount = (amount * USDtoEUR).toFixed(2);
             }
         } else if (currencyFrom === "€") {
             if (currencyTo === "$") {
-                newAmount = (amount * EURtoUSD).toFixed(2)
+                newAmount = (amount * EURtoUSD).toFixed(2);
             } else if (currencyTo === "£") {
-                newAmount = (amount * EURtoGBR).toFixed(2)
+                newAmount = (amount * EURtoGBR).toFixed(2);
             }
         }
     }

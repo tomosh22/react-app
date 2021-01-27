@@ -1,3 +1,5 @@
+//Component and functions created by Maisie Eddleston
+
 import React from "react";
 import styled from 'styled-components';
 import {currencyConverter, GetDate, GetDateAndMinutes} from "./MoveMoneyFunctions";
@@ -7,6 +9,7 @@ import Icon from '@mdi/react';
 import {mdiCalendar, mdiTag, mdiAccountArrowRight, mdiAccountArrowLeftOutline} from '@mdi/js';
 import '@djthoms/pretty-checkbox';
 import {context} from "./App";
+const crypto = require("crypto");
 
 const CirclePayeeButton = styled.button`
     background-color: #5FA9EF;
@@ -49,6 +52,7 @@ const initialState = {
     payToday: false,
     chosenPayee: "",
     password: "",
+
     accFromError: "",
     accToError: "",
     accNameError: "",
@@ -63,12 +67,14 @@ const initialState = {
     reconfirm: 0,
 
     userAccounts: [],
-    //example of what user accounts should look like
+    //2D array of all of the users [account number, account name]
 
     recentPayees: [],
-    //example of what recent Payees should look like
+    //2D array of all the users recent payees [name, account number]
     favourite: false,
     favouritePayees: [],
+    //2D array of all the users favourite payees [name, account number]
+
     tagCategories: [],
     tag: "",
     tagError: "",
@@ -78,15 +84,17 @@ const initialState = {
     accountCurrency: "",
     convertedAmount: "",
     convert: false,
+    //set true if currency is different from the account from currency
     balance: 0.00,
-    //example of what balance should look like
 
     display: 0,
     // determines the display of the webpage
     // 0: main transaction page; 1: review details page; 2: new payee page; 3: recent payee page;
+    // 4:authorise payment; 5:confirmation payment has gone through; 6:select account from page;
 
     passwordAttempts: 3,
     //number of attempts for the user to enter password
+
     userPassword: "",
     salt: "",
     //user's hashed password and salt from database
@@ -99,17 +107,22 @@ export class TransferToUser extends React.Component {
     state = initialState;
 
     handleChange = event => {
-        // stores what user types in form in React
-        this.setState({[event.target.name]: event.target.value})
+        /*
+         stores what user types in form in React
+         */
+        this.setState({[event.target.name]: event.target.value});
 
-    }
+    };
+
     handleCheck = event => {
-        // stores what user types in form in React
-        this.setState({[event.target.name]: event.target.checked})
+        /*
+         stores what user types in form in React
+         */
+        this.setState({[event.target.name]: event.target.checked});
         if (event.target.checked === true) {
             if (event.target.name === "payLater") {
                 let dateAndMinutes = "";
-                this.setState({payToday: false, dateAndMinutes})
+                this.setState({payToday: false, dateAndMinutes});
             } else if (event.target.name === "payToday") {
                 this.setState({payLater: false});
                 let dateAndMinutes = GetDateAndMinutes();
@@ -118,33 +131,40 @@ export class TransferToUser extends React.Component {
                 this.setState({date, dateAndMinutes, dateHold});
             }
         }
-    }
+    };
 
     handleDetails = event => {
-        //stores details of payees user mouse is hovering over
-        this.setState({details: event.target.value})
-    }
+        /*
+        stores details of payees user mouse is hovering over
+         */
+        this.setState({details: event.target.value});
+    };
 
     resetDetails = () => {
-        this.setState({details: ""})
-    }
+        /*
+        resets details to an empty string
+         */
+        this.setState({details: ""});
+    };
 
     handleSubmit = (event) => {
         event.preventDefault();
         if (this.state.display === 0) {
-            this.validateTransaction()
+            this.validateTransaction();
         } else if (this.state.display === 3) {
             this.setPayeeDetails();
             this.state.display = 0;
-            this.GetBalance()
-        }//uncomment this when connected to database
+            this.GetBalance();
+        }
         else if (this.state.display === 4) {
             this.validatePassword();
         }
-    }
+    };
 
     setPayeeDetails = () => {
-        //put the payees details in the correct format
+        /*
+        put the payees details in the correct format
+         */
         if (this.state.chosenPayee) {
             let details = (this.state.chosenPayee).split(",");
             let accName = details[0];
@@ -152,30 +172,35 @@ export class TransferToUser extends React.Component {
             let chosenPayee = "";
             this.setState({accName, accNumber, chosenPayee})
         }
-    }
+    };
 
     validateAccountFrom = (event, userName) => {
-        //validates the account to send from
+        /*
+        validates the account to send from
+         */
         event.preventDefault();
         let details = (this.state.accFrom).split(",");
         let accFrom = details[0];
         let accFromName = details[1];
         this.setState({accFrom, accFromName});
-        console.log((accFrom))
         let accFromError = "";
         let display = 5;
         if (!this.state.accFrom) {
-            accFromError = "Account name is required"
+            accFromError = "Account name is required";
         }
         if (!accFromError) {
             display = 0;
         }
         this.GetRecentPayees(event, userName, accFrom);
-        this.setState({accFromError, display})
-    }
+        this.setState({accFromError, display});
+    };
 
     addTagCategory = (event, userName) => {
-        //add new tag to the tag list
+        /*
+        add new tag to the tag list after tag has been validated
+        store this tag in the database
+         */
+
         let tagCategories = this.state.tagCategories;
         let i;
         let suitable = true;
@@ -204,10 +229,13 @@ export class TransferToUser extends React.Component {
             AddTag(tag, userName);
             this.setState({tagCategories, addTag, tag});
         }
-    }
+    };
 
     deleteTagCategory = (event, userName) => {
-        //deletes tag from the tag list
+        /*
+        delete tag from the tag list and the database
+         */
+
         let tagCategories = this.state.tagCategories;
         let i;
         let found = false;
@@ -218,17 +246,20 @@ export class TransferToUser extends React.Component {
                 DeleteTag(this.state.deleteTag, userName);
                 let deleteTag = "";
                 let tag = "";
-                this.setState({tagCategories, tag, deleteTag})
+                this.setState({tagCategories, tag, deleteTag});
             }
         }
         if (!found) {
             let tagError = "Tag does not exists";
-            this.setState({tagError})
+            this.setState({tagError});
         }
-    }
+    };
 
     validateTransaction = () => {
-        // validates the user's input for transaction form
+        /*
+         validate the user's input for transaction form
+         */
+
         let accFromError = "";
         let accToError = "";
         let amountError = "";
@@ -245,43 +276,44 @@ export class TransferToUser extends React.Component {
         const amountRegex = new RegExp("^[0-9]+(\.[0-9]{1,2})?$");
 
         if (!this.state.accFrom) {
-            accFromError = "Account name is required"
+            accFromError = "Account name is required";
         }
         if (!this.state.accName || !this.state.accNumber) {
-            accToError = "Payee Details are required"
+            accToError = "Payee Details are required";
         }
 
         if (!this.state.amount) {
-            amountError = "Amount is required"
+            amountError = "Amount is required";
         } else if (!(amountRegex.test(this.state.amount))) {
-            amountError = "Amount must be valid"
+            amountError = "Amount must be valid";
         } else if (this.state.amount > this.state.balance) {
-            amountError = "Amount must be less than your balance"
+            amountError = "Amount must be less than your balance";
         }
 
         if ((this.state.reference).length > 20) {
-            referenceError = "Reference must be less than 20 characters"
+            referenceError = "Reference must be less than 20 characters";
         }
 
         if (!this.state.date) {
-            dateError = "Date to pay is required"
+            dateError = "Date to pay is required";
         }
 
         if (!accFromError && !accToError && !amountError && !referenceError && !dateError && !tagError) {
-
+            //checks if the user has entered a tag or reference
             if (!this.state.reference && (!this.state.tag || this.state.tag === "Add tag..." || this.state.tag === "Delete tag...")) {
-                TagReferenceError = "You have not entered a tag or reference. Would you like to send anyway?"
+                TagReferenceError = "You have not entered a tag or reference. Would you like to send anyway?";
                 reconfirm++;
             } else if (!this.state.reference) {
-                TagReferenceError = "You have not entered a reference. Would you like to send anyway?"
+                TagReferenceError = "You have not entered a reference. Would you like to send anyway?";
                 reconfirm++;
             } else if (!this.state.tag || this.state.tag === "Add tag..." || this.state.tag === "Delete tag...") {
-                TagReferenceError = "You have not entered a tag. Would you like to send anyway?"
+                TagReferenceError = "You have not entered a tag. Would you like to send anyway?";
                 reconfirm++;
             }
 
-            if (!TagReferenceError || reconfirm == 2) {
+            if (!TagReferenceError || reconfirm === 2) {
                 if (!this.state.dateAndMinutes) {
+                    //puts date in the correct format for the database
                     dateHold = date;
                     date = this.state.date + " 00:00:00";
                 } else {
@@ -313,27 +345,32 @@ export class TransferToUser extends React.Component {
             convert,
             convertedAmount
         })
-    }
+    };
 
     async validateNewPayee(event, userName) {
-        // validates the user's input for new payee
+        /*
+         validate the user's input for new payee
+         check if a favourite payee, and if so, add to the Favourites table in the database
+         */
+
+
         event.preventDefault();
 
         let accNameError = "";
         let accNumberError = "";
         let display = 2;
 
-        const sortCodeRegex = new RegExp("^[0-9]{2}-[0-9]{2}-[0-9]{2}")
-
         if (!this.state.accName) {
-            accNameError = "Account name is required"
+            accNameError = "Account name is required";
         }
         if (!this.state.accNumber) {
-            accNumberError = "Account number is required"
+            accNumberError = "Account number is required";
         }
 
 
         if (!accNameError && !accNumberError) {
+            this.GetBalance();
+
             if (this.state.favourite) {
                 let favouritePayees = this.state.favouritePayees;
                 let newFavourite = [this.state.accName, this.state.accNumber];
@@ -347,29 +384,30 @@ export class TransferToUser extends React.Component {
                 if (!found) {
                     favouritePayees.push(newFavourite);
                     SetFavourite(userName, this.state.accName, this.state.accNumber);
-                    this.setState({favouritePayees})
+                    this.setState({favouritePayees});
                 }
             }
             display = 0;
         }
 
-        this.setState({accNameError, accNumberError, display})
+        this.setState({accNameError, accNumberError, display});
     }
 
     async validatePassword() {
-        // validates user's password to authorise payment
+        /*
+         validate user's password to authorise payment then process the payment
+         */
+
         let passwordError = "";
-        //change userPassword here!!
         let password = this.state.password;
         let passwordAttempts = this.state.passwordAttempts;
         let display = 4;
 
         let userPassword = this.state.userPassword;
-        //var hash = crypto.createHmac("sha512", this.state.salt);
-        //hash.update(password + this.state.salt);
-        //hash = hash.digest("hex");
-        //password = hash;
-        //userPassword = this.state.userPassword;
+        var hash = crypto.createHmac("sha512", this.state.salt);
+        hash.update(password + this.state.salt);
+        hash = hash.digest("hex");
+        password = hash;
 
         if (!this.state.password) {
             passwordError = "Password is required"
@@ -377,70 +415,84 @@ export class TransferToUser extends React.Component {
             if (passwordAttempts > 0) {
                 if (password !== userPassword) {
                     --passwordAttempts;
-                    passwordError = passwordAttempts + " login attempts remaining"
+                    passwordError = passwordAttempts + " login attempts remaining";
                 } else {
                     ProcessPayment(this.state.balance, this.state.amount, this.state.accFrom, this.state.accNumber,
                         this.state.reference, this.state.tag, this.state.date, this.state.accName, this.state.payToday);
                     display = 5;
                 }
             } else {
-                passwordError = "0 login attempts remaining"
+                passwordError = "0 login attempts remaining";
             }
         }
-        this.setState({passwordError, passwordAttempts, display})
+        this.setState({passwordError, passwordAttempts, display});
     }
 
     ChangeDetails = () => {
-        //displays main transaction form
+        /*
+        display main transaction form
+         */
         let display = 0;
         let date = this.state.dateHold;
-        this.setState({display, date})
-    }
+        this.setState({display, date});
+    };
 
     SelectNewPayee = () => {
-        //displays add new payee form
+        /*
+        display add new payee form
+         */
         let display = 2;
-        this.setState({display})
-    }
+        this.setState({display});
+    };
 
     SelectRecentPayee = () => {
-        //displays select recent/favourite payee form
+        /*
+        display select recent/favourite payee form
+         */
         let display = 3;
         this.setState({display});
-    }
+    };
 
     SelectAccountFrom = (event, userName) => {
-        //get the users accounts
+        /*
+        Get the users accounts,favourite payees and additional tags
+         */
         let display = 6;
-        this.GetUserAccounts(event, userName)
-        this.GetFavourite(event, userName)
+        this.GetUserAccounts(event, userName);
+        this.GetFavourite(event, userName);
         this.GetTag(event, userName);
-        this.setState({display})
-    }
+        this.setState({display});
+    };
 
     authorisePayment = (event, userName) => {
-        //displays authorise payment form
+        /*
+        Get the user's password from the database then display authorise payment form
+         */
         let display = 4;
         let amount = this.state.amount;
         if (this.state.convert) {
-            amount = this.state.convertedAmount
+            amount = this.state.convertedAmount;
         }
         this.GetPassword(event, userName);
-        this.setState({display, amount})
-    }
+        this.setState({display, amount});
+    };
 
     resetState = () => {
-        //resets all details to their initial state
+        /*
+        reset all details to their initial state
+         */
         this.setState(initialState);
-    }
+    };
 
 
     //DATABASE FUNCTIONS
 
 
     async GetUserAccounts(event, userName) {
-        //USES userName
-        //CODE TO MAKE ARRAY OF USER ACCOUNTS NAMES RATHER THAN DEFAULT ARRAY
+        /*
+        Get all of the user's accounts and store in a 2D array [account number, account name]
+         */
+
         let userAccounts = [];
         let i;
         await fetch("http://localhost:3000/getUserAccounts/" + userName,
@@ -450,27 +502,28 @@ export class TransferToUser extends React.Component {
             for (i = 0; i < data.length; i++) {
                 userAccounts.push([data[i].AccNumber, data[i].Name])
             }
-        })
-        console.log(userAccounts)
-        this.setState({userAccounts})
+        });
+        this.setState({userAccounts});
     }
 
     async GetRecentPayees(event, userName, accFrom) {
-        //CODE TO MAKE ARRAY OF USER RECENT PAYEES RATHER THAN DEFAULT ARRAY
+        /*
+        Get all of the user's payees and select the 5 most recent ones, store in a 2D array [name of payee, account number]
+         */
+
         let recentPayees = [];
         let i = 0;
         let j;
         let found = false;
         let numToDisplay = 5;
-        console.log(accFrom)
+
         await fetch("http://localhost:3000/getAccountPayees/" + accFrom,
             {
                 method: "GET"
             }).then(response => response.json()).then(data => {
             if (data.length < 5) {
-                numToDisplay = data.length
+                numToDisplay = data.length;
             }
-            ;
             let numOfPayees = data.length;
             while (numToDisplay > 0 && numOfPayees > 0) {
                 if (!(data[i].NameTo === this.state.userName)) {
@@ -482,21 +535,23 @@ export class TransferToUser extends React.Component {
                         }
                     }
                     if (found === false) {
-                        recentPayees.push([data[i].NameTo, data[i].AccNumberTo])
-                        --numToDisplay
+                        recentPayees.push([data[i].NameTo, data[i].AccNumberTo]);
+                        --numToDisplay;
                     }
                 }
-                i++
-                --numOfPayees
+                i++;
+                --numOfPayees;
             }
-        })
-        //recentPayees should be a 2d array [accName,accNumber] of 5 most recent payees.
-        console.log(recentPayees);
-        this.setState({recentPayees})
+        });
+        this.setState({recentPayees});
     }
 
     async GetTag(event, userName) {
-        //USES userName
+        /*
+        Get the additional tags for the user from the Tags table in database
+        Stores these tags in an array, along with the default tags
+         */
+
         let i;
         let tagCategories = this.state.tagCategories;
         tagCategories.splice(0, tagCategories.length);
@@ -509,40 +564,46 @@ export class TransferToUser extends React.Component {
             for (i = 0; i < data.length; i++) {
                 tagCategories.push(data[i].Tag)
             }
-        })
-        console.log(tagCategories);
+        });
+
         this.setState({tagCategories});
     }
 
     async GetBalance() {
-        //CHECKS USER HAS ENOUGH MONEY IN THAT ACCOUNT TO PAY
+        /*
+        Get the user's account balance from database to confirm they have enough to pay
+         */
+
         let balance = 0.00;
         let accountCurrency = "";
         await fetch("http://localhost:3000/getUserBalance/" + this.state.accFrom,
             {
                 method: "GET"
-            }).then(response => response.json()).then(data => (balance = data[0].Balance, accountCurrency = data[0].Currency))
-        console.log(balance, accountCurrency);
-        this.setState({balance, accountCurrency})
+            }).then(response => response.json()).then(data => (balance = data[0].Balance, accountCurrency = data[0].Currency));
+
+        this.setState({balance, accountCurrency});
     }
 
     async GetPassword(event, userName) {
-        //USES userName
-        // GETS THE USER'S HASHED PASSWORD AND SALT
+        /*
+        Get the user's hashed password and salt from the database
+         */
+
         let userPassword;
         let salt;
-        await fetch("http://localhost:3000/selectHashAndSalt/" + userName,
+        await fetch("http://localhost:3000/selectHashAndSaltAndSecret/" + userName,
             {
                 method: "GET"
             }).then(response => response.json()).then(data => (userPassword = data[0].Password, salt = data[0].Salt))
-        console.log(userPassword);
-        console.log(salt);
-        this.setState({userPassword, salt})
+
+        this.setState({userPassword, salt});
     }
 
     async GetFavourite(event, userName) {
-        //USES userName
-        //GETS THE USER'S FAVOURITE PAYEES
+        /*
+        Get all of the user's favourite payees and store in 2D array [name of payee, account number]
+         */
+
         let favouritePayees = [];
         let i;
         await fetch("http://localhost:3000/getFavouritePayees/" + userName,
@@ -550,11 +611,11 @@ export class TransferToUser extends React.Component {
                 method: "GET"
             }).then(response => response.json()).then(data => {
             for (i = 0; i < data.length; i++) {
-                favouritePayees.push([data[i].Name, data[i].AccNumber])
+                favouritePayees.push([data[i].Name, data[i].AccNumber]);
             }
-        })
-        console.log(favouritePayees);
-        this.setState({favouritePayees})
+        });
+
+        this.setState({favouritePayees});
     }
 
 
@@ -663,7 +724,7 @@ export class TransferToUser extends React.Component {
 
             case 1:
                 return (
-                    // REVIEW DETAILS PAGE
+                    //REVIEW DETAILS PAGE
                     <context.Consumer>{({userName}) => (
                         <div>
                             <h1>Review Details</h1>
@@ -690,7 +751,7 @@ export class TransferToUser extends React.Component {
 
             case 2:
                 return (
-                    // ADD A NEW PAYEE PAGE
+                    //ADD A NEW PAYEE PAGE
                     <context.Consumer>{({userName}) => (
                         <div>
                             <br/>
@@ -730,8 +791,7 @@ export class TransferToUser extends React.Component {
                         <br/>
                         <form action="SelectRecentPayee" id="SelectRecentPayee" method="post"
                               onSubmit={this.handleSubmit}>
-                            <label htmlFor="recentPayees" hidden={this.state.recentPayees.length === 0}>Recent
-                                Payees:</label><br/>
+                            <label htmlFor="recentPayees">Recent Payees:</label><br/>
                             {this.state.recentPayees.map(list => (
                                 <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
                                                    onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
@@ -739,8 +799,7 @@ export class TransferToUser extends React.Component {
                                 </CirclePayeeButton>
                             ))}
                             <br/><br/>
-                            <label htmlFor="favouritePayees" hidden={this.state.favouritePayees.length === 0}>Favourite
-                                Payees:</label><br/>
+                            <label htmlFor="favouritePayees">Favourite Payees:</label><br/>
                             {this.state.favouritePayees.map(list => (
                                 <CirclePayeeButton name={"chosenPayee"} value={list} onClick={this.handleChange}
                                                    onMouseOver={this.handleDetails} onMouseOut={this.resetDetails}>
@@ -789,7 +848,7 @@ export class TransferToUser extends React.Component {
                 return (
                     <context.Consumer>{({userName}) => (
                         <div>
-                            <br></br>
+                            <br/>
                             <form action="SelectAccount" id="SelectAccount" method="post"
                                   onSubmit={e => this.validateAccountFrom(e, userName)}>
                                 <select id="accFrom" name="accFrom" value={this.state.accFrom}
@@ -802,7 +861,7 @@ export class TransferToUser extends React.Component {
                                     ))}
                                 </select>
                                 <div style={{color: "red"}}>{this.state.accFromError}</div>
-                                <br></br>
+                                <br/>
                                 <Button type="button" onClick={this.ChangeDetails}>Back</Button>
                                 <Button type="submit">Submit</Button>
                             </form>
@@ -813,6 +872,5 @@ export class TransferToUser extends React.Component {
                 break;
 
         }
-        ;
     }
 }
