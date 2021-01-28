@@ -1,6 +1,6 @@
 import React from "react";
 
-import {NavLink,BrowserRouter as Router, Route} from "react-router-dom";
+import {NavLink, BrowserRouter as Router, Route, Redirect} from "react-router-dom";
 import {Switch} from "react-router";
 import {AdminDataAnalysis} from "./AdminDataAnalysis";
 import {AdminUserList} from "./AdminUserList";
@@ -8,6 +8,22 @@ import style from "../../assets/css/admin.module.css"
 import {AdminUserChange} from "./AdminUserChange";
 
 export class AdminPage extends React.Component{
+
+    state = {
+        loggedIn: true
+    }
+
+    ifLogged = () =>{
+        return(
+            <Switch>
+                <Route exact path={"/service"} component={AdminDataAnalysis}/>
+                <Route exact path={"/service/userList"} component={AdminUserList}/>
+                <Route path={'/service/userChange/:username'}
+                       render={props => <AdminUserChange {...props}/>}/>
+            </Switch>
+        )
+    }
+
     render(){
         return(
             <div>
@@ -21,11 +37,7 @@ export class AdminPage extends React.Component{
                         </NavLink>
                     </nav>
                     <div className={style.contentHolder}>
-                        <Switch>
-                            <Route exact path={"/service"} component={AdminDataAnalysis}/>
-                            <Route exact path={"/service/userList"} component={AdminUserList}/>
-                            <Route path={'/service/userChange/:username'} render={props => <AdminUserChange {...props}/>}/>
-                        </Switch>
+                        {this.state.loggedIn? this.ifLogged() : <Redirect to={'/admin'}/>}
                     </div>
                 </Router>
             </div>
