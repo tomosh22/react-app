@@ -8,7 +8,7 @@ export class AdminLogin extends Component {
         this.state = {
             username: '',
             password: '',
-            logged: false
+            logged: true
         };
     }
     handleInputChange = (event) =>{
@@ -17,6 +17,11 @@ export class AdminLogin extends Component {
             [name]: value
         });
     }
+
+    handleSubmit(event,){
+
+    }
+
     // todo: Create `authentication/admin` on the express and integrate responses with different
     //  codes, to determine errors
     onSubmit = async (event) => {
@@ -43,9 +48,10 @@ export class AdminLogin extends Component {
         return(
             <div>
                 <div>
-                    <form className={style.admin_login} onSubmit={this.onSubmit}>
+                    <form className={style.admin_login} method="get" onSubmit={this.onSubmit}>
                         <h4>Admin login</h4>
                         <input
+                            id="login"
                             type="text"
                             name="username"
                             placeholder="username"
@@ -53,6 +59,7 @@ export class AdminLogin extends Component {
                             onChange={this.handleInputChange}
                             required/><br/>
                         <input
+                            id="password"
                             type="password"
                             name="password"
                             placeholder="password"
