@@ -1,3 +1,4 @@
+//written by Tom O'Shaughnessy
 import React, {useContext, useState} from "react";
 import {context} from "./App"
 import {Link} from "react-router-dom";
@@ -6,6 +7,7 @@ import Chart from "react-google-charts"
 
 
 export class Dashboard extends React.Component {
+    //chartType can be either balances or expenditure
     state = {
         chartType: "balances",
 
@@ -14,8 +16,11 @@ export class Dashboard extends React.Component {
         display: -1
     }
 
+    //returns data for chart of all the user's account's balances
     getBalances(accounts) {
+        // chart headers
         const data = [["Account Name", "Balance"]]
+
         for (var x of accounts) {
             data.push([x.name.concat(": ", x.currency, x.balance), x.balance])
         }
@@ -23,9 +28,9 @@ export class Dashboard extends React.Component {
         return data
     }
 
+    //returns data for chart of all the user's transactions
     getExpenditure(transactions, vendors) {
-        console.log(transactions)
-        console.log(vendors)
+        //chart headers
         let data = [["Category", "Amount"]]
 
         for (var x of transactions) {
@@ -34,7 +39,13 @@ export class Dashboard extends React.Component {
             if (vendors[x.accNumberTo]) {
                 vendorExists = true
             }
-            //console.log("category: ",vendors[x.accNumberTo].category)
+
+            //deciding what to use for category of transaction
+            //if a tag is provided that is used
+            //if there is no tag but the recipient is in vendors table the category of that vendor is used
+            //otherwise category is Unknown
+
+            //if transaction has associated tag
             if (x.tag) {
                 for (var y of data) {
 
@@ -75,31 +86,31 @@ export class Dashboard extends React.Component {
             }
 
         }
-        console.log(data)
+
         return data
     }
 
+    //called when user changes chart type from drowndown
     handleChange(event) {
-        //console.log("value",event.target.value)
         this.setState({chartType: event.target.value})
-        console.log(this.state.chartType)
+
     }
 
+    //gets all transactions from one specific account
     getAccountTransactions(accNumber, allTransactions) {
-        console.log(allTransactions)
         const transactions = [];
         for (var x of allTransactions) {
             if (x.accNumberFrom == accNumber) {
                 transactions.push(x)
             }
         }
-        console.log(transactions)
+
         return transactions
     }
 
     render() {
 
-
+        //renders all user accounts with onclick changing state.display
         function Accounts(props) {
             const data = useContext(context);
             var accsArray = [];
@@ -113,6 +124,7 @@ export class Dashboard extends React.Component {
             return <div>{accsArray}</div>
         }
 
+        //renders chart on main dashboard page
         function DashBoardChart(props) {
             const chartType = props.state.chartType
 
@@ -158,6 +170,7 @@ export class Dashboard extends React.Component {
             }
         }
 
+        //main dashboard page
         if (this.state.display === -1) {
             return (
 
@@ -187,16 +200,19 @@ export class Dashboard extends React.Component {
                 )}
                 </context.Consumer>
             )
-        } else {
+        }
+        //state.display is account number, account view instead of dashboard home page
+        else {
             let account = null;
             const accounts = this.props.accounts
 
             for (var x of accounts) {
-                console.log(x)
                 if (x.accNumber == this.state.display) {
                     account = x;
                 }
             }
+
+            //generating table of account transactions
             let fields = []
             let tableRows = []
             fields.push(<td className={style.dashboardTable}>Amount</td>)
@@ -205,7 +221,6 @@ export class Dashboard extends React.Component {
             fields.push(<td className={style.dashboardTable}>Account Number of Recipient</td>)
             fields.push(<td className={style.dashboardTable}>Reference</td>)
             tableRows.push(<tr key={-1}>{fields}</tr>)
-
 
             for (var x of this.getAccountTransactions(account.accNumber, this.props.transactions)) {
                 fields = []
