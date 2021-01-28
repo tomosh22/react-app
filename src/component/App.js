@@ -98,7 +98,7 @@ export class App extends Component {
                                 <Route exact path={"/faq"}><FAQ/></Route>
                                 <Route exact path={"/contactus"} component={ContactUs}/>
                                 <Route exact path={"/signup"} component={SignUp}/>
-                                <Route exact path={"/logout"}><Logout/></Route>
+                                <Route exact path={"/logout"} component={Logout}></Route>
                                 <Route exact path={"*"}><ErrorPage/></Route>
                             </Switch>
                         </div>
