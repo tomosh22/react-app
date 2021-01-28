@@ -65,7 +65,7 @@ export class Home extends React.Component {
                     </p>
                     <p>Source:
                         https://www.prospects.ac.uk/applying-for-university/university-life/saving-money-as-a-student
-                    </p><br/>
+                    </p>
                 </div>
             </div>
         );
