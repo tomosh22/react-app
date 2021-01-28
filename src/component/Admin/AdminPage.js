@@ -8,10 +8,13 @@ import style from "../../assets/css/admin.module.css"
 import {AdminUserChange} from "./AdminUserChange";
 
 export class AdminPage extends React.Component{
-
-    state = {
-        loggedIn: true
+    constructor(props) {
+        super(props);
+        this.state = {
+            loggedIn: true
+        }
     }
+
 
     ifLogged = () =>{
         return(
@@ -24,6 +27,7 @@ export class AdminPage extends React.Component{
         )
     }
 
+
     render(){
         return(
             <div>
@@ -34,6 +38,9 @@ export class AdminPage extends React.Component{
                         </NavLink>
                         <NavLink to={"/service/userList"}>
                             <button className={style.navigationButton}>List Of Users</button>
+                        </NavLink>
+                        <NavLink to={"/admin"}>
+                            <button className={style.navigationButton} onClick={() => this.setState({loggedIn: false})}>Log Off</button>
                         </NavLink>
                     </nav>
                     <div className={style.contentHolder}>
