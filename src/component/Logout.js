@@ -7,7 +7,8 @@ export class Logout extends React.Component {
             <div>
                 <context.Consumer>{({resetState, firstName}) => (
                     <div>
-                        <p>firstname,{firstName}</p>
+                        <p>Are you sure you want to logout, {firstName}?<br/><br/>
+                            You will need to log back in using 2FA.</p>
                         <button onClick={resetState}>Logout</button>
                     </div>
 

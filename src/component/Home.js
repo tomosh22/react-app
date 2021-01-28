@@ -1,5 +1,9 @@
 import React from "react";
 
+/*
+Created by Joel Tierney
+React Component containing StuBank homepage.
+*/
 export class Home extends React.Component {
     render() {
         return (
