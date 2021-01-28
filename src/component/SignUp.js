@@ -1,3 +1,4 @@
+//written by Tom O'Shaughnessy
 import React, {useContext} from "react";
 import {context, Account} from "./App"
 
@@ -5,6 +6,7 @@ const crypto = require("crypto");
 const twofactor = require("node-2fa");
 
 export class SignUp extends React.Component {
+    //stores user input values, errors are used for input validation
     state = {
         username: "",
         password: "",
@@ -28,7 +30,7 @@ export class SignUp extends React.Component {
         postcodeError: "",
         newSecret: ""
     };
-
+    //called every time a field changes value
     handleChange = event => {
         // stores what user types in form in React
         this.setState({[event.target.name]: event.target.value})
@@ -39,8 +41,9 @@ export class SignUp extends React.Component {
 
     }
 
-
+    //inputs user data into database and logs the user in with their new account
     async handleSubmit(event, setFirstName, setLoggedIn, addAccount, setUsername) {
+        //removes apostrophes from last name
         this.state.lastName = this.state.lastName.replace("\'", "");
         // validates the user's input
         event.preventDefault();
@@ -55,6 +58,7 @@ export class SignUp extends React.Component {
             this.state.address2Error === "" &&
             this.state.postcodeError === ""
         ) {
+            //checks if desired username already exists
             var abort = false;
             await fetch("http://localhost:3000/selectUsername/" + this.state.username, {
                 method: "GET"
@@ -64,6 +68,7 @@ export class SignUp extends React.Component {
                     abort = true
                 }
             })
+            //aborts if username exists
             if (abort) return;
             //generate salt and hashed password without ascii code 39 (')
             var found;
@@ -71,7 +76,7 @@ export class SignUp extends React.Component {
                 var salt = crypto.randomBytes(16);
                 found = false;
                 for (var x of salt) {
-                    console.log(x)
+
                     if (x == 39) {
                         found = true;
                     }
@@ -82,9 +87,13 @@ export class SignUp extends React.Component {
                 ;
             }
             salt = salt.toString("utf8")
+
+            //hashes user's password
             var hash = crypto.createHmac("sha512", salt)
             hash.update(this.state.password + salt)
             hash = hash.digest("hex")
+
+            //checks if address is already in database
             var AddressId = -1;
             await fetch("http://localhost:3000/selectAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.address3 + "/" + this.state.address1 + "/" + this.state.postcode, {
                 method: "GET"
@@ -93,6 +102,7 @@ export class SignUp extends React.Component {
                     AddressId = data[0].AddressId
                 }
             })
+            //if address doesnt exist create it
             if (AddressId === -1) {
                 await fetch("http://localhost:3000/insertAddress/" + this.state.address1 + "/" + this.state.address2 + "/" + this.state.address3 + "/" + this.state.address4 + "/" + this.state.postcode,
                     {
@@ -105,10 +115,12 @@ export class SignUp extends React.Component {
                     this.data = data[0]
                 })
             }
+            //adds user data to database
             await fetch("http://localhost:3000/insertUser/" + this.state.username + "/" + hash + "/" + salt + "/" + this.state.firstName + "/" + this.state.lastName + "/" + this.state.email + "/" + AddressId + "/" + this.state.newSecret.secret,
                 {
                     method: "POST"
                 })
+            //gets all user accounts for login
             await fetch("http://localhost:3000/getUserAccounts/" + this.state.username, {
                 method: "GET"
             }).then(response => response.json()).then(data => {
@@ -116,13 +128,15 @@ export class SignUp extends React.Component {
                     addAccount(new Account(data.Name, data.Type, data.Balance, data.Currency, data.AccNumber))
                 }
             })
+            //logs in
             setUsername(this.state.username);
             setFirstName(this.state.firstName);
             setLoggedIn(true);
+            //redirects to dashboard
             this.props.history.push("/dashboard");
         }
     }
-
+    //checks all user input against regex
     validate = event => {
         let usernameError = "";
         let passwordError = "";

@@ -110,7 +110,7 @@ export class App extends Component {
 
     state = {
         resetState: () => this.resetState(),
-        //resetState:()=>console.log("dfsingdsoi"),
+        
         userName: null,
         setUsername: (usr) => this.setState({userName: usr}),
         firstName: null,
@@ -148,7 +148,7 @@ export class App extends Component {
     }
 
     addAccount(acc) {
-        console.log("adding account", acc)
+
         var accountsCopy = JSON.parse(JSON.stringify(this.state.accounts))
         accountsCopy.push(acc)
         this.setState({accounts: accountsCopy})
@@ -165,15 +165,15 @@ export class App extends Component {
     }
 
     addTransaction(trans) {
-        //console.log("adding transaction",trans)
+
         var transactionsCopy = JSON.parse(JSON.stringify(this.state.transactions))
         transactionsCopy.push(trans)
         this.setState({transactions: transactionsCopy})
-        console.log("transactions", this.state.transactions)
+
     }
 
     resetState() {
-        console.log("resetting")
+
         this.setState({firstName: null})
         this.setState({lastName: null})
         this.setState({loggedIn: false})
