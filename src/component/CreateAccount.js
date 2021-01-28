@@ -2,6 +2,9 @@ import React from "react";
 import {Account, context} from "./App";
 import styled from "styled-components";
 
+/*
+Styling for the submit button of the form using styled-components.
+*/
 const Button = styled.button`
     background-color: #78bc55;
     border: none;
@@ -15,25 +18,36 @@ const Button = styled.button`
     border-radius: 6px;
 `
 
+/*
+Created by Joel Tierney
+React Component to allow user to create an account.
+*/
 export class CreateAccount extends React.Component {
-
+    /*
+    Stores default values and gives the user a default balance of 1000.
+    */
     state = {
         type: "current",
         currency: "£",
         balance: 1000,
-        //Set default values as will not update if user does not select a different option to the default option
         accountName: "",
         accountNameError: "",
         accountNumber: "",
     }
 
+    /*
+    Stores what the user inputs into the form, within React.
+    */
     handleChange = event => {
-        // stores what user types in form in React
         this.setState({[event.target.name]: event.target.value})
     }
 
+    /*
+    Checks the user has entered an account name, checks this account name has not
+    already been created by the same user within the database, and outputs an alert
+    error if the account name already exists from that specific user.
+    */
     async handleSubmit(event, userName, addAccount) {
-        // validates the user's input
         event.preventDefault();
         this.validate();
         if (
@@ -51,6 +65,10 @@ export class CreateAccount extends React.Component {
             if (abort) return;
         }
 
+        /*
+        Generates random 8 digit account number and checks against database to make sure
+        it is not already stored in there.
+        */
         let isUnique = false;
         while (isUnique === false) {
             this.state.accountNumber = Math.floor(10000000 + Math.random() * 90000000)
@@ -63,6 +81,11 @@ export class CreateAccount extends React.Component {
             })
         }
 
+        /*
+        Inserts new account into the database using insertAccount in Express,
+        uses addAccount to create a new account so that the dashboard immediately updates.
+        Redirects user back to dashboard upon completion.
+        */
         await fetch("http://localhost:3000/insertAccount/" + this.state.accountName + "/" + this.state.type + "/" + this.state.balance + "/" + this.state.currency + "/" + userName + "/" + this.state.accountNumber,
             {
                 method: "POST"
@@ -71,8 +94,10 @@ export class CreateAccount extends React.Component {
         this.props.history.push("/dashboard");
     }
 
+    /*
+    If the user does not input an account name, outputs an error on screen.
+    */
     validate = event => {
-        // validates the user's input
         let accountNameError = "";
         if (!this.state.accountName) {
             accountNameError = "Account name is required"
@@ -82,6 +107,11 @@ export class CreateAccount extends React.Component {
 
     render() {
         return (
+            /*
+            Form which takes account type, currency and account name of the account the
+            user wants to create. Passes all of this and the username they are currently
+            logged into over to the handleSubmit function.
+            */
             <context.Consumer>{({userName, addAccount}) => (
                 <div>
                     <h1>Create Account</h1>
