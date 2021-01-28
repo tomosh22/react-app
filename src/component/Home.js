@@ -9,13 +9,15 @@ export class Home extends React.Component {
     render() {
         return (
             <div>
-                <h1>Welcome to StuBank!</h1>
-                <p>We are a brand new banking group made specifically for students,
-                    launching in <strong>February 2021. </strong><br/><br/>
-                    We are extremely excited to welcome you to the StuBank website and hope
-                    you choose us to be your next student banking provider.<br/>
-                    If you're not sure where to start, we encourage you to check out our FAQ page!</p>
-                <div className={style.tips}>
+                <div className={style.home}>
+                    <h1>Welcome to StuBank!</h1>
+                    <p>We are a brand new banking group made specifically for students,
+                        launching in <strong>February 2021. </strong><br/><br/>
+                        We are extremely excited to welcome you to the StuBank website and hope
+                        you choose us to be your next student banking provider.<br/>
+                        If you're not sure where to start, we encourage you to check out our FAQ page!</p>
+                </div>
+                <div className={style.home}>
                     <h1>Top Money-Saving Tips</h1>
                     <p>
                         1. It's important to <strong>keep track of your spending</strong>. Create a spreadsheet of your
