@@ -4,9 +4,9 @@ import {Redirect} from "react-router";
 import {context} from "./AdminPage"
 
 const crypto = require("crypto");
-
 /*
-*   For testing comment lines 49 - 55 and uncomment line 48
+*       Created by Jevgenij Guzikovskij
+*       This page provides ability to login for user with admin permissions
 * */
 
 export class AdminLogin extends Component {
@@ -35,7 +35,7 @@ export class AdminLogin extends Component {
         await fetch("http://localhost:3000/getAdminHashAndSalt/" + this.state.username, {
             method: "GET"
         }).then(response => response.json()).then(data => {
-            if (data) {
+            if (data[0]) {
                 hash = data[0].Password;
                 salt = data[0].Salt;
             }
@@ -45,7 +45,6 @@ export class AdminLogin extends Component {
         hashCheck.update(this.state.password + salt)
         hashCheck = hashCheck.digest("hex")
 
-        //if(true){
         if (hash === hashCheck) {
             await fetch("http://localhost:3000/selectLoginAdmin/" + this.state.username, {
                 method: "GET"

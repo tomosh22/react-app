@@ -1,9 +1,15 @@
 import React from "react";
-import {Account} from "../App";
+import {Redirect} from "react-router-dom";
+
+/*
+*       Created by Jevgenij Guzikovskij.
+*       This page provides functionality to change user data and submit it to the database
+*       When update is completed redirects to the previous page.
+* */
 
 const crypto = require("crypto");
 
-export class AdminUserChange extends React.Component{
+export class AdminUserChange extends React.Component {
     state = {
         username: this.props.match.params.username,
         password: "",
@@ -17,17 +23,19 @@ export class AdminUserChange extends React.Component{
         lastNameError: "",
     };
 
-    handleInputChange = (event) =>{
-        // stores what user types in form in React
+    handleInputChange = (event) => {
+        // Stores what user types in form in React
         const {value, name} = event.target;
         this.setState({
             [name]: value
         });
     }
 
-    async handleSubmit(event, setFirstName, addAccount, setUsername) {
+    // Once submitted, validates input and IF passed proceeds values to server which queries database
+    async handleSubmit(event) {
+        let salt;
         this.state.lastName = this.state.lastName.replace("\'", "");
-        // validates the user's input
+        // Validates the user's input
         event.preventDefault();
         this.validate();
         if (
@@ -37,43 +45,33 @@ export class AdminUserChange extends React.Component{
             this.state.firstNameError === "" &&
             this.state.lastNameError === ""
         ) {
-            var abort = false;
-            await fetch("http://localhost:3000/selectUsername/" + this.state.username, {
-                method: "GET"
-            }).then(response => response.json()).then(data => {
-                if (data[0]) {
-                    alert("username already exists");
-                    abort = true
-                }
-            })
-            if (abort) return;
-            //generate salt and hashed password without ascii code 39 (')
-            var found;
+            // Generate salt and hashed password without ascii code 39 (')
+            let found;
             while (true) {
-                var salt = crypto.randomBytes(16);
+                salt = crypto.randomBytes(16);
                 found = false;
-                for (var x of salt) {
-                    console.log(x)
-                    if (x == 39) {
+                for (const x of salt) {
+                    if (x === 39) {
                         found = true;
                     }
                 }
                 if (!found) {
                     break;
                 }
-                ;
             }
             salt = salt.toString("utf8")
-            var hash = crypto.createHmac("sha512", salt)
+            let hash = crypto.createHmac("sha512", salt);
             hash.update(this.state.password + salt)
             hash = hash.digest("hex")
             await fetch("http://localhost:3000/updateUserInformation/" + this.state.username + "/" + hash + "/" + salt + "/" + this.state.firstName + "/" + this.state.lastName + "/" + this.state.email,
                 {
                     method: "POST"
                 })
+            this.setState({redirect: true})
         }
     }
 
+    // Validation copied from the Login.js, since it follows the same rules, could be extracted from both files as new component in future
     validate = event => {
         let usernameError = "";
         let passwordError = "";
@@ -112,10 +110,12 @@ export class AdminUserChange extends React.Component{
         })
     };
 
-    render(){
-        return(
+    render() {
+        return (
             <div>
-                <form action="changeUserData" id="changeUserForm" method="post">
+                {this.state.redirect? <Redirect to={'/admin/service/userList'}/> : null}
+                <form onSubmit={(event) => this.handleSubmit(event)} action="changeUserData" id="changeUserForm"
+                      method="post">
                     <label htmlFor="username">Username: </label><br/>
                     <input
                         type="text"
@@ -124,6 +124,7 @@ export class AdminUserChange extends React.Component{
                         style={{textAlign: "center"}}
                         value={this.state.username}
                         onChange={this.handleInputChange}
+                        readOnly={true}
                     />
                     <div style={{color: "red"}}>{this.state.usernameError}</div>
                     <br/>
@@ -177,7 +178,6 @@ export class AdminUserChange extends React.Component{
                     <br/>
                     <br/>
                     <button type="submit">Submit</button>
-
                 </form>
             </div>
         )

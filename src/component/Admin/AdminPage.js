@@ -7,6 +7,11 @@ import style from "../../assets/css/admin.module.css"
 import {AdminUserChange} from "./AdminUserChange";
 import {AdminLogin} from "./AdminLogin";
 
+/*
+*       Created by Jevgenij Guzikovskij.
+*       This page is a placeholder for the admin pages.
+* */
+
 export const context = React.createContext();
 
 export class AdminPage extends React.Component{
@@ -14,7 +19,6 @@ export class AdminPage extends React.Component{
         super(props);
         this.state = {
             resetState: () => this.resetState(),
-            //resetState:()=>console.log("dfsingdsoi"),
             username: null,
             setUsername: (usr) => this.setState({username: usr}),
             loggedIn: false,

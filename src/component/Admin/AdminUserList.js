@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {Redirect} from "react-router-dom";
 import style from "../../assets/css/admin.module.css";
 
@@ -42,9 +42,10 @@ export class AdminUserList extends React.Component{
         }
     }
 
+    // Maps user data into the table
     renderTableData = () =>{
         return this.state.users.map((user, index) => {
-            const { username, firstname, surname, email} = user //destructuring
+            const { username, firstname, surname, email} = user // Destructuring data
             return (
                 <tr key={username}>
                     <td>{username}</td>
@@ -59,21 +60,22 @@ export class AdminUserList extends React.Component{
         })
     }
 
+    // Redirects to the AdminUserChange page and passes necessary data
     redirection(username, firstname, surname, email){
-        this.setState({redirectProps: {username: username, firstname:firstname, surname:surname, email:email} })
+        this.setState({redirectProps: {username: username, firstname: firstname, surname: surname, email: email} })
         this.setState({redirect: true});
     }
 
     renderTableHeader() {
         if (this.state.users.length > 0) {
             let header = Object.keys(this.state.users[0])
-            const tableHeader = header.map((key, index) => {
+            return header.map((key, index) => {
                 return <th key={index}>{key.toUpperCase()}</th>
-            })
-            return tableHeader;
+            });
         }
     }
 
+    // Wraps table header and its content as well as getting userList from the database
     wrapTable(){
         this.getUserList();
         return(
