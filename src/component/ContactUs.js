@@ -1,6 +1,13 @@
 import React from "react";
 
+/*
+Created by Joel Tierney
+React Component to allow users to contact StuBank.
+*/
 export class ContactUs extends React.Component {
+    /*
+    Stores default values.
+    */
     constructor(props) {
         super(props);
         this.state = {
@@ -10,11 +17,19 @@ export class ContactUs extends React.Component {
         }
     }
 
+    /*
+    Stores what the user inputs into the form, within React.
+    */
     handleChange = event => {
-        // stores what user types in form in React
         this.setState({[event.target.name]: event.target.value})
     }
 
+    /*
+    Checks there are no errors from validate(), then uses the JS Fetch API to
+    send a HTTP POST request containing the name, message and email. If this is
+    successful, the form is reset and a success message is displayed. The user is
+    redirected to the homepage.
+    */
     handleSubmit(event) {
         event.preventDefault();
         this.validate();
@@ -44,8 +59,11 @@ export class ContactUs extends React.Component {
         }
     }
 
+    /*
+    If the user does not input a name/email/message, it outputs an error on screen.
+    Also, if the email is not in the valid format, it outputs an error on screen.
+    */
     validate = event => {
-        // validates the user's input
         let nameError = "";
         let emailError = "";
         let messageError = "";
@@ -66,12 +84,19 @@ export class ContactUs extends React.Component {
         this.setState({nameError, emailError, messageError})
     }
 
+    /*
+    Resets the form once it has been sent successfully.
+    */
     resetForm() {
         this.setState({name: "", email: "", message: ""})
     }
 
     render() {
         return (
+            /*
+            Form which takes a name, email and message and passes
+            this to the handleSubmit function.
+            */
             <div>
                 <h1>Contact Us</h1>
                 <p>Please do not hesitate to get in touch with any questions, queries or concerns you have. <br/>Before
