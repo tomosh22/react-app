@@ -38,23 +38,26 @@ export class AdminLogin extends Component {
             if (data[0]) {
                 hash = data[0].Password;
                 salt = data[0].Salt;
+                alert(salt);
             }
         })
-
-        let hashCheck = crypto.createHmac("sha512", salt);
-        hashCheck.update(this.state.password + salt)
-        hashCheck = hashCheck.digest("hex")
-
-        if (hash === hashCheck) {
-            await fetch("http://localhost:3000/selectLoginAdmin/" + this.state.username, {
-                method: "GET"
-            }).then(response => response.json()).then(data => {
-                username = data[0].Username;
-                salt = data[0].Salt;
-            })
-            setUsername(this.state.username);
-            setLoggedIn(true);
-            this.props.history.push("/admin/service")
+        if (salt) {
+            let hashCheck = crypto.createHmac("sha512", salt);
+            hashCheck.update(this.state.password + salt)
+            hashCheck = hashCheck.digest("hex")
+            if (hash === hashCheck) {
+                await fetch("http://localhost:3000/selectLoginAdmin/" + this.state.username, {
+                    method: "GET"
+                }).then(response => response.json()).then(data => {
+                    if (data[0]) {
+                        username = data[0].Username;
+                        salt = data[0].Salt;
+                    }
+                })
+                setUsername(this.state.username);
+                setLoggedIn(true);
+                this.props.history.push("/admin/service")
+            }
         }
         else {
             alert("Incorrect login, please try again")
