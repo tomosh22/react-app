@@ -29,14 +29,26 @@ export class Login extends React.Component {
             return null
         }
         var username, hash, salt, firstname, secondname, email, secret
+        let abort = false
         //pulls hash, salt and secret from database
         await fetch("http://localhost:3000/selectHashAndSaltAndSecret/" + this.state.username, {
             method: "GET"
         }).then(response => response.json()).then(data => {
-            hash = data[0].Password;
-            salt = data[0].Salt;
-            secret = data[0].Secret
+            //if no data is returned need to abort function
+            if(!data[0]){
+                alert("That username does not exist")
+                abort = true
+            }
+            else{
+                hash = data[0].Password;
+                salt = data[0].Salt;
+                secret = data[0].Secret
+            }
         })
+        //abort function if no data returned from database
+        if(abort){
+            return null;
+        }
         //hashes inputted password to check against hash from database
         var hashCheck = crypto.createHmac("sha512", salt)
         hashCheck.update(this.state.password + salt)
