@@ -4,6 +4,10 @@ import {Link, NavLink} from "react-router-dom";
 import React, {useContext} from "react";
 import {context} from "./App";
 
+/*
+*       Created by Jevgenij Guzikovskij
+*       This component is a main header and navigation of the application across all the pages.
+* */
 export class Header extends React.Component {
     render() {
 

@@ -7,7 +7,6 @@ import {CreateAccount} from "./CreateAccount";
 import {SignUp} from "./SignUp";
 import {TransferToAccount} from "./TransferToAccount";
 import {MoveMoney} from "./MoveMoney";
-import {AdminLogin} from './Admin/AdminLogin'
 import {Home} from "./Home";
 import {AdminPage} from "./Admin/AdminPage";
 import {Logout} from "./Logout";
@@ -68,8 +67,7 @@ export class App extends Component {
                 <div>
                     <Router>
                         <div>
-                            <Route exact path={"/admin"}><AdminLogin/></Route>
-                            <Route exact path={"/service"}><AdminPage/></Route>
+                            <Route exact path={"/admin"}><AdminPage/></Route>
                         </div>
                     </Router>
                 </div>
