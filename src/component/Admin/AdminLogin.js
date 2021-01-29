@@ -38,7 +38,6 @@ export class AdminLogin extends Component {
             if (data[0]) {
                 hash = data[0].Password;
                 salt = data[0].Salt;
-                alert(salt);
             }
         })
         if (salt) {
