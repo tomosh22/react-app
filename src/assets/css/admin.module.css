@@ -1,3 +1,9 @@
+/*
+    Created by Jevgenij Guzikovskij.
+    This document holds all the styling for the admin pages.
+*/
+
+/* Admin login page styling */
 .admin_login{
     position: relative;
     z-index: 1;
@@ -9,10 +15,7 @@
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
 
-#login, #password{
-    margin-bottom: 2vh;
-}
-
+/* Styling applied when resolution changes */
 @media only screen and (max-width: 768px) {
     div>form{
         align-items: center;
@@ -37,11 +40,13 @@
     line-height: 15px;
 
 }
+
+/* Navigation buttons placeholder styling */
 .navButtonHolder{
     text-decoration: none;
-
 }
 
+/* Navigation buttons styling */
 .navigationButton{
     background-color: Transparent;
     font-size: 2.2vh;
@@ -52,12 +57,15 @@
     border: none;
 }
 
+/* Styling for different states of the buttons */
 .navigationButton:active,
 .navigationButton:hover{
     color: grey;
     border: none;
 }
 
+
+/* Link styling */
 a,
 a:visited,
 a:active,
@@ -67,6 +75,7 @@ a:hover{
     display: inline-flex;
 }
 
+/* Main placeholder styling */
 .contentHolder{
     text-align: center;
     border-width: 3px;
@@ -75,13 +84,14 @@ a:hover{
     border-radius: 7px;
 }
 
+/* Header styling */
 .header {
     text-align: center;
     font-family: arial, sans-serif;
 }
 
 
-/* USER LIST TABLE STYLING */
+/* User table styling */
 .userTable {
     text-align: center;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -107,39 +117,23 @@ a:hover{
     color: white;
 }
 
-/* DATA ANALYSIS STYLING */
+/* Data analysis styling */
 .dropdownContainer{
     position: relative;
 }
-.menu{
-    background: #ffffff;
-    border-radius: 8px;
-    position: absolute;
-    top: 60px;
-    right: 0;
-    width: 300px;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-20px);
-    transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
-}
 
-.menu.active{
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
+/* Data holder styling */
 .dataHolder{
     display: flex;
     flex-direction: column;
 }
 
+/* Data styling */
 .data{
     justify-content: space-between;
 }
 
+/* Redirection link*/
 .redirectLink{
     font: bold 1vh Arial;
     text-decoration: none;

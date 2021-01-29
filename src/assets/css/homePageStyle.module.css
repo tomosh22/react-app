@@ -1,4 +1,8 @@
-
+/*
+        This document was created by Jevgenij Guzikovskij
+        Modified by //todo: Add your names :)
+        Document provides styling mostly for the header component and some pages which interact with user
+*/
 body {
     margin: 0 0 0 0;
     font-family: 'Montserrat', sans-serif;
@@ -36,6 +40,7 @@ a:hover {
     align-items: center;
 }
 
+/* Navigation Links */
 .navLink {
     position: relative;
     margin: 0 10px;
@@ -51,11 +56,13 @@ a:hover {
     white-space: nowrap;
 }
 
+/* Navigation link behaviour */
 .navLink:hover {
     color: darkslategray;
     border-width: 0;
 }
 
+/* Navigation link behaviour */
 .navLink:after {
     content: "";
     width: 100%;
@@ -70,6 +77,7 @@ a:hover {
     transition: opacity 0.1s;
 }
 
+/* Navigation link behaviour */
 .navLink:hover:after {
     opacity: 1;
 }
@@ -92,6 +100,7 @@ header {
     border-bottom: 2px solid currentColor;
 }
 
+/* Inner holder of the header component */
 .headerInner {
     display: flex;
     justify-content: space-between;
@@ -100,12 +109,14 @@ header {
     margin-top: 0.3645833333333333vw;
 }
 
+/* Logo and Company name holder */
 .logo {
     display: inline-flex;
     margin-bottom: 0;
     align-items: center;
 }
 
+/* Header behaviour when screen resolution changes */
 @media only screen and (max-width: 768px) {
     .headerInner {
         flex-direction: column;
@@ -142,12 +153,14 @@ header {
     }
 }
 
+/* Header behaviour when screen resolution changes */
 @media only screen and (min-width: 768px) {
     .favicon {
         width: 6vh;
     }
 }
 
+/* Icon holder */
 .faviconContainer {
     display: inline;
     height: auto;
@@ -155,12 +168,14 @@ header {
     margin-right: 0.5vw;
 }
 
+/* Icon styling */
 .favicon {
     object-fit: contain;
     padding-right: 0.2vw;
     height: auto;
 }
 
+/* Main holder, where all the pages are placed */
 .main {
     text-align: center;
     font-size: small;
@@ -168,6 +183,7 @@ header {
     overflow-x: hidden;
 }
 
+/* todo: Write definition of the styling :) */
 .dashboardTable {
     padding: 0;
     margin: 0;
