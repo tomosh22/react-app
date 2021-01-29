@@ -1,60 +1,112 @@
-import React from "react";
+import React, {useState} from "react";
 import {Redirect} from "react-router-dom";
-import style from "../../assets/css/admin.module.css"
+import style from "../../assets/css/admin.module.css";
 
+/*
+        Created by Jevgenij Guzikovskij.
+        React Component containing StuBank Users list for Administrator.
+*/
 
 export class AdminUserList extends React.Component{
     constructor(props) {
         super(props)
         this.state = {
-            users: [
-                { id: 1, username: 'Wasi', firstname: 21, email: 'wasif@email.com', change:'Edit'},
-                { id: 2, username: 'Alih', firstname: 19, email: 'ali@email.com' ,  change:'Edit'},
-                { id: 3, username: 'Saad', firstname: 16, email: 'saad@email.com' , change:'Edit'},
-                { id: 4, username: 'Asad', firstname: 25, email: 'asad@email.com' , change:'Edit'}
-                ]
+            users: [],
+            showTable: false,
+            clickedId: null
+        }
+    }
+    onClick() {
+        this.wrapTable();
+    }
+
+    // In case user manually changes length of users list, it will not query database extra
+    // Once user list is saved, we change state of the table, to render it and hide button
+    async getUserList(){
+        if (0 <! this.state.users.length) {
+            await fetch("http://localhost:3000/getAllUsers", {
+                method: "GET"
+            }).then(response => response.json()).then(data => {
+                if (data.length !== this.state.users.length || data.length < this.state.users.length) {
+                    data.map((user) => {
+                        this.state.users.push({
+                            username: user.Username,
+                            firstname: user.FirstName,
+                            surname: user.SecondName,
+                            email: user.Email
+                        });
+                    });
+                    this.setState({showTable: true});
+                }
+            })
         }
     }
 
-    state = { redirect: null };
-
     renderTableData = () =>{
         return this.state.users.map((user, index) => {
-            const { id, username, firstname, email, change} = user //destructuring
+            const { username, firstname, surname, email} = user //destructuring
             return (
-                <tr key={id}>
-                    <td>{id}</td>
+                <tr key={username}>
                     <td>{username}</td>
                     <td>{firstname}</td>
+                    <td>{surname}</td>
                     <td>{email}</td>
                     <td>
-                        <button onClick={() => this.setState({ redirect: `/service/userChange/${username}`})}>{change}</button>
+                        <button onClick={() => this.redirection(username,firstname,surname,email)}>{'Edit'}</button>
                     </td>
                 </tr>
             )
         })
     }
 
-    renderTableHeader() {
-        let header = Object.keys(this.state.users[0])
-        return header.map((key, index) => {
-            return <th key={index}>{key.toUpperCase()}</th>
-        })
+    redirection(username, firstname, surname, email){
+        this.setState({redirectProps: {username: username, firstname:firstname, surname:surname, email:email} })
+        this.setState({redirect: true});
     }
 
-    render(){
-        if (this.state.redirect) {
-            return <Redirect to={this.state.redirect} />
+    renderTableHeader() {
+        if (this.state.users.length > 0) {
+            let header = Object.keys(this.state.users[0])
+            const tableHeader = header.map((key, index) => {
+                return <th key={index}>{key.toUpperCase()}</th>
+            })
+            return tableHeader;
         }
+    }
+
+    wrapTable(){
+        this.getUserList();
         return(
             <div>
                 <h1 className={style.header}>Table of Users</h1>
                 <table className={style.userTable}>
-                    <tbody>
-                        <tr>{this.renderTableHeader()}</tr>
-                        {this.renderTableData()}
-                    </tbody>
+                    {this.renderTableHeader()}
+                    <th key={5}>{"REDIRECT"}</th>
+                    {this.renderTableData()}
                 </table>
+            </div>
+        )
+    }
+
+    render(){
+        if (this.state.redirect) {
+            return <Redirect to={{
+                pathname: `/admin/service/userChange/${this.state.redirectProps.username}`,
+                state: {
+                    username: this.state.redirectProps.username,
+                    firstname: this.state.redirectProps.firstname,
+                    surname:this.state.redirectProps.surname,
+                    email:  this.state.redirectProps.email
+                }
+            }}/>
+        }
+        return(
+            <div>
+                {
+                    this.state.showTable ?
+                        this.wrapTable() :
+                        <button style={{height: "2.8vh"}} onClick={() => this.onClick()}>Show table</button>
+                }
             </div>
         )
     }

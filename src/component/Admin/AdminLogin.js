@@ -1,16 +1,22 @@
 import React, {Component} from "react";
 import style from "../../assets/css/admin.module.css";
 import {Redirect} from "react-router";
+import {context} from "./AdminPage"
+
+const crypto = require("crypto");
+
+/*
+*   For testing comment lines 49 - 55 and uncomment line 48
+* */
 
 export class AdminLogin extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            username: '',
-            password: '',
-            logged: true
-        };
+        this.state ={
+            username: "",
+        }
     }
+
     handleInputChange = (event) =>{
         const {value, name} = event.target;
         this.setState({
@@ -18,37 +24,66 @@ export class AdminLogin extends Component {
         });
     }
 
-    handleSubmit(event,){
+    async handleSubmit(event, setUsername, setLoggedIn) {
+        event.preventDefault();
+        await this.validate();
+        if (this.state.usernameError || this.state.passwordError) {
+            return null;
+        }
 
+        let username, hash, salt;
+        await fetch("http://localhost:3000/getAdminHashAndSalt/" + this.state.username, {
+            method: "GET"
+        }).then(response => response.json()).then(data => {
+            if (data) {
+                hash = data[0].Password;
+                salt = data[0].Salt;
+            }
+        })
+
+        let hashCheck = crypto.createHmac("sha512", salt);
+        hashCheck.update(this.state.password + salt)
+        hashCheck = hashCheck.digest("hex")
+
+        //if(true){
+        if (hash === hashCheck) {
+            await fetch("http://localhost:3000/selectLoginAdmin/" + this.state.username, {
+                method: "GET"
+            }).then(response => response.json()).then(data => {
+                username = data[0].Username;
+                salt = data[0].Salt;
+            })
+            setUsername(this.state.username);
+            setLoggedIn(true);
+            this.props.history.push("/admin/service")
+        }
+        else {
+            alert("Incorrect login, please try again")
+        }
     }
 
-    // todo: Create `authentication/admin` on the express and integrate responses with different
-    //  codes, to determine errors
-    onSubmit = async (event) => {
-        event.preventDefault();
-        await fetch("http://localhost:3000/authentication/admin", {
-            method: "POST",
-            body: JSON.stringify(this.state)
-        })
-            .then(response => {
-                if (response.status === 222) {
-                    this.props.history.push('/');
-                    this.state.logged = true;
-                } else {
-                    throw new Error(response.error());
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Error appeared at the log in time. Please, try again!')
-            })
+    async validate(event) {
+        // validates the admins input
+        let usernameError = "";
+        let passwordError = "";
+
+        if (!this.state.username) {
+            usernameError = "Username is required"
+        }
+        if (!this.state.password) {
+            passwordError = "Password is required"
+        }
+
+        this.setState({usernameError, passwordError})
     }
 
     render(){
         return(
+            <context.Consumer>{({setUsername,setLoggedIn}) =>(
             <div>
                 <div>
-                    <form className={style.admin_login} method="get" onSubmit={this.onSubmit}>
+                    <form action="Login" className={style.admin_login} method="post"
+                          onSubmit={e => this.handleSubmit(e, setUsername, setLoggedIn)}>
                         <h4>Admin login</h4>
                         <input
                             id="login"
@@ -69,12 +104,14 @@ export class AdminLogin extends Component {
                         <button type={"submit"}>Login</button>
                     </form>
                     {
-                        this.state.logged && (
-                            <Redirect to={'/service'}/>
+                        this.state.loggedIn && (
+                            <Redirect to={'/admin/service'}/>
                         )
                     }
                 </div>
             </div>
+            )}
+            </context.Consumer>
         )
     }
 }
