@@ -45,14 +45,6 @@ export class AdminLogin extends Component {
             hashCheck.update(this.state.password + salt)
             hashCheck = hashCheck.digest("hex")
             if (hash === hashCheck) {
-                await fetch("http://localhost:3000/selectLoginAdmin/" + this.state.username, {
-                    method: "GET"
-                }).then(response => response.json()).then(data => {
-                    if (data[0]) {
-                        username = data[0].Username;
-                        salt = data[0].Salt;
-                    }
-                })
                 setUsername(this.state.username);
                 setLoggedIn(true);
                 this.props.history.push("/admin/service")
